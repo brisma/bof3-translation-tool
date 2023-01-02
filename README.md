@@ -322,6 +322,7 @@ La nuova immagine riarrangiata sarà:
 Decisamente meglio, no?
 
 > Quando si lavora con le BMP è possibile passare il parametro `--negative` per utilizzare una palette dei colori negativa, ad esempio:
+> 
 > ![Font rearranged](./img/ENDKANJI.1.bin.4b.128w.128x32.256r_negative.bmp)
 > 
 > Con le TIM ciò non è necessario in quanto le TIM generate possiedono già le due palette all'interno.
