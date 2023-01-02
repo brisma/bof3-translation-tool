@@ -322,7 +322,7 @@ def encode_text(data):
     text_bytes = np.array([], dtype=np.ubyte)
     data_offset = 0
 
-    while data_offset < data.size:
+    while data_offset < len(data):
         b = data[data_offset]
         data_offset += 1
 
@@ -330,7 +330,7 @@ def encode_text(data):
             # Manages tags
             tag = ''
             tag_char = None
-            while tag_char != '>' and data_offset < data.size:
+            while tag_char != '>' and data_offset < len(data):
                 tag_char = data[data_offset]
                 data_offset += 1
                 if tag_char != '>': tag += tag_char
@@ -492,7 +492,7 @@ def encode_text(data):
     return text_bytes
 
 # Unpack EMI file into BIN files
-def unpack(input, output_dir='', verbose=False):
+def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, verbose=False):
     json_path = Path(output_dir) / f'{input.stem}.json'
 
     emi_file = read_file(input)
@@ -571,10 +571,11 @@ def unpack(input, output_dir='', verbose=False):
         emi_current_offset = emi_current_offset + data_block_size + data_block_padding_size
         print(f'{bin_path} created.')
 
-        if is_text:
+        if is_text and dump_txt:
             dump_text(bin_path)
 
-        if is_graphic:
+        if is_graphic and dump_gfx:
+            # TODO add others typical formats
             raw_to_bmp(bin_path, None, 4, 64, 64, 16, 128)
             raw_to_bmp(bin_path, None, 4, 128, 128, 32, 256)
             raw_to_bmp(bin_path, None, 8, 64, 64, 16, 128)
@@ -595,7 +596,7 @@ def pack(input, output_dir='', verbose=False):
     emi_unknown = json_data.get('emi_unknown')
     emi_header = json_data.get('emi_header')
 
-    print(f'Packing {input} into {emi_path})...')
+    print(f'Packing {input} into {emi_path}...')
     if verbose:
         print(f'EMI Original size: {emi_size}')
         print(f'EMI Data blocks: {emi_data_blocks}')
@@ -657,6 +658,134 @@ def pack(input, output_dir='', verbose=False):
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     write_file(emi_path, np.concatenate([emi_toc, data_blocks]))
     print(f'{emi_path} created.')
+
+# Dump text from BIN file
+def dump_text(input, output=None, verbose=False):
+    if not output:
+        output = input.parent / f'{input.name}.json'
+    else:
+        output = Path(output)
+
+    bin = read_file(input)
+    pointers_size = struct.unpack('<H', bin[0:2])[0]
+
+    print(f'Dumping text blocks ({pointers_size // 2}) from {input} into {output}...')
+
+    json_data = []
+
+    for i in range(0, pointers_size, 2):
+        start_offset = struct.unpack('<H', bin[i:i+2])[0]
+        end_offset = struct.unpack('<H', bin[i+2:i+4])[0] if i+2 < pointers_size else bin.size
+        decoded_text = decode_text(bin[start_offset:end_offset])
+
+        if verbose and decoded_text != '':
+            print(f' Original data: {" ".join(["{:02x}".format(x) for x in bin[start_offset:end_offset]])}')
+            print(f' Decoded text: {decoded_text}')
+
+        json_data.append(decoded_text)
+
+    write_json(output, json_data)
+    print('Text dumped.')
+
+# Reinsert text into BIN file
+def reinsert_text(input, output=None, verbose=False):
+    if not output:
+        output = input.parent / f'{input.stem}.bin'
+    else:
+        output = Path(output)
+
+    text_json = read_json(input)
+
+    print(f'Reinserting text blocks ({len(text_json)}) from {input} into {output}...')
+
+    bin_pointers = np.full(len(text_json) * 2, 0x00, dtype=np.ubyte)
+    bin_text = np.array([], dtype=np.ubyte)
+    offset = bin_pointers.size
+    bin_pointers[0:2] = np.frombuffer(struct.pack('<H', offset), dtype=np.ubyte)
+
+    for i in range(0, len(text_json), 1):
+        if text_json[i] == '':
+            bin_pointers[i*2:(i*2)+2] = np.frombuffer(struct.pack('<H', offset), dtype=np.ubyte)
+        else:
+            text_encoded = encode_text(text_json[i])
+
+            if verbose and text_json[i] != '':
+                print(f' Original text: {text_json[i]}')
+                print(f' Encoded data: {" ".join(["{:02x}".format(x) for x in text_encoded])}')
+
+            bin_pointers[i*2:(i*2)+2] = np.frombuffer(struct.pack('<H', offset), dtype=np.ubyte)
+            offset += text_encoded.size
+            bin_text = np.hstack((bin_text, text_encoded))
+
+    write_file(output, np.concatenate([bin_pointers, bin_text], dtype=np.ubyte))
+    print('Text reinserted.')
+
+# Index all texts into single file
+def index_texts(inputs, output_strings, output_pointers, verbose=False):
+    strings_json = [""]
+    pointers_json = {}
+
+    print(f'Indexing {len(inputs)} JSON files into {output_strings}/{output_pointers}...')
+
+    indexed_lines = 0
+    repeated_lines = 0
+
+    for input in inputs:
+        strings = read_json(input)
+        pointers_json[input.name] = []
+
+        if verbose:
+            print(f' Indexing {input.name} JSON...')
+
+        for string in strings:
+            if string in strings_json:
+                pointer = strings_json.index(string)
+                if verbose and string != '':
+                    print(f' String "{string}" found at position {pointer}.')
+                pointers_json[input.name].append(pointer)
+                if string != '':
+                    repeated_lines += 1
+            else:
+                strings_json.append(string)
+                if verbose and string != '':
+                    print(f' String "{string}" is new, adding at position {len(strings_json) - 1}.')
+                pointers_json[input.name].append(strings_json.index(string))
+                indexed_lines += 1
+
+    write_json(Path(output_strings), strings_json)
+    write_json(Path(output_pointers), pointers_json)
+    print(f'Indexed {indexed_lines} strings ({repeated_lines} repeated strings).')
+
+# Expand an indexed file into multiple files
+def expand_texts(input_strings, input_pointers, output_dir='', verbose=False):
+    strings_json = read_json(input_strings)
+    pointers_json = read_json(input_pointers)
+
+    if len(strings_json) <= 0 and len(pointers_json) <= 0:
+        raise Exception('Invalid strings/pointers files.')
+
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    print(f'Expanding {len(pointers_json)} files using {len(strings_json)} strings...')
+
+    string_expanded = 0
+
+    for filename, pointers in pointers_json.items():
+        strings = []
+
+        if verbose:
+            print(f' Recreating file {filename}...')
+
+        for pointer in pointers:
+            if strings_json[pointer] != "":
+                string_expanded += 1
+                if verbose:
+                    print(f' Adding string "{strings_json[pointer]}" at position {pointer} into {filename} file.')
+            strings.append(strings_json[pointer])
+
+        write_json(Path(output_dir) / filename, strings)
+        print(f'File {filename} with {len(pointers)} strings recreated.')
+    
+    print(f'Expanded {len(pointers_json)} files with a total of {string_expanded} strings.')
 
 # Convert RAW graphic to TIM (PSX)
 def raw_to_tim(input, output, bpp, raw_width, tile_w=None, tile_h = None, resize_width = None):
@@ -846,143 +975,43 @@ def bmp_to_raw(input, output, bpp, tile_w=None, tile_h = None, resize_width = No
     
     print('Done.')
 
-# Dump text from BIN file
-def dump_text(input, output=None, verbose=False):
-    if not output:
-        output = input.parent / f'{input.name}.json'
-
-    bin = read_file(input)
-    pointers_size = struct.unpack('<H', bin[0:2])[0]
-
-    print(f'Dumping text blocks ({pointers_size // 2}) from {input} into {output}...')
-
-    json_data = []
-
-    for i in range(0, pointers_size, 2):
-        start_offset = struct.unpack('<H', bin[i:i+2])[0]
-        end_offset = struct.unpack('<H', bin[i+2:i+4])[0] if i+2 < pointers_size else bin.size
-        decoded_text = decode_text(bin[start_offset:end_offset])
-
-        if verbose and decoded_text != '':
-            print(f' Original data: {" ".join(["{:02x}".format(x) for x in bin[start_offset:end_offset]])}')
-            print(f' Decoded text: {decoded_text}')
-
-        json_data.append(decoded_text)
-
-    write_json(output, json_data)
-    print('Text dumped.')
-
-# Reinsert text into BIN file
-def reinsert_text(input, output=None, verbose=False):
-    if not output:
-        output = input.parent / f'{input.stem}.bin'
-
-    text_json = read_json(input)
-
-    print(f'Reinserting text blocks ({len(text_json)}) from {input} into {output}...')
-
-    bin_pointers = np.full(len(text_json) * 2, 0x00, dtype=np.ubyte)
-    bin_text = np.array([], dtype=np.ubyte)
-    offset = bin_pointers.size
-    bin_pointers[0:2] = np.frombuffer(struct.pack('<H', offset), dtype=np.ubyte)
-
-    for i in range(0, len(text_json), 1):
-        if text_json[i] == '':
-            bin_pointers[i*2:(i*2)+2] = np.frombuffer(struct.pack('<H', offset), dtype=np.ubyte)
-        else:
-            text_encoded = encode_text(text_json[i])
-
-            if verbose and text_json[i] != '':
-                print(f' Original text: {text_json[i]}')
-                print(f' Encoded data: {" ".join(["{:02x}".format(x) for x in text_encoded])}')
-
-            bin_pointers[i*2:(i*2)+2] = np.frombuffer(struct.pack('<H', offset), dtype=np.ubyte)
-            offset += text_encoded.size
-            bin_text = np.hstack((bin_text, text_encoded))
-
-    write_file(output, np.concatenate([bin_pointers, bin_text], dtype=np.ubyte))
-    print('Text reinserted.')
-
-# Index all texts into single file
-def index_texts(inputs, output_strings, output_pointers, verbose=False):
-    strings_json = [""]
-    pointers_json = {}
-
-    print(f'Indexing {len(inputs)} JSON files into {output_strings}/{output_pointers}...')
-
-    indexed_lines = 0
-    repeated_lines = 0
-
-    for input in inputs:
-        strings = read_json(input)
-        pointers_json[input.name] = []
-
-        if verbose:
-            print(f' Indexing {input.name} JSON...')
-
-        for string in strings:
-            if string in strings_json:
-                pointer = strings_json.index(string)
-                if verbose and string != '':
-                    print(f' String "{string}" found at position {pointer}.')
-                pointers_json[input.name].append(pointer)
-                if string != '':
-                    repeated_lines += 1
-            else:
-                strings_json.append(string)
-                if verbose and string != '':
-                    print(f' String "{string}" is new, adding at position {len(strings_json) - 1}.')
-                pointers_json[input.name].append(strings_json.index(string))
-                indexed_lines += 1
-
-    write_json(output_strings, strings_json)
-    write_json(output_pointers, pointers_json)
-    print(f'Indexed {indexed_lines} strings ({repeated_lines} repeated strings).')
-
-# Expand an indexed file into multiple files
-def expand_texts(input_strings, input_pointers, output_dir='', verbose=False):
-    strings_json = read_json(input_strings)
-    pointers_json = read_json(input_pointers)
-
-    if len(strings_json) <= 0 and len(pointers_json) <= 0:
-        raise Exception('Invalid strings/pointers files.')
-
-    Path(output_dir).mkdir(parents=True, exist_ok=True)
-    print(f'Expanding {len(pointers_json)} files using {len(strings_json)} strings...')
-
-    string_expanded = 0
-
-    for filename, pointers in pointers_json.items():
-        strings = []
-
-        if verbose:
-            print(f' Recreating file {filename}...')
-
-        for pointer in pointers:
-            if strings_json[pointer] != "":
-                string_expanded += 1
-                if verbose:
-                    print(f' Adding string "{strings_json[pointer]}" at position {pointer} into {filename} file.')
-            strings.append(strings_json[pointer])
-
-        write_json(output_dir / filename, strings)
-        print(f'File {filename} with {len(pointers)} strings recreated.')
-    
-    print(f'Expanded {len(pointers_json)} files with a total of {string_expanded} strings.')
-
 def main(command_line=None):
-    parser = argparse.ArgumentParser(prog='bof3tool.py', description='Breath of Fire III Tool (PSX)')
+    parser = argparse.ArgumentParser(prog='bof3tool.py', description='Breath of Fire III Tool (PSX/PSP)')
     subparser = parser.add_subparsers(help='Description', required=True, dest='command')
 
     unpack_parser = subparser.add_parser('unpack', help='unpack EMI files into BIN files', )
     unpack_parser.add_argument('-i', '--input', help='input .EMI files', type=Path, required=True, nargs='*')
     unpack_parser.add_argument('-o', '--output-directory', dest='output_dir', help='output directory', type=str, required=False, default='')
+    unpack_parser.add_argument('--dump-text', dest='dump_txt', default=False, action='store_true', help='dump text')
+    unpack_parser.add_argument('--dump-graphic', dest='dump_gfx', default=False, action='store_true', help='dump graphic')
     unpack_parser.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
 
     pack_parser = subparser.add_parser('pack', help='pack BIN files into EMI file')
     pack_parser.add_argument('-i', '--input', help='input .JSON files', type=Path, required=True, nargs='*')
     pack_parser.add_argument('-o', '--output-directory', dest='output_dir', help='output directory', type=str, required=False, default='')
     pack_parser.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
+
+    dump = subparser.add_parser('dump', help='dump text from BIN file')
+    dump.add_argument('-i', '--input', help='input .BIN (text) files', type=Path, required=True, nargs='*')
+    dump.add_argument('-o', '--output', help='output .JSON file', type=str, required=False, default=None)
+    dump.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
+
+    reinsert = subparser.add_parser('reinsert', help='reinsert text into BIN file')
+    reinsert.add_argument('-i', '--input', help='input .JSON files', type=Path, required=True, nargs='*')
+    reinsert.add_argument('-o', '--output', help='output .BIN (text) file', type=str, required=False, default=None)
+    reinsert.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
+
+    index = subparser.add_parser('index', help='index all texts into single file')
+    index.add_argument('-i', '--input', help='input .JSON files', type=Path, required=True, nargs='*')
+    index.add_argument('--output-strings', dest='output_strings', help='output .JSON file of strings', type=str, required=True)
+    index.add_argument('--output-pointers', dest='output_pointers', help='output .JSON file of pointers', type=str, required=True)
+    index.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
+
+    expand = subparser.add_parser('expand', help='expand an indexed file into multiple files')
+    expand.add_argument('--input-strings', dest='input_strings', help='input .JSON strings file', type=Path, required=True)
+    expand.add_argument('--input-pointers', dest='input_pointers', help='input .JSON pointers file', type=Path, required=True)
+    expand.add_argument('-o', '--output-directory', dest='output_dir', help='output directory', type=str, required=False, default='')
+    expand.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
 
     raw2tim = subparser.add_parser('raw2tim', help='convert graphic RAW to TIM (PSX)')
     raw2tim.add_argument('-i', '--input', help='input .BIN (RAW) files', type=Path, required=True, nargs='*')
@@ -1018,28 +1047,6 @@ def main(command_line=None):
     bmp2raw.add_argument('--tile-height', dest='tile_h', help='tile height', type=int, required=False, default=None)
     bmp2raw.add_argument('--resize-width', dest='resize_width', help='resize width', type=int, required=False, default=None)
 
-    dump = subparser.add_parser('dump', help='dump text from BIN file')
-    dump.add_argument('-i', '--input', help='input .BIN (text) files', type=Path, required=True, nargs='*')
-    dump.add_argument('-o', '--output', help='output .JSON file', type=str, required=False, default=None)
-    dump.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
-
-    reinsert = subparser.add_parser('reinsert', help='reinsert text into BIN file')
-    reinsert.add_argument('-i', '--input', help='input .JSON files', type=Path, required=True, nargs='*')
-    reinsert.add_argument('-o', '--output', help='output .BIN (text) file', type=str, required=False, default=None)
-    reinsert.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
-
-    index = subparser.add_parser('index', help='index all texts into single file')
-    index.add_argument('-i', '--input', help='input .JSON files', type=Path, required=True, nargs='*')
-    index.add_argument('--output-strings', dest='output_strings', help='output .JSON file of strings', type=str, required=True)
-    index.add_argument('--output-pointers', dest='output_pointers', help='output .JSON file of pointers', type=str, required=True)
-    index.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
-
-    expand = subparser.add_parser('expand', help='expand an indexed file into multiple files')
-    expand.add_argument('--input-strings', dest='input_strings', help='input .JSON strings file', type=Path, required=True)
-    expand.add_argument('--input-pointers', dest='input_pointers', help='input .JSON pointers file', type=Path, required=True)
-    expand.add_argument('-o', '--output-directory', dest='output_dir', help='output directory', type=str, required=False, default='')
-    expand.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
-
     parser.add_argument('-v', '--version', action='version', version=f'{parser.prog} {version}')
     args = parser.parse_args(command_line)
 
@@ -1048,10 +1055,20 @@ def main(command_line=None):
     try:
         if args.command == 'unpack':
             for path in args.input:
-                unpack(input=path, output_dir=args.output_dir, verbose=args.verbose)
+                unpack(input=path, output_dir=args.output_dir, dump_txt=args.dump_txt, dump_gfx=args.dump_gfx, verbose=args.verbose)
         elif args.command == 'pack':
             for path in args.input:
                 pack(input=path, output_dir=args.output_dir, verbose=args.verbose)
+        elif args.command == 'dump':
+            for path in args.input:
+                dump_text(input=path, output=args.output, verbose=args.verbose)
+        elif args.command == 'reinsert':
+            for path in args.input:
+                reinsert_text(input=path, output=args.output, verbose=args.verbose)
+        elif args.command == 'index':
+            index_texts(inputs=args.input, output_strings=args.output_strings, output_pointers=args.output_pointers, verbose=args.verbose)
+        elif args.command == 'expand':
+            expand_texts(input_strings=args.input_strings, input_pointers=args.input_pointers, output_dir=args.output_dir, verbose=args.verbose)
         elif args.command == 'raw2tim':
             for path in args.input:
                 raw_to_tim(input=path, output=args.output, bpp=args.bpp, raw_width=args.width,
@@ -1066,16 +1083,6 @@ def main(command_line=None):
         elif args.command == 'bmp2raw':
             for path in args.input:
                 bmp_to_raw(input=path, output=args.output, bpp=args.bpp, tile_w=args.tile_w, tile_h=args.tile_h, resize_width=args.resize_width)
-        elif args.command == 'dump':
-            for path in args.input:
-                dump_text(input=path, output=args.output, verbose=args.verbose)
-        elif args.command == 'reinsert':
-            for path in args.input:
-                reinsert_text(input=path, output=args.output, verbose=args.verbose)
-        elif args.command == 'index':
-            index_texts(inputs=args.input, output_strings=args.output_strings, output_pointers=args.output_pointers, verbose=args.verbose)
-        elif args.command == 'expand':
-            expand_texts(input_strings=args.input_strings, input_pointers=args.input_pointers, output_dir=args.output_dir, verbose=args.verbose)
     except Exception as err:
         print(f'Error: {err}')
 
