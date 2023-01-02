@@ -29,6 +29,7 @@ positional arguments:
     unpack              unpack EMI files into BIN files
     pack                pack BIN files into EMI file
     dump                dump text from BIN file
+    translate           translate a JSON file using Amazon Translate (ML)
     reinsert            reinsert text into BIN file
     index               index all texts into single file
     expand              expand an indexed file into multiple files
@@ -45,8 +46,9 @@ optional arguments:
 I comandi a disposizione sono:
 * **unpack**: estrae il contenuto dei file EMI
 * **pack**: ricostruisce il file EMI precedentemente estratto
-* **dump**: estrae il testo da un file BIN
-* **reinsert**: converte un file di testo in formato BIN
+* **dump**: estrae il testo da un file BIN in un file di testo JSON
+* **translate**: traduce un file di testo JSON utilizzando Amazon Translate (ML)
+* **reinsert**: converte un file di testo JSON in formato BIN
 * **index**: indicizza più file di testo in un unico file (utile per i testi ripetuti)
 * **expand**: espande un file indicizzato negli originali file di testo (testi ripetuti)
 * **raw2tim**: converte un file grafico RAW in formato TIM riarraggiando i tile
@@ -158,6 +160,58 @@ Il file JSON creato conterrà il testo codificato in UTF-8 e tutti i comandi (pa
     ...
 ]
 ```
+
+### Traduzione automatico con Amazon Translate (ML)
+Utilizzando la funzione `translate` è possibile automatizzare la traduzione del testo sfruttando il Machine Learning di Amazon Translate.
+
+L'utilizzo richiede la creazione di un **account AWS** e la **configurazione dell'AWS CLI** localmente sul proprio computer.
+
+> ATTENZIONE: la traduzione automatica è utile solo per avere una "prima bozza" dei testi tradotti e/o giusto per avere un confronto con ciò che verrebbe automaticamente tradotto con l'utilizzo del Machine Learning  ad inizio 2023.
+>
+> La traduzione proposta contiene errori vari come:
+> - traduzione decontestualizzata e/o non corretta
+> - caratteri trasformati/persi (ad es. le doppie virgolette)
+> - spazi bianchi aggiunti dove non serve (e quindi spazio sprecato)
+> - codici di controllo spostati, etc.
+
+L'utilizzo è molto semplice:
+```
+python bof3tool.py translate -h
+```
+
+```
+usage: bof3tool.py translate [-h] -i INPUT [-o OUTPUT] [--source-language SOURCE_LANG] --target-language TARGET_LANG [--verbose]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        input .JSON file
+  -o OUTPUT, --output OUTPUT
+                        output .JSON file
+  --source-language SOURCE_LANG
+                        source language code (default en)
+  --target-language TARGET_LANG
+                        target language code (fr, de, it...)
+  --verbose             show verbose logs
+```
+
+Ad esempio per tradurre tutti i testi indicizzati in un unico file:
+```
+python bof3tool.py translate -i strings_en.json -o strings_it.json --target-language it
+```
+
+Dopo qualche minuto (dipende da quante righe di testo volete tradurre) otterremo:
+```
+--- Breath of Fire III Tool (PSX/PSP) ---
+
+Translating 6366 strings from 'en' to 'it' using Amazon Translate (ML)...
+File strings_en.json translated into strings_it.json from 'en' to 'it' using Amazon Translate (ML).
+6365 strings translated for a total of 608684 characters.
+```
+
+Ribadisco: la traduzione proposta **va controllata frase per frase e corretta**.
+
+Nel repository, all'interno della cartella ***autotranslate*** potete trovare i testi originali del gioco versione PSX nel file `strings_en.json` e la **traduzione italiana da revisionare** proposta da Amazon Translate nel file `strings_it.json`.
 
 ### Reinserimento testo
 Allo stesso modo è possibile ricostruire un file BIN di testo partendo da un JSON utilizzando:

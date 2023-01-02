@@ -687,6 +687,49 @@ def dump_text(input, output=None, verbose=False):
     write_json(output, json_data)
     print('Text dumped.')
 
+# Translate a JSON using Amazon Translate (ML)
+def translate_texts(input, output, source_lang, target_lang, verbose=False):
+    strings_json = read_json(input)
+
+    if len(strings_json) <= 0:
+        raise Exception('Empty JSON file.')
+
+    output = Path(output)
+    
+    import boto3
+    client = boto3.client('translate')
+
+    print(f"Translating {len(strings_json)} strings from '{source_lang}' to '{target_lang}' using Amazon Translate (ML)...")
+    translated_strings = []
+    lines_translated = 0
+    characterd_translated = 0
+
+    for line in strings_json:
+        if line != "":
+            translate_response = client.translate_text(
+                Text=line,
+                SourceLanguageCode=source_lang,
+                TargetLanguageCode=target_lang,
+                Settings={
+                    'Formality': 'INFORMAL'
+                }
+            )
+            translated_line = translate_response['TranslatedText']
+            lines_translated = lines_translated + 1
+            characterd_translated = characterd_translated + len(line)
+
+            if verbose:
+                print(f' Original text: {line}...')
+                print(f' Translated text: {translated_line}...')
+
+            translated_strings.append(translated_line)
+        else:
+            translated_strings.append(line)
+
+    write_json(output, translated_strings)
+    print(f"File {input} translated into {output} from '{source_lang}' to '{target_lang}' using Amazon Translate (ML).")
+    print(f"{lines_translated} strings translated for a total of {characterd_translated} characters.")
+
 # Reinsert text into BIN file
 def reinsert_text(input, output=None, verbose=False):
     if not output:
@@ -996,6 +1039,13 @@ def main(command_line=None):
     dump.add_argument('-o', '--output', help='output .JSON file', type=str, required=False, default=None)
     dump.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
 
+    translate = subparser.add_parser('translate', help='translate a JSON file using Amazon Translate (ML)')
+    translate.add_argument('-i', '--input', help='input .JSON file', type=Path, required=True)
+    translate.add_argument('-o', '--output', help='output .JSON file', type=str, required=False, default=None)
+    translate.add_argument('--source-language', dest='source_lang', help='source language code (default en)', type=str, required=False, default='en')
+    translate.add_argument('--target-language', dest='target_lang', help='target language code (fr, de, it...)', type=str, required=True, default=None)
+    translate.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
+
     reinsert = subparser.add_parser('reinsert', help='reinsert text into BIN file')
     reinsert.add_argument('-i', '--input', help='input .JSON files', type=Path, required=True, nargs='*')
     reinsert.add_argument('-o', '--output', help='output .BIN (text) file', type=str, required=False, default=None)
@@ -1062,6 +1112,8 @@ def main(command_line=None):
         elif args.command == 'dump':
             for path in args.input:
                 dump_text(input=path, output=args.output, verbose=args.verbose)
+        elif args.command == 'translate':
+            translate_texts(input=args.input, output=args.output, source_lang=args.source_lang, target_lang=args.target_lang, verbose=args.verbose)
         elif args.command == 'reinsert':
             for path in args.input:
                 reinsert_text(input=path, output=args.output, verbose=args.verbose)
