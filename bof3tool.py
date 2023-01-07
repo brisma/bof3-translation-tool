@@ -6,7 +6,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.0.0'
+version = '1.0.1'
 
 # Alternates array bytes
 def swap_bytes(data):
@@ -108,12 +108,21 @@ def check_valid_tim(tim_data):
     else:
         return False
 
+# Count how many text block are present
+def count_multi_text(data):
+    if data[0:4].tobytes() == b'\x08\x00\x00\x00':
+        return 2
+    else:
+        return 1
+
 # Read binary file
 def read_file(bin_path):
     return np.fromfile(bin_path, dtype=np.ubyte)
 
 # Write binary file
 def write_file(bin_path, bin_data):
+    Path(bin_path).unlink(missing_ok=True)
+    Path(bin_path.parent).mkdir(parents=True, exist_ok=True)
     bin_data.tofile(bin_path)
 
 # Check and read JSON file
@@ -537,7 +546,7 @@ def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, verbose=False):
         data_block_toc_padding = data_block_toc[14:16].tobytes().hex().upper() # uint16 little endian
 
         is_graphic = data_block_type == '0300'
-        is_text = data_block_ram_location == '80010000'
+        is_text = data_block_ram_location in ['80010000', '00010000', '8001A000', '0001A000']
 
         data_block = {
             'data_block_file_name': str(Path(f'{input.stem}/{input.stem}.{data_block_number}.bin')),
@@ -655,7 +664,6 @@ def pack(input, output_dir='', verbose=False):
         data_blocks[data_blocks_offset:data_blocks_offset + data_bin_size] = data_bin
         data_blocks_offset = data_blocks_offset + data_bin_size + data_bin_padding_size
 
-    Path(output_dir).mkdir(parents=True, exist_ok=True)
     write_file(emi_path, np.concatenate([emi_toc, data_blocks]))
     print(f'{emi_path} created.')
 
@@ -667,22 +675,36 @@ def dump_text(input, output=None, verbose=False):
         output = Path(output)
 
     bin = read_file(input)
-    pointers_size = struct.unpack('<H', bin[0:2])[0]
+    texts_number = count_multi_text(bin)
 
-    print(f'Dumping text blocks ({pointers_size // 2}) from {input} into {output}...')
+    json_data = {}
+    blocks = []
 
-    json_data = []
+    if texts_number == 2:
+        blocks.append(('block0', struct.unpack('<L', bin[0:4])[0], struct.unpack('<L', bin[4:8])[0]))
+        blocks.append(('block1', struct.unpack('<L', bin[4:8])[0], bin.size))
+    else:
+        blocks.append(('block0', 0, bin.size))
 
-    for i in range(0, pointers_size, 2):
-        start_offset = struct.unpack('<H', bin[i:i+2])[0]
-        end_offset = struct.unpack('<H', bin[i+2:i+4])[0] if i+2 < pointers_size else bin.size
-        decoded_text = decode_text(bin[start_offset:end_offset])
+    for block, start, end in blocks:
+        data = bin[start:end]
+        pointers_size = struct.unpack('<H', data[0:2])[0]
+        print(f'Dumping {pointers_size // 2} strings from {block} of {input} into {output}...')
 
-        if verbose and decoded_text != '':
-            print(f' Original data: {" ".join(["{:02x}".format(x) for x in bin[start_offset:end_offset]])}')
-            print(f' Decoded text: {decoded_text}')
+        strings = []
 
-        json_data.append(decoded_text)
+        for i in range(0, pointers_size, 2):
+            start_offset = struct.unpack('<H', data[i:i+2])[0]
+            end_offset = struct.unpack('<H', data[i+2:i+4])[0] if i+2 < pointers_size else data.size
+            decoded_text = decode_text(data[start_offset:end_offset])
+
+            if verbose and decoded_text != '':
+                print(f' Original data: {" ".join(["{:02x}".format(x) for x in data[start_offset:end_offset]])}')
+                print(f' Decoded text: {decoded_text}')
+
+            strings.append(decoded_text)
+        
+        json_data[block] = strings
 
     write_json(output, json_data)
     print('Text dumped.')
@@ -698,33 +720,35 @@ def translate_texts(input, output, source_lang, target_lang, verbose=False):
     
     import boto3
     client = boto3.client('translate')
-
-    print(f"Translating {len(strings_json)} strings from '{source_lang}' to '{target_lang}' using Amazon Translate (ML)...")
-    translated_strings = []
+    translated_strings = {}
     lines_translated = 0
     characterd_translated = 0
 
-    for line in strings_json:
-        if line != "":
-            translate_response = client.translate_text(
-                Text=line,
-                SourceLanguageCode=source_lang,
-                TargetLanguageCode=target_lang,
-                Settings={
-                    'Formality': 'INFORMAL'
-                }
-            )
-            translated_line = translate_response['TranslatedText']
-            lines_translated = lines_translated + 1
-            characterd_translated = characterd_translated + len(line)
+    for block in strings_json.keys():
+        print(f"Translating {len(strings_json[block])} strings of {block} from '{source_lang}' to '{target_lang}' using Amazon Translate (ML)...")
+        translated_strings[block] = []
 
-            if verbose:
-                print(f' Original text: {line}...')
-                print(f' Translated text: {translated_line}...')
+        for line in strings_json[block]:
+            if line != "":
+                translate_response = client.translate_text(
+                    Text=line,
+                    SourceLanguageCode=source_lang,
+                    TargetLanguageCode=target_lang,
+                    Settings={
+                        'Formality': 'INFORMAL'
+                    }
+                )
+                translated_line = translate_response['TranslatedText']
+                lines_translated = lines_translated + 1
+                characterd_translated = characterd_translated + len(line)
 
-            translated_strings.append(translated_line)
-        else:
-            translated_strings.append(line)
+                if verbose:
+                    print(f' Original text: {line}...')
+                    print(f' Translated text: {translated_line}...')
+
+                translated_strings[block].append(translated_line)
+            else:
+                translated_strings[block].append(line)
 
     write_json(output, translated_strings)
     print(f"File {input} translated into {output} from '{source_lang}' to '{target_lang}' using Amazon Translate (ML).")
@@ -737,67 +761,95 @@ def reinsert_text(input, output=None, verbose=False):
     else:
         output = Path(output)
 
-    text_json = read_json(input)
+    json_data = read_json(input)
+    blocks = json_data.keys()
+    output_data = np.array([], dtype=np.ubyte)
 
-    print(f'Reinserting text blocks ({len(text_json)}) from {input} into {output}...')
+    is_multi_block = len(blocks) > 1
 
-    bin_pointers = np.full(len(text_json) * 2, 0x00, dtype=np.ubyte)
-    bin_text = np.array([], dtype=np.ubyte)
-    offset = bin_pointers.size
-    bin_pointers[0:2] = np.frombuffer(struct.pack('<H', offset), dtype=np.ubyte)
+    if is_multi_block:
+        # Create an empty buffer for blocks pointers
+        output_data = np.zeros(len(blocks) * 4, dtype=np.ubyte)
 
-    for i in range(0, len(text_json), 1):
-        if text_json[i] == '':
-            bin_pointers[i*2:(i*2)+2] = np.frombuffer(struct.pack('<H', offset), dtype=np.ubyte)
-        else:
-            text_encoded = encode_text(text_json[i])
+    for index, block in enumerate(blocks):
+        # Write block pointer offset
+        if is_multi_block:
+            output_data[index*4:(index+1)*4] = np.frombuffer(struct.pack('<L', output_data.size), dtype=np.ubyte)
 
-            if verbose and text_json[i] != '':
-                print(f' Original text: {text_json[i]}')
-                print(f' Encoded data: {" ".join(["{:02x}".format(x) for x in text_encoded])}')
+        strings = json_data[block]
+        print(f'Reinserting {len(strings)} strings from {block} of {input} into {output}...')
 
-            bin_pointers[i*2:(i*2)+2] = np.frombuffer(struct.pack('<H', offset), dtype=np.ubyte)
-            offset += text_encoded.size
-            bin_text = np.hstack((bin_text, text_encoded))
+        bin_pointers = np.full(len(strings) * 2, 0x00, dtype=np.ubyte)
+        bin_text = np.array([], dtype=np.ubyte)
+        offset = bin_pointers.size
+        bin_pointers[0:2] = np.frombuffer(struct.pack('<H', offset), dtype=np.ubyte)
 
-    write_file(output, np.concatenate([bin_pointers, bin_text], dtype=np.ubyte))
+        for i in range(0, len(strings), 1):
+            if strings[i] == '':
+                bin_pointers[i*2:(i*2)+2] = np.frombuffer(struct.pack('<H', offset), dtype=np.ubyte)
+            else:
+                text_encoded = encode_text(strings[i])
+
+                if verbose and strings[i] != '':
+                    print(f' Original text: {strings[i]}')
+                    print(f' Encoded data: {" ".join(["{:02x}".format(x) for x in text_encoded])}')
+
+                bin_pointers[i*2:(i*2)+2] = np.frombuffer(struct.pack('<H', offset), dtype=np.ubyte)
+                offset += text_encoded.size
+                bin_text = np.hstack((bin_text, text_encoded))
+
+        output_data = np.concatenate([output_data, np.concatenate([bin_pointers, bin_text], dtype=np.ubyte)], dtype=np.ubyte)
+
+    write_file(output, np.array(output_data, dtype=np.ubyte))
     print('Text reinserted.')
 
 # Index all texts into single file
 def index_texts(inputs, output_strings, output_pointers, verbose=False):
-    strings_json = [""]
+    strings_json = {'blocks': [""]}
     pointers_json = {}
+    info = {}
 
     print(f'Indexing {len(inputs)} JSON files into {output_strings}/{output_pointers}...')
 
-    indexed_lines = 0
-    repeated_lines = 0
-
     for input in inputs:
-        strings = read_json(input)
-        pointers_json[input.name] = []
+        json_data = read_json(input)
+        blocks = json_data.keys()
 
-        if verbose:
-            print(f' Indexing {input.name} JSON...')
+        for block in blocks:
+            if input.name not in pointers_json:
+                pointers_json[input.name] = {}
 
-        for string in strings:
-            if string in strings_json:
-                pointer = strings_json.index(string)
-                if verbose and string != '':
-                    print(f' String "{string}" found at position {pointer}.')
-                pointers_json[input.name].append(pointer)
-                if string != '':
-                    repeated_lines += 1
-            else:
-                strings_json.append(string)
-                if verbose and string != '':
-                    print(f' String "{string}" is new, adding at position {len(strings_json) - 1}.')
-                pointers_json[input.name].append(strings_json.index(string))
-                indexed_lines += 1
+            pointers_json[input.name][block] = []
+
+            if block not in info:
+                info[block] = {
+                    'repeated_lines': 0,
+                    'indexed_lines': 0
+                }
+
+            if verbose:
+                print(f' Indexing {input.name} JSON {block}...')
+
+            for string in json_data[block]:
+                if string in strings_json['blocks']:
+                    pointer = strings_json['blocks'].index(string)
+                    if verbose and string != '':
+                        print(f' String "{string}" found at position {pointer}.')
+                    pointers_json[input.name][block].append(pointer)
+                    if string != '':
+                        info[block]['repeated_lines'] += 1
+                else:
+                    strings_json['blocks'].append(string)
+                    if verbose and string != '':
+                        print(f' String "{string}" is new, adding at position {len(strings_json["blocks"]) - 1}.')
+                    pointers_json[input.name][block].append(strings_json['blocks'].index(string))
+                    info[block]['indexed_lines'] += 1
 
     write_json(Path(output_strings), strings_json)
     write_json(Path(output_pointers), pointers_json)
-    print(f'Indexed {indexed_lines} strings ({repeated_lines} repeated strings).')
+
+    for block in info:
+        print(f"Indexed {info[block]['indexed_lines']} strings ({info[block]['repeated_lines']} repeated strings) for {block}.")
 
 # Expand an indexed file into multiple files
 def expand_texts(input_strings, input_pointers, output_dir='', verbose=False):
@@ -808,27 +860,32 @@ def expand_texts(input_strings, input_pointers, output_dir='', verbose=False):
         raise Exception('Invalid strings/pointers files.')
 
     Path(output_dir).mkdir(parents=True, exist_ok=True)
-    print(f'Expanding {len(pointers_json)} files using {len(strings_json)} strings...')
+    print(f'Expanding {len(pointers_json)} files...')
 
+    strings = {}
     string_expanded = 0
 
-    for filename, pointers in pointers_json.items():
-        strings = []
-
+    for filename, blocks in pointers_json.items():
         if verbose:
             print(f' Recreating file {filename}...')
 
-        for pointer in pointers:
-            if strings_json[pointer] != "":
-                string_expanded += 1
-                if verbose:
-                    print(f' Adding string "{strings_json[pointer]}" at position {pointer} into {filename} file.')
-            strings.append(strings_json[pointer])
+        for block in blocks:
+            if verbose:
+                print(f' Expanding block {block}...')
+
+            strings[block] = []
+
+            for pointer in pointers_json[filename][block]:
+                if strings_json['blocks'][pointer] != "":
+                    string_expanded += 1
+                    if verbose:
+                        print(f' Adding string "{strings_json["blocks"][pointer]}" at position {pointer} into {filename} file.')
+                strings[block].append(strings_json['blocks'][pointer])
 
         write_json(Path(output_dir) / filename, strings)
-        print(f'File {filename} with {len(pointers)} strings recreated.')
+        print(f'File {filename} recreated.')
     
-    print(f'Expanded {len(pointers_json)} files with a total of {string_expanded} strings.')
+    print(f'Expanded {len(pointers_json)} files using {string_expanded} indexed strings.')
 
 # Convert RAW graphic to TIM (PSX)
 def raw_to_tim(input, output, bpp, raw_width, tile_w=None, tile_h = None, resize_width = None):
