@@ -194,7 +194,7 @@ Dopo qualche minuto (dipende da quante righe di testo volete tradurre) otterremo
 ```
 --- Breath of Fire III Tool (PSX/PSP) ---
 
-Translating 6366 strings from 'en' to 'it' using Amazon Translate (ML)...
+Translating 6366 strings of blocks from 'en' to 'it' using Amazon Translate (ML)...
 File strings_en.json translated into strings_it.json from 'en' to 'it' using Amazon Translate (ML).
 6365 strings translated for a total of 608684 characters.
 ```
@@ -214,7 +214,7 @@ Il risultato che otterremo sarà:
 ```
 --- Breath of Fire III Tool (PSX/PSP) ---
 
-Reinserting text blocks (256) from AREA000.12.bin.json into AREA000.12.bin...
+Reinserting 256 strings from block0 of AREA000.12.bin.json into AREA000.12.bin...
 Text reinserted.
 ```
 
@@ -235,7 +235,7 @@ Il risultato sarà ad esempio:
 --- Breath of Fire III Tool (PSX/PSP) ---
 
 Indexing 169 JSON files into strings_en.json/pointers_en.json...
-Indexed 6365 strings (4475 repeated strings).
+Indexed 6365 strings (4475 repeated strings) for block0.
 ```
 
 ### Espansione testi indicizzati
@@ -251,14 +251,14 @@ Il comando ricostruirà i file JSON originale all'interno della cartella `expand
 ```
 --- Breath of Fire III Tool (PSX/PSP) ---
 
-Expanding 169 files using 6366 strings...
+Expanding 169 files...
 File AREA000.12.bin.json with 256 strings recreated.
 File AREA001.12.bin.json with 256 strings recreated.
 File AREA002.8.bin.json with 256 strings recreated.
 ...
 File AREA198.12.bin.json with 256 strings recreated.
 File AREA199.12.bin.json with 256 strings recreated.
-Expanded 169 files with a total of 10840 strings.
+Expanded 169 files using 10840 indexed strings.
 ```
 
 ### Conversione grafica RAW in TIM/BMP
