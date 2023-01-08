@@ -1,12 +1,91 @@
 import argparse
 import json
 import struct
+import re
 import numpy as np
 from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.0.1'
+version = '1.0.2'
+
+# Map of files containing graphics to dump
+gfx_map = {
+    'ENDKANJI.1.bin': '4b.128w.128x32.256r',
+    'FIRST.4.bin': '4b.128w.128x32.256r',
+    'SCENA17.3.bin': '4b.128w.128x32.256r',
+    'BATL_OVR.2.bin': '8b.64w.64x32.256r',
+    'LOAD.1.bin': '4b.128w.128x32.256r',
+    'START.6.bin': '4b.128w.128x32.256r',
+    'BATL_DRA.1.bin': '8b.64w.64x32.128r',
+    'DEMO.6.bin': '8b.64w.64x32.256r',
+    'FIRST.5.bin': '4b.128w.128x32.256r',
+    'FIRST.6.bin': '4b.128w.128x32.256r',
+    'TURIMODE.4.bin': '8b.64w.64x32.1024r',
+    'TURISHAR.2.bin': '8b.64w.64x32.256r',
+    'TURISHAR.3.bin': '8b.64w.64x32.256r',
+    'MAGIC008.2.bin': '4b.128w.128x32.256r',
+    'MAGIC013.5.bin': '4b.128w.128x32.256r',
+    'MAGIC038.8.bin': '4b.128w.128x32.256r',
+    'MAGIC039.5.bin': '4b.128w.128x32.256r',
+    'MAGIC040.5.bin': '4b.128w.128x32.256r',
+    'MAGIC043.5.bin': '4b.128w.128x32.256r',
+    'MAGIC062.5.bin': '4b.128w.128x32.256r',
+    'MAGIC067.7.bin': '4b.128w.64x16.64r',
+    'MAGIC069.5.bin': '4b.128w.128x32.256r',
+    'MAGIC082.5.bin': '4b.128w.128x32.256r',
+    'MAGIC083.5.bin': '4b.128w.128x32.256r',
+    'MAGIC088.5.bin': '4b.128w.128x32.256r',
+    'MAGIC225.5.bin': '4b.128w.128x32.256r',
+    'BATE.2.bin': '4b.128w.128x32.256r',
+    'COMMU01.1.bin': '4b.128w.128x32.256r',
+    'COMMU02B.1.bin': '4b.128w.128x32.256r',
+    'COMMU05.1.bin': '4b.128w.128x32.256r',
+    'FIRST.5.bin': '4b.128w.128x32.256r',
+    'SHISU.2.bi': '4b.128w.128x32.256r',
+    'SHOP.2.bin': '4b.128w.128x32.256r',
+    'SISYOU.2.bin': '4b.128w.128x32.256r',
+    'START.4.bin': '4b.128w.128x32.256r',
+    'STATUS.2.bin': '4b.128w.128x32.256r',
+    'SCENA17.2.bin': '8b.64w.64x32.256r',
+    'AREA016.6.bin': '8b.64w.64x32.1024r',
+    'AREA016.8.bin': '8b.64w.64x32.1024r',
+    'AREA030.14.bin': '8b.64w.64x32.1024r',
+    'AREA030.21.bin': '4b.128w.128x32.256r',
+    'AREA033.6.bin': '8b.64w.64x32.1024r',
+    'AREA033.8.bin': '8b.64w.64x32.1024r',
+    'AREA045.6.bin': '8b.64w.64x32.1024r',
+    'AREA045.8.bin': '8b.64w.64x32.1024r',
+    'AREA065.6.bin': '8b.64w.64x32.1024r',
+    'AREA065.8.bin': '8b.64w.64x32.1024r',
+    'AREA087.6.bin': '8b.64w.64x32.1024r',
+    'AREA087.8.bin': '8b.64w.64x32.1024r',
+    'AREA088.6.bin': '8b.64w.64x32.1024r',
+    'AREA088.8.bin': '8b.64w.64x32.1024r',
+    'AREA089.14.bin': '8b.64w.64x32.1024r',
+    'AREA089.21.bin': '4b.128w.128x32.256r',
+    'AREA115.6.bin': '8b.64w.64x32.1024r',
+    'AREA115.8.bin': '8b.64w.64x32.1024r',
+    'AREA121.6.bin': '8b.64w.64x32.1024r',
+    'AREA121.8.bin': '8b.64w.64x32.1024r',
+    'AREA128.8.bin': '4b.128w.64x32.2048r',
+    'AREA129.14.bin': '8b.64w.64x32.1024r',
+    'AREA129.21.bin': '4b.128w.128x32.256r',
+    'AREA151.6.bin': '8b.64w.64x32.1024r',
+    'AREA151.8.bin': '8b.64w.64x32.1024r',
+    'AREA152.6.bin': '8b.64w.64x32.1024r',
+    'AREA152.8.bin': '8b.64w.64x32.1024r'
+}
+
+def extract_gfx_values(format):
+    numbers = re.findall(r'\d+', format)
+    return {
+        'bpp': int(numbers[0]),
+        'width': int(numbers[1]),
+        'tile_w': int(numbers[2]),
+        'tile_h': int(numbers[3]),
+        'width_resized': int(numbers[4])
+    }
 
 # Alternates array bytes
 def swap_bytes(data):
@@ -584,11 +663,9 @@ def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, verbose=False):
             dump_text(bin_path)
 
         if is_graphic and dump_gfx:
-            # TODO add others typical formats
-            raw_to_bmp(bin_path, None, 4, 64, 64, 16, 128)
-            raw_to_bmp(bin_path, None, 4, 128, 128, 32, 256)
-            raw_to_bmp(bin_path, None, 8, 64, 64, 16, 128)
-            raw_to_bmp(bin_path, None, 8, 128, 128, 32, 256)
+            if f'{input.stem}.{data_block_number}.bin' in gfx_map:
+                img_data = extract_gfx_values(gfx_map[f'{input.stem}.{data_block_number}.bin'])
+                raw_to_bmp(bin_path, None, img_data['bpp'], img_data['width'], img_data['tile_w'], img_data['tile_h'], img_data['width_resized'])
 
     write_json(json_path=json_path, json_data=json_data)
     print(f'EMI {input} unpacked into {emi_data_blocks} files.')
@@ -692,17 +769,28 @@ def dump_text(input, output=None, verbose=False):
         print(f'Dumping {pointers_size // 2} strings from {block} of {input} into {output}...')
 
         strings = []
+        finish = False
 
         for i in range(0, pointers_size, 2):
             start_offset = struct.unpack('<H', data[i:i+2])[0]
             end_offset = struct.unpack('<H', data[i+2:i+4])[0] if i+2 < pointers_size else data.size
-            decoded_text = decode_text(data[start_offset:end_offset])
 
-            if verbose and decoded_text != '':
-                print(f' Original data: {" ".join(["{:02x}".format(x) for x in data[start_offset:end_offset]])}')
-                print(f' Decoded text: {decoded_text}')
+            if end_offset < start_offset:
+                finish = True
+                print('Reached end of valid pointers, skipping next.')
+                decoded_text = decode_text(data[start_offset:end_offset if end_offset >= start_offset else data.size])
+                strings.append(decoded_text)
+                continue
 
-            strings.append(decoded_text)
+            if finish:
+                strings.append(0)
+            else:
+                decoded_text = decode_text(data[start_offset:end_offset if end_offset >= start_offset else data.size])
+                if verbose and decoded_text != '':
+                    print(f' Original data: {" ".join(["{:02x}".format(x) for x in data[start_offset:end_offset]])}')
+                    print(f' Decoded text: {decoded_text}')
+
+                strings.append(decoded_text)
         
         json_data[block] = strings
 
@@ -785,7 +873,15 @@ def reinsert_text(input, output=None, verbose=False):
         bin_pointers[0:2] = np.frombuffer(struct.pack('<H', offset), dtype=np.ubyte)
 
         for i in range(0, len(strings), 1):
-            if strings[i] == '':
+            if strings[i] == 0:
+                # Needed only for AREA030.19.bin, AREA089.19.bin, AREA129.19.bin
+                pointer_recycled = bin_pointers.size
+
+                if i == len(strings) - 1:
+                    pointer_recycled = offset
+
+                bin_pointers[i*2:(i*2)+2] = np.frombuffer(struct.pack('<H', pointer_recycled), dtype=np.ubyte)
+            elif strings[i] == '':
                 bin_pointers[i*2:(i*2)+2] = np.frombuffer(struct.pack('<H', offset), dtype=np.ubyte)
             else:
                 text_encoded = encode_text(strings[i])
@@ -894,6 +990,8 @@ def raw_to_tim(input, output, bpp, raw_width, tile_w=None, tile_h = None, resize
             output = input.parent / f'{input.name}.{bpp}b.{raw_width}w.{tile_w}x{tile_h}.{resize_width}r.tim'
         else:
             output = input.parent / f'{input.name}.{bpp}b.{raw_width}w.tim'
+    else:
+        output = Path(output)
     
     raw = read_file(input)
     raw_height = raw.size // raw_width * 2 if bpp == 4 else raw.size // raw_width
@@ -963,6 +1061,8 @@ def raw_to_tim(input, output, bpp, raw_width, tile_w=None, tile_h = None, resize
 def tim_to_raw(input, output, tile_w=None, tile_h = None, resize_width = None):
     if not output:
         output = input.parent / f'{input.stem}.bin'
+    else:
+        output = Path(output)
 
     tim = read_file(input)
 
@@ -1005,6 +1105,8 @@ def raw_to_bmp(input, output, bpp, raw_width, tile_w=None, tile_h = None, resize
             output = input.parent / f'{input.name}.{bpp}b.{raw_width}w.{tile_w}x{tile_h}.{resize_width}r.bmp'
         else:
             output = input.parent / f'{input.name}.{bpp}b.{raw_width}w.bmp'
+    else:
+        output = Path(output)
 
     raw = read_file(input)
     raw_height = raw.size // raw_width * 2 if bpp == 4 else raw.size // raw_width
@@ -1046,6 +1148,8 @@ def raw_to_bmp(input, output, bpp, raw_width, tile_w=None, tile_h = None, resize
 def bmp_to_raw(input, output, bpp, tile_w=None, tile_h = None, resize_width = None):
     if not output:
         output = input.parent / f'{input.name}.{bpp}bpp.bin'
+    else:
+        output = Path(output)
 
     bmp = Image.open(input)
 

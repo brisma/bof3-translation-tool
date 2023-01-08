@@ -29,9 +29,21 @@ do
     python bof3tool.py reinsert -i "$file" -o "TEMP/BIN/$BIN/${filename%.*}"
 done
 
-# TODO: copio le grafiche in TEMP/GFX
+# Copio le grafiche in TEMP/GFX
+mkdir -p TEMP/GFX/$BIN
+cp -r GFX/$BIN TEMP/GFX
 
-# TODO: converto tutte le grafiche in file RAW in BIN
+# Converto tutte le grafiche in file RAW in BIN
+for file in TEMP/GFX/$BIN/*.bmp
+do
+    bin_name=$(echo $(basename $file) | cut -d'.' -f1-3)
+    bpp=$(echo $file | cut -d'.' -f4 | cut -d'b' -f1)
+    tile_w_h=$(echo $file | cut -d'.' -f6)
+    tile_w=$(echo $tile_w_h | cut -d'x' -f1)
+    tile_h=$(echo $tile_w_h | cut -d'x' -f2)
+    resize_width=$(echo $file | cut -d'.' -f5 | cut -d'w' -f1)
+    python bof3tool.py bmp2raw -i "$file" -o "TEMP/BIN/$BIN/$bin_name" --bpp "$bpp" --tile-width "$tile_w" --tile-height "$tile_h" --resize-width "$resize_width"
+done
 
 # Copio la cartella contenente i file EMI spacchettati in TEMP
 cp -R UNPACKED/$BIN TEMP

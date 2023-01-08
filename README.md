@@ -68,53 +68,41 @@ All'interno ci troveremo una struttura composta da:
 * un file JSON contenente le informazioni del file originale
 * una cartella contenente i file estratti dall'EMI
 
-Se al comando precedente aggiungiamo anche i parametri `--dump-txt` e `--dump-gfx` avremo inoltre:
+Se al comando precedente aggiungiamo anche i parametri `--dump-text` e `--dump-graphic` avremo inoltre:
 * l'eventuale dump del testo rilevato in formato JSON (potrebbe non essere testo di gioco ma materiale di debug)
-* la grafica esportata in formato BMP nei formati standard (potrebbero non essere giusti). Questo è utile solo per capire se può esserci della grafica da modificare.
+* la grafica esportata in formato BMP secondo la mappa dei file conosciuti aventi grafica da tradurre
 
 Esempio di estrazione di un singolo file:
 ```
-python bof3tool.py unpack -i AREA000.EMI -o unpacked --dump-txt --dump-gfx
+python bof3tool.py unpack -i AREA033.EMI -o unpacked --dump-text --dump-graphic
 ```
 
 Risultato:
 ```
 --- Breath of Fire III Tool (PSX/PSP) ---
 
-Unpacking AREA000.EMI into unpacked/AREA000.json and data blocks(14)...
-unpacked/AREA000/AREA000.1.bin created.
-unpacked/AREA000/AREA000.2.bin created.
-unpacked/AREA000/AREA000.3.bin created.
-unpacked/AREA000/AREA000.4.bin created.
-unpacked/AREA000/AREA000.5.bin created.
-unpacked/AREA000/AREA000.6.bin created.
-Coverting RAW AREA000.6.bin in BMP unpacked/AREA000/AREA000.6.bin.4b.64w.64x16.128r.bmp using 4bpp, final width size 128 using tile of 64x16...
+Unpacking AREA033.EMI into unpacked/AREA033.json and data blocks(14)...
+unpacked/AREA033/AREA033.1.bin created.
+unpacked/AREA033/AREA033.2.bin created.
+unpacked/AREA033/AREA033.3.bin created.
+unpacked/AREA033/AREA033.4.bin created.
+unpacked/AREA033/AREA033.5.bin created.
+unpacked/AREA033/AREA033.6.bin created.
+Coverting RAW AREA033.6.bin in BMP unpacked/AREA033/AREA033.6.bin.8b.64w.64x32.1024r.bmp using 8bpp, final width size 1024 using tile of 64x32...
 Done.
-Coverting RAW AREA000.6.bin in BMP unpacked/AREA000/AREA000.6.bin.4b.128w.128x32.256r.bmp using 4bpp, final width size 256 using tile of 128x32...
+unpacked/AREA033/AREA033.7.bin created.
+unpacked/AREA033/AREA033.8.bin created.
+Coverting RAW AREA033.8.bin in BMP unpacked/AREA033/AREA033.8.bin.8b.64w.64x32.1024r.bmp using 8bpp, final width size 1024 using tile of 64x32...
 Done.
-Coverting RAW AREA000.6.bin in BMP unpacked/AREA000/AREA000.6.bin.8b.64w.64x16.128r.bmp using 8bpp, final width size 128 using tile of 64x16...
-Done.
-Coverting RAW AREA000.6.bin in BMP unpacked/AREA000/AREA000.6.bin.8b.128w.128x32.256r.bmp using 8bpp, final width size 256 using tile of 128x32...
-Done.
-unpacked/AREA000/AREA000.7.bin created.
-unpacked/AREA000/AREA000.8.bin created.
-Coverting RAW AREA000.8.bin in BMP unpacked/AREA000/AREA000.8.bin.4b.64w.64x16.128r.bmp using 4bpp, final width size 128 using tile of 64x16...
-Done.
-Coverting RAW AREA000.8.bin in BMP unpacked/AREA000/AREA000.8.bin.4b.128w.128x32.256r.bmp using 4bpp, final width size 256 using tile of 128x32...
-Done.
-Coverting RAW AREA000.8.bin in BMP unpacked/AREA000/AREA000.8.bin.8b.64w.64x16.128r.bmp using 8bpp, final width size 128 using tile of 64x16...
-Done.
-Coverting RAW AREA000.8.bin in BMP unpacked/AREA000/AREA000.8.bin.8b.128w.128x32.256r.bmp using 8bpp, final width size 256 using tile of 128x32...
-Done.
-unpacked/AREA000/AREA000.9.bin created.
-unpacked/AREA000/AREA000.10.bin created.
-unpacked/AREA000/AREA000.11.bin created.
-unpacked/AREA000/AREA000.12.bin created.
-Dumping text blocks (256) from unpacked/AREA000/AREA000.12.bin into unpacked/AREA000/AREA000.12.bin.json...
+unpacked/AREA033/AREA033.9.bin created.
+unpacked/AREA033/AREA033.10.bin created.
+unpacked/AREA033/AREA033.11.bin created.
+unpacked/AREA033/AREA033.12.bin created.
+Dumping 256 strings from block0 of unpacked/AREA033/AREA033.12.bin into unpacked/AREA033/AREA033.12.bin.json...
 Text dumped.
-unpacked/AREA000/AREA000.13.bin created.
-unpacked/AREA000/AREA000.14.bin created.
-EMI AREA000.EMI unpacked into 14 files.
+unpacked/AREA033/AREA033.13.bin created.
+unpacked/AREA033/AREA033.14.bin created.
+EMI AREA033.EMI unpacked into 14 files.
 ```
 
 ### Reimpacchattare file EMI
@@ -143,22 +131,24 @@ Il risultato che otterremo sarà:
 ```
 --- Breath of Fire III Tool (PSX/PSP) ---
 
-Dumping text blocks (256) from unpacked/AREA000/AREA000.12.bin into AREA000.12.bin.json...
+Dumping 256 strings from block0 of unpacked/AREA000/AREA00.12.bin into unpacked/AREA000/AREA000.12.bin.json...
 Text dumped.
 ```
 
 Il file JSON creato conterrà il testo codificato in UTF-8 e tutti i comandi (pause, posizioni, nomi etc) come ad esempio:
 
 ```json
-[
-    "<POS 81>   Spring in McNeil<TIME 20><END>",
-    "\"Ah...spring...<END>",
-    "\"It looks like it'll<NL>be a good crop this<NL>year...<CLEAR>That means we can<NL>take it easy this<NL>year!<END>",
-    "\"Not only do we have<NL>to worry about bad<NL>crops...<CLEAR>In the country, we've<NL>got taxes to<NL>worry about too...<CLEAR>I wish I could move<NL>to a real city...<NL>like Wyndia<END>",
-    "\"I guess y'all aren't<NL>as bad as I thought...<CLEAR>Good job!<END>",
-    "\"What're you doing,<NL>this time of night?<CLEAR>Sleep during the day<NL>an' stay up all night?<NL>S'weird, if ya ask me<END>",
-    ...
-]
+{
+  "block0": [
+      "<POS 81>   Spring in McNeil<TIME 20><END>",
+      "\"Ah...spring...<END>",
+      "\"It looks like it'll<NL>be a good crop this<NL>year...<CLEAR>That means we can<NL>take it easy this<NL>year!<END>",
+      "\"Not only do we have<NL>to worry about bad<NL>crops...<CLEAR>In the country, we've<NL>got taxes to<NL>worry about too...<CLEAR>I wish I could move<NL>to a real city...<NL>like Wyndia<END>",
+      "\"I guess y'all aren't<NL>as bad as I thought...<CLEAR>Good job!<END>",
+      "\"What're you doing,<NL>this time of night?<CLEAR>Sleep during the day<NL>an' stay up all night?<NL>S'weird, if ya ask me<END>",
+      ...
+  ]
+}
 ```
 
 ### Traduzione automatico con Amazon Translate (ML)

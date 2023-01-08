@@ -17,7 +17,7 @@ done
 for dir in $BIN/*/
 do
     dir=${dir%*/}
-    if [ -d "$dir" ]; then
+    if [ -d "$dir" ] && [ -n "$(find "$dir" -name '*.EMI' -print -quit)" ]; then
         python bof3tool.py unpack -i $dir/*.EMI -o UNPACKED/$dir --dump-text --dump-graphic
     fi
 done
@@ -32,9 +32,9 @@ for menu in BATTLE BOSS ETC; do
   find UNPACKED/$BIN/$menu/ -name "*.bin.json" -execdir sh -c "mkdir -p ../../../../DUMP/$BIN/MENU && mv \$1 ../../../../DUMP/$BIN/MENU" sh {} \;
 done
 
-# Sposta tutte le grafiche in GFX
+# Sposta tutte le grafiche in GFX/piattaforma
 mkdir -p GFX/$BIN
-rsync -aim --include="*/" --include="*.bmp" --exclude="*" --delete-excluded UNPACKED/$BIN/ GFX/$BIN
+find "UNPACKED/$BIN/" -name "*.bmp" -exec mv {} "GFX/$BIN" \;
 
 # Indicizza i dump di WORLD
 python bof3tool.py index -i DUMP/$BIN/WORLD/*.json --output-strings dump_world_$BIN.json --output-pointers pointers_world_$BIN.json
