@@ -13,10 +13,10 @@ fi
 mkdir -p TEMP/DUMP
 
 # Copio dump e puntatori in TEMP/DUMP
-cp dump_world_$BIN.json TEMP/DUMP
-cp pointers_world_$BIN.json TEMP/DUMP
-cp dump_menu_$BIN.json TEMP/DUMP
-cp pointers_menu_$BIN.json TEMP/DUMP
+cp DUMP/dump_world_$BIN.json TEMP/DUMP
+cp DUMP/pointers_world_$BIN.json TEMP/DUMP
+cp DUMP/dump_menu_$BIN.json TEMP/DUMP
+cp DUMP/pointers_menu_$BIN.json TEMP/DUMP
 
 # Espando i dump nei loro sottofile
 python bof3tool.py expand --input-strings TEMP/DUMP/dump_world_$BIN.json --input-pointers TEMP/DUMP/pointers_world_$BIN.json -o TEMP/DUMP/$BIN
@@ -44,6 +44,11 @@ do
     resize_width=$(echo $file | cut -d'.' -f5 | cut -d'w' -f1)
     python bof3tool.py bmp2raw -i "$file" -o "TEMP/BIN/$BIN/$bin_name" --bpp "$bpp" --tile-width "$tile_w" --tile-height "$tile_h" --resize-width "$resize_width"
 done
+
+# Copio i file da iniettare
+if [ "$(ls -A INJECT/$BIN)" ]; then
+  cp -R INJECT/$BIN/* TEMP/BIN/$BIN
+fi
 
 # Copio la cartella contenente i file EMI spacchettati in TEMP
 cp -R UNPACKED/$BIN TEMP

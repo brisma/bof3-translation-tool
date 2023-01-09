@@ -203,3 +203,12 @@ PSP/
 PSX_FRA/
 PSX_USA/
 PSX_ITA/
+PSX_GER/
+PSX_ESP/
+DUMP/
+GFX/
+TEMP/
+dump_world_*
+pointers_world_*
+dump_menu_*
+pointers_menu_*

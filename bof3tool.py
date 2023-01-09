@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.0.2'
+version = '1.0.3'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -221,7 +221,7 @@ def write_json(json_path, json_data):
             print(f'Error writing JSON file {json_path}: {err}.')
 
 # Decode BIN data into UTF-8 text
-def decode_text(data):
+def decode_text(data, extra_table):
     text = ''
     data_offset = 0
     
@@ -305,6 +305,8 @@ def decode_text(data):
                 value = data[data_offset]
                 data_offset += 1
                 text += f'<EFFECT {value:02x}>'
+            elif effect == 0x00:
+                text += '<EFFECT_DEFAULT>'
             else:
                 text += f'<HEX 0e><HEX {effect:02x}>'
         elif b == 0x0f: # <RUMBLE>
@@ -346,6 +348,8 @@ def decode_text(data):
             text += '?'
         elif b == 0x5D: # !
             text += '!'
+        elif b == 0x5E: # ♥️
+            text += '♥️'
         elif b == 0x5F: # ♫
             text += '♫'
         elif b >= 0x61 and b <= 0x7A: # a-z
@@ -400,13 +404,15 @@ def decode_text(data):
             text += '%'
         elif b == 0xFF: # space
             text += ' '
+        elif format(b, '02x') in extra_table:
+            text += extra_table[format(b, '02x')]
         else:
             text += f'<HEX {b:02x}>'
 
     return text
 
 # Encode UTF-8 text into BIN data
-def encode_text(data):
+def encode_text(data, extra_table):
     text_bytes = np.array([], dtype=np.ubyte)
     data_offset = 0
 
@@ -468,7 +474,9 @@ def encode_text(data):
             elif tag == 'PAUSE':
                 text_bytes = np.hstack((text_bytes, np.array([0x0B], dtype=np.ubyte))) 
             elif tag == 'TEXT_ANIMATION':
-                text_bytes = np.hstack((text_bytes, np.array([0x0D], dtype=np.ubyte))) 
+                text_bytes = np.hstack((text_bytes, np.array([0x0D], dtype=np.ubyte)))
+            elif tag == 'EFFECT_DEFAULT':
+                text_bytes = np.hstack((text_bytes, np.array([0x0E, 0x00], dtype=np.ubyte)))
             elif tag == 'RUMBLE':
                 text_bytes = np.hstack((text_bytes, np.array([0x0F, 0x04, 0x02], dtype=np.ubyte))) 
             elif tag == 'END_TEXT':
@@ -520,6 +528,8 @@ def encode_text(data):
                 text_bytes = np.hstack((text_bytes, np.array([0x5C], dtype=np.ubyte)))
             elif b == '!': # !
                 text_bytes = np.hstack((text_bytes, np.array([0x5D], dtype=np.ubyte)))
+            elif b == '♥️': # ♥️
+                text_bytes = np.hstack((text_bytes, np.array([0x5E], dtype=np.ubyte)))
             elif b == '♫': # ♫
                 text_bytes = np.hstack((text_bytes, np.array([0x5F], dtype=np.ubyte)))
             elif ord(b) >= 0x61 and ord(b) <= 0x7A: # a-z
@@ -574,13 +584,15 @@ def encode_text(data):
                 text_bytes = np.hstack((text_bytes, np.array([0x93], dtype=np.ubyte)))
             elif b == ' ': # space
                 text_bytes = np.hstack((text_bytes, np.array([0xFF], dtype=np.ubyte)))
+            elif b in extra_table:
+                text_bytes = np.hstack((text_bytes, np.array(bytearray.fromhex(extra_table[b]), dtype=np.ubyte)))
             else:
                 raise Exception(f'Character "{b}" in string "{data}" is not allowed.')
 
     return text_bytes
 
 # Unpack EMI file into BIN files
-def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, verbose=False):
+def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, extra_table={}, verbose=False):
     json_path = Path(output_dir) / f'{input.stem}.json'
 
     emi_file = read_file(input)
@@ -660,7 +672,7 @@ def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, verbose=False):
         print(f'{bin_path} created.')
 
         if is_text and dump_txt:
-            dump_text(bin_path)
+            dump_text(input=bin_path, extra_table=extra_table)
 
         if is_graphic and dump_gfx:
             if f'{input.stem}.{data_block_number}.bin' in gfx_map:
@@ -729,7 +741,13 @@ def pack(input, output_dir='', verbose=False):
                 print(f' New text block full at {data_bin_size * 100 / (data_bin_size + data_bin_padding_size):.0f}%')
 
         if not data_bin_size <= data_block_size + data_block_padding_size:
-            raise Exception(f'Data block {data_block_number} is too big, cannot be injected.')
+            if is_text:
+                if data_bin_size + data_block_padding_size > 22528: # Over 0x5800 bytes limit
+                    raise Exception(f'Text data block {data_block_number} is too big even after expansion to 22528 bytes, cannot be injected.')
+                else:
+                    print(f'New text data block expanded to {data_block_size + data_block_padding_size} bytes (<= 22528 bytes limit)')
+            else:
+                raise Exception(f'Data block {data_block_number} is too big, cannot be injected.')
 
         data_block_toc = np.full(16, 0x2E, dtype=np.ubyte)
         data_block_toc[0:4] = np.frombuffer(struct.pack('<I', data_bin_size), dtype=np.ubyte)
@@ -745,7 +763,7 @@ def pack(input, output_dir='', verbose=False):
     print(f'{emi_path} created.')
 
 # Dump text from BIN file
-def dump_text(input, output=None, verbose=False):
+def dump_text(input, output=None, extra_table={}, verbose=False):
     if not output:
         output = input.parent / f'{input.name}.json'
     else:
@@ -753,6 +771,7 @@ def dump_text(input, output=None, verbose=False):
 
     bin = read_file(input)
     texts_number = count_multi_text(bin)
+    extra_table = dict((k.lower(), v) for k, v in extra_table.items()) # key in lower case when dumping
 
     json_data = {}
     blocks = []
@@ -778,14 +797,14 @@ def dump_text(input, output=None, verbose=False):
             if end_offset < start_offset:
                 finish = True
                 print('Reached end of valid pointers, skipping next.')
-                decoded_text = decode_text(data[start_offset:end_offset if end_offset >= start_offset else data.size])
+                decoded_text = decode_text(data[start_offset:end_offset if end_offset >= start_offset else data.size], extra_table)
                 strings.append(decoded_text)
                 continue
 
             if finish:
                 strings.append(0)
             else:
-                decoded_text = decode_text(data[start_offset:end_offset if end_offset >= start_offset else data.size])
+                decoded_text = decode_text(data[start_offset:end_offset if end_offset >= start_offset else data.size], extra_table)
                 if verbose and decoded_text != '':
                     print(f' Original data: {" ".join(["{:02x}".format(x) for x in data[start_offset:end_offset]])}')
                     print(f' Decoded text: {decoded_text}')
@@ -843,12 +862,13 @@ def translate_texts(input, output, source_lang, target_lang, verbose=False):
     print(f"{lines_translated} strings translated for a total of {characterd_translated} characters.")
 
 # Reinsert text into BIN file
-def reinsert_text(input, output=None, verbose=False):
+def reinsert_text(input, output=None, extra_table={}, verbose=False):
     if not output:
         output = input.parent / f'{input.stem}.bin'
     else:
         output = Path(output)
 
+    extra_table = dict((k, v.lower()) for k, v in extra_table.items()) # value in lower case when reinserting
     json_data = read_json(input)
     blocks = json_data.keys()
     output_data = np.array([], dtype=np.ubyte)
@@ -884,7 +904,7 @@ def reinsert_text(input, output=None, verbose=False):
             elif strings[i] == '':
                 bin_pointers[i*2:(i*2)+2] = np.frombuffer(struct.pack('<H', offset), dtype=np.ubyte)
             else:
-                text_encoded = encode_text(strings[i])
+                text_encoded = encode_text(strings[i], extra_table)
 
                 if verbose and strings[i] != '':
                     print(f' Original text: {strings[i]}')
@@ -1180,6 +1200,14 @@ def bmp_to_raw(input, output, bpp, tile_w=None, tile_h = None, resize_width = No
     print('Done.')
 
 def main(command_line=None):
+    # Parser for extra table characters
+    class ParseExtraTable(argparse.Action):
+        def __call__(self, parser, namespace, values, option_string=None):
+            setattr(namespace, self.dest, dict())
+            for value in values:
+                key, value = value.split('=')
+                getattr(namespace, self.dest)[key] = value
+
     parser = argparse.ArgumentParser(prog='bof3tool.py', description='Breath of Fire III Tool (PSX/PSP)')
     subparser = parser.add_subparsers(help='Description', required=True, dest='command')
 
@@ -1188,6 +1216,7 @@ def main(command_line=None):
     unpack_parser.add_argument('-o', '--output-directory', dest='output_dir', help='output directory', type=str, required=False, default='')
     unpack_parser.add_argument('--dump-text', dest='dump_txt', default=False, action='store_true', help='dump text')
     unpack_parser.add_argument('--dump-graphic', dest='dump_gfx', default=False, action='store_true', help='dump graphic')
+    unpack_parser.add_argument('--extra-table', help="extra table (ex. A0=à A1=è A2=ò)", action=ParseExtraTable, required=False, nargs='+', default={})
     unpack_parser.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
 
     pack_parser = subparser.add_parser('pack', help='pack BIN files into EMI file')
@@ -1198,6 +1227,7 @@ def main(command_line=None):
     dump = subparser.add_parser('dump', help='dump text from BIN file')
     dump.add_argument('-i', '--input', help='input .BIN (text) files', type=Path, required=True, nargs='*')
     dump.add_argument('-o', '--output', help='output .JSON file', type=str, required=False, default=None)
+    dump.add_argument('--extra-table', help="extra table (ex. A0=à A1=è A2=ò)", action=ParseExtraTable, required=False, nargs='+', default={})
     dump.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
 
     translate = subparser.add_parser('translate', help='translate a JSON file using Amazon Translate (ML)')
@@ -1210,6 +1240,7 @@ def main(command_line=None):
     reinsert = subparser.add_parser('reinsert', help='reinsert text into BIN file')
     reinsert.add_argument('-i', '--input', help='input .JSON files', type=Path, required=True, nargs='*')
     reinsert.add_argument('-o', '--output', help='output .BIN (text) file', type=str, required=False, default=None)
+    reinsert.add_argument('--extra-table', help="extra table (ex. à=A0 è=A1 ò=A2)", action=ParseExtraTable, required=False, nargs='+', default={})
     reinsert.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
 
     index = subparser.add_parser('index', help='index all texts into single file')
@@ -1266,18 +1297,18 @@ def main(command_line=None):
     try:
         if args.command == 'unpack':
             for path in args.input:
-                unpack(input=path, output_dir=args.output_dir, dump_txt=args.dump_txt, dump_gfx=args.dump_gfx, verbose=args.verbose)
+                unpack(input=path, output_dir=args.output_dir, dump_txt=args.dump_txt, dump_gfx=args.dump_gfx, extra_table=args.extra_table, verbose=args.verbose)
         elif args.command == 'pack':
             for path in args.input:
                 pack(input=path, output_dir=args.output_dir, verbose=args.verbose)
         elif args.command == 'dump':
             for path in args.input:
-                dump_text(input=path, output=args.output, verbose=args.verbose)
+                dump_text(input=path, output=args.output, extra_table=args.extra_table, verbose=args.verbose)
         elif args.command == 'translate':
             translate_texts(input=args.input, output=args.output, source_lang=args.source_lang, target_lang=args.target_lang, verbose=args.verbose)
         elif args.command == 'reinsert':
             for path in args.input:
-                reinsert_text(input=path, output=args.output, verbose=args.verbose)
+                reinsert_text(input=path, output=args.output, extra_table=args.extra_table, verbose=args.verbose)
         elif args.command == 'index':
             index_texts(inputs=args.input, output_strings=args.output_strings, output_pointers=args.output_pointers, verbose=args.verbose)
         elif args.command == 'expand':

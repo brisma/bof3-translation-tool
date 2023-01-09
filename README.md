@@ -68,9 +68,10 @@ All'interno ci troveremo una struttura composta da:
 * un file JSON contenente le informazioni del file originale
 * una cartella contenente i file estratti dall'EMI
 
-Se al comando precedente aggiungiamo anche i parametri `--dump-text` e `--dump-graphic` avremo inoltre:
+Se al comando precedente aggiungiamo anche i parametri `--dump-text`, `--dump-graphic` e `--extra-table 9A=à 9B=ò...` avremo inoltre:
 * l'eventuale dump del testo rilevato in formato JSON (potrebbe non essere testo di gioco ma materiale di debug)
 * la grafica esportata in formato BMP secondo la mappa dei file conosciuti aventi grafica da tradurre
+* nel dump dei testi saranno gestiti eventuali caratteri extra (ad es. le accentate)
 
 Esempio di estrazione di un singolo file:
 ```
@@ -120,11 +121,18 @@ Packing unpacked/AREA000.json into output/AREA000.EMI...
 output/AREA000.EMI created.
 ```
 
+> **ATTENZIONE**: potrebbe capitare che durante la traduzione dei testi il nuovo file da reinserire sia più grande dell'originale.
+>
+> In questo caso il tool applicherà la seguente logica:
+> - se il file è di poco più grande e può rientrare nel padding originale del blocco (i blocchi sono da 2048 byte) verrà reinserito senza problemi poiché consuma il padding già presente
+> - se il file supera la dimensione originale e consuma tutto il padding disponibile allora il file all'interno dell'**EMI** verrà espanso in automatico purché sia minore del **limite massimo di 0x5800 (22528) byte**.
+> - se il file **supera** il **limite di 0x5800 (22528)** byte il reimpacchettamente andrà in **errore**
+
 ### Estrazione del testo
 Per estrarre il testo di gioco si può utilizzare il comando `dump` sul file BIN contenente il testo:
 
 ```
-python bof3tool.py dump -i unpacked/AREA000/AREA000.12.bin -o AREA000.12.bin.json
+python bof3tool.py dump -i unpacked/AREA000/AREA000.12.bin -o AREA000.12.bin.json --extra-table 9A=à 9B=ò...
 ```
 
 Il risultato che otterremo sarà:
@@ -150,6 +158,8 @@ Il file JSON creato conterrà il testo codificato in UTF-8 e tutti i comandi (pa
   ]
 }
 ```
+
+Inoltre se è stato aggiunto il parametro opzionale `--extra-table` saranno dumpati anche eventuali caratteri extra come ad es. le accentate del precedente esempio.
 
 ### Traduzione automatico con Amazon Translate (ML)
 Utilizzando la funzione `translate` è possibile automatizzare la traduzione del testo sfruttando il Machine Learning di Amazon Translate.
@@ -207,7 +217,7 @@ Nel repository, all'interno della cartella ***autotranslate*** potete trovare i 
 Allo stesso modo è possibile ricostruire un file BIN di testo partendo da un JSON utilizzando:
 
 ```
-python bof3tool.py reinsert -i AREA000.12.bin.json -o AREA000.12.bin
+python bof3tool.py reinsert -i AREA000.12.bin.json -o AREA000.12.bin --extra-table 9A=à 9B=ò...
 ```
 
 Il risultato che otterremo sarà:
@@ -217,6 +227,8 @@ Il risultato che otterremo sarà:
 Reinserting 256 strings from block0 of AREA000.12.bin.json into AREA000.12.bin...
 Text reinserted.
 ```
+
+Anche in questo caso la presenza del parametro opzionale `--extra-table` permette di gestire eventuali caratteri UTF8 presenti nel dump con i suoi corrispettivi valori byte (ad es. la lettera **à** verrà inserite come byte **0x9A** e via dicendo).
 
 Il nuovo file BIN ottenuto potrà essere reinserito nel file EMI.
 

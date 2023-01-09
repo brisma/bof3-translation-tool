@@ -6,6 +6,18 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
+# Rimuove le cartelle/file che non contengono testo da tradurre
+dirs_to_delete="BENEMY BGM BMAG_XA BPLCHAR PLCHAR SCE_XA MODULE PSMF dummy.bin"
+
+for dir in $dirs_to_delete; do
+  if [ -d "$BIN/$dir" ]; then
+    rm -rf "$BIN/$dir"
+  fi
+  if [ -f "$BIN/$dir" ]; then
+    rm "$BIN/$dir"
+  fi
+done
+
 # Rimuovi tutte le AREA non utilizzate per entrambe le versioni
 files_to_delete="AREA006 AREA025 AREA029 AREA036 AREA063 AREA064 AREA070 AREA072 AREA073 AREA076 AREA084 AREA093 AREA102 AREA106 AREA109 AREA110 AREA124 AREA125 AREA127 AREA137 AREA138 AREA139 AREA146 AREA156 AREA158 AREA159 AREA160 AREA161 AREA162 AREA163 AREA190"
 
@@ -36,8 +48,11 @@ done
 mkdir -p GFX/$BIN
 find "UNPACKED/$BIN/" -name "*.bmp" -exec mv {} "GFX/$BIN" \;
 
+# Crea la cartella dei file da iniettare
+mkdir -p INJECT/$BIN
+
 # Indicizza i dump di WORLD
-python bof3tool.py index -i DUMP/$BIN/WORLD/*.json --output-strings dump_world_$BIN.json --output-pointers pointers_world_$BIN.json
+python bof3tool.py index -i DUMP/$BIN/WORLD/*.json --output-strings DUMP/dump_world_$BIN.json --output-pointers DUMP/pointers_world_$BIN.json
 
 # Indicizza i dump di MENU
-python bof3tool.py index -i DUMP/$BIN/MENU/*.json --output-strings dump_menu_$BIN.json --output-pointers pointers_menu_$BIN.json
+python bof3tool.py index -i DUMP/$BIN/MENU/*.json --output-strings DUMP/dump_menu_$BIN.json --output-pointers DUMP/pointers_menu_$BIN.json
