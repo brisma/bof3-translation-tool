@@ -1,5 +1,139 @@
 #!/bin/bash
 
+BIN_TO_DUPLICATE="AREA005.11.bin AREA009.11.bin
+AREA005.11.bin AREA010.11.bin
+AREA005.11.bin AREA012.11.bin
+AREA005.11.bin AREA018.11.bin
+AREA005.11.bin AREA019.11.bin
+AREA030.5.bin AREA089.5.bin
+AREA030.5.bin AREA129.5.bin
+AREA044.11.bin AREA048.11.bin
+AREA095.11.bin AREA096.11.bin
+AREA135.11.bin AREA136.11.bin
+BATTLE.16.bin BATTLE2.16.bin
+BATTLE.16.bin BOSS001.13.bin
+BATTLE.16.bin BOSS002.16.bin
+BATTLE.16.bin BOSS004.13.bin
+BATTLE.16.bin BOSS007.16.bin
+BATTLE.16.bin BOSS008.16.bin
+BATTLE.16.bin BOSS012.16.bin
+BATTLE.16.bin BOSS013.16.bin
+BATTLE.16.bin BOSS014.16.bin
+BATTLE.16.bin BOSS015.16.bin
+BATTLE.16.bin BOSS017.16.bin
+BATTLE.16.bin BOSS018.16.bin
+BATTLE.16.bin BOSS019.16.bin
+BATTLE.16.bin BOSS020.16.bin
+BATTLE.16.bin BOSS021.16.bin
+BATTLE.16.bin BOSS022.13.bin
+BATTLE.16.bin BOSS023.16.bin
+BATTLE.16.bin BOSS024.16.bin
+BATTLE.16.bin BOSS025.13.bin
+BATTLE.16.bin BOSS027.16.bin
+BATTLE.16.bin BOSS028.16.bin
+BATTLE.16.bin BOSS029.16.bin
+BATTLE.16.bin BOSS030.16.bin
+BATTLE.16.bin BOSS031.13.bin
+BATTLE.16.bin BOSS032.16.bin
+BATTLE.16.bin BOSS033.16.bin
+BATTLE.16.bin BOSS034.16.bin
+BATTLE.16.bin BOSS035.16.bin
+BATTLE.16.bin BOSS036.16.bin
+BATTLE.16.bin BOSS037.16.bin
+BATTLE.16.bin BOSS038.16.bin
+BATTLE.16.bin BOSS040.16.bin
+BATTLE.16.bin BOSS042.16.bin
+BATTLE.16.bin BOSS046.16.bin
+BATTLE.16.bin BOSS047.16.bin
+BATTLE.16.bin BOSS049.16.bin
+BATTLE.16.bin BOSS050.16.bin
+BATTLE.16.bin BOSS051.16.bin
+BATTLE.16.bin BOSS052.16.bin
+BATTLE.16.bin BOSS054.16.bin
+BATTLE.16.bin BOSS055.16.bin
+BATTLE.4.bin BATTLE2.4.bin
+BATTLE.4.bin BOSS001.1.bin
+BATTLE.4.bin BOSS002.4.bin
+BATTLE.4.bin BOSS004.1.bin
+BATTLE.4.bin BOSS007.4.bin
+BATTLE.4.bin BOSS008.4.bin
+BATTLE.4.bin BOSS012.4.bin
+BATTLE.4.bin BOSS013.4.bin
+BATTLE.4.bin BOSS014.4.bin
+BATTLE.4.bin BOSS015.4.bin
+BATTLE.4.bin BOSS017.4.bin
+BATTLE.4.bin BOSS018.4.bin
+BATTLE.4.bin BOSS019.4.bin
+BATTLE.4.bin BOSS020.4.bin
+BATTLE.4.bin BOSS021.4.bin
+BATTLE.4.bin BOSS022.1.bin
+BATTLE.4.bin BOSS023.4.bin
+BATTLE.4.bin BOSS024.4.bin
+BATTLE.4.bin BOSS025.1.bin
+BATTLE.4.bin BOSS027.4.bin
+BATTLE.4.bin BOSS028.4.bin
+BATTLE.4.bin BOSS029.4.bin
+BATTLE.4.bin BOSS030.4.bin
+BATTLE.4.bin BOSS031.1.bin
+BATTLE.4.bin BOSS032.4.bin
+BATTLE.4.bin BOSS033.4.bin
+BATTLE.4.bin BOSS034.4.bin
+BATTLE.4.bin BOSS035.4.bin
+BATTLE.4.bin BOSS036.4.bin
+BATTLE.4.bin BOSS037.4.bin
+BATTLE.4.bin BOSS038.4.bin
+BATTLE.4.bin BOSS040.4.bin
+BATTLE.4.bin BOSS042.4.bin
+BATTLE.4.bin BOSS046.4.bin
+BATTLE.4.bin BOSS047.4.bin
+BATTLE.4.bin BOSS049.4.bin
+BATTLE.4.bin BOSS050.4.bin
+BATTLE.4.bin BOSS051.4.bin
+BATTLE.4.bin BOSS052.4.bin
+BATTLE.4.bin BOSS054.4.bin
+BATTLE.4.bin BOSS055.4.bin
+BOSS025.14.bin BOSS027.17.bin
+COMMU00.1.bin AREA175.15.bin
+COMMU00.1.bin AREA176.15.bin
+COMMU00.1.bin AREA177.15.bin
+COMMU00.1.bin AREA178.15.bin
+COMMU00.1.bin AREA179.15.bin
+COMMU00.1.bin AREA180.15.bin
+COMMU00.1.bin AREA181.15.bin
+COMMU00.1.bin AREA182.15.bin
+COMMU00.1.bin AREA183.15.bin
+COMMU00.1.bin AREA184.15.bin
+COMMU00.1.bin AREA185.15.bin
+COMMU02.9.bin COMMU02B.8.bin
+START.9.bin STATUS.1.bin"
+
+GFX_TO_DUPLICATE="DEMO.6.bin TURISHAR.3.bin
+DEMO.5.bin TURISHAR.2.bin
+MAGIC008.2.bin MAGIC013.5.bin
+MAGIC008.2.bin MAGIC038.8.bin
+MAGIC008.2.bin MAGIC039.5.bin
+MAGIC008.2.bin MAGIC040.5.bin
+MAGIC008.2.bin MAGIC043.5.bin
+MAGIC008.2.bin MAGIC062.5.bin
+MAGIC008.2.bin MAGIC069.5.bin
+MAGIC008.2.bin MAGIC082.5.bin
+MAGIC008.2.bin MAGIC083.5.bin
+MAGIC008.2.bin MAGIC088.5.bin
+MAGIC008.2.bin MAGIC225.5.bin
+BATE.2.bin COMMU01.1.bin
+BATE.2.bin COMMU02B.1.bin
+BATE.2.bin COMMU05.1.bin
+BATE.2.bin SHISU.2.bin
+BATE.2.bin SHOP.2.bin
+BATE.2.bin SISYOU.2.bin
+BATE.2.bin START.4.bin
+BATE.2.bin STATUS.2.bin
+BATE.2.bin AREA030.21.bin
+BATE.2.bin AREA089.21.bin
+BATE.2.bin AREA129.21.bin
+AREA030.14.bin TURIMODE.4.bin
+AREA151.6.bin AREA152.6.bin"
+
 BIN=$1
 if [ -z "$1" ]; then
   echo "Errore: non è stata specificata la cartella da ricostruire"
@@ -50,7 +184,7 @@ while read -r original duplicate; do
   if [ -f "TEMP/BIN/$BIN/$original" ]; then
     cp TEMP/BIN/$BIN/$original TEMP/BIN/$BIN/$duplicate
   fi
-done < gfx_to_duplicate.txt
+done <<< "$GFX_TO_DUPLICATE"
 
 # Copio i file binari e duplico i mancanti
 if [ "$(ls -A BINARY/$BIN)" ]; then
@@ -60,7 +194,7 @@ while read -r original duplicate; do
   if [ -f "TEMP/BIN/$BIN/$original" ]; then
     cp TEMP/BIN/$BIN/$original TEMP/BIN/$BIN/$duplicate
   fi
-done < bin_to_duplicate.txt
+done <<< "$BIN_TO_DUPLICATE"
 
 # Copio i file da iniettare
 if [ "$(ls -A INJECT/$BIN)" ]; then
