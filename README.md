@@ -1,6 +1,27 @@
 # bof3-translation-tool
 Breath of Fire 3 Translation Tool
 
+- [bof3-translation-tool](#bof3-translation-tool)
+  - [Introduzione](#introduzione)
+  - [Utilizzo](#utilizzo)
+    - [Spacchettare file EMI](#spacchettare-file-emi)
+    - [Reimpacchattare file EMI](#reimpacchattare-file-emi)
+    - [Estrazione del testo](#estrazione-del-testo)
+    - [Traduzione automatico con Amazon Translate (ML)](#traduzione-automatico-con-amazon-translate-ml)
+    - [Reinserimento testo](#reinserimento-testo)
+    - [Indicizzazione dei testi](#indicizzazione-dei-testi)
+    - [Espansione testi indicizzati](#espansione-testi-indicizzati)
+    - [Conversione grafica RAW in TIM/BMP](#conversione-grafica-raw-in-timbmp)
+    - [Conversione grafica TIM/BMP in RAW](#conversione-grafica-timbmp-in-raw)
+  - [Dump di tutti i testi/grafiche/file binari da modificare](#dump-di-tutti-i-testigrafichefile-binari-da-modificare)
+    - [Prerequisiti](#prerequisiti)
+    - [Estrazione](#estrazione)
+    - [Risultato finale](#risultato-finale)
+  - [Reinserimento di tutti i testi/grafiche/file binari modificati](#reinserimento-di-tutti-i-testigrafichefile-binari-modificati)
+    - [Prerequisiti](#prerequisiti-1)
+    - [Reinserimento](#reinserimento)
+    - [Risultato finale](#risultato-finale-1)
+
 ## Introduzione
 Questo tool è stato sviluppato per spacchettare e reimpacchettare i file in formato EMI di Breath of Fire 3 PSX/PSP. 
 Con ogni probabilità funziona anche con Breath of Fire 4 (almeno per la gestione degli EMI, non ho verificato testi/grafica).
@@ -166,7 +187,7 @@ Utilizzando la funzione `translate` è possibile automatizzare la traduzione del
 
 L'utilizzo richiede la creazione di un **account AWS** e la **configurazione dell'AWS CLI** localmente sul proprio computer.
 
-> ATTENZIONE: la traduzione automatica è utile solo per avere una "prima bozza" dei testi tradotti e/o giusto per avere un confronto con ciò che verrebbe automaticamente tradotto con l'utilizzo del Machine Learning  ad inizio 2023.
+> **ATTENZIONE**: la traduzione automatica è utile solo per avere una "prima bozza" dei testi tradotti e/o giusto per avere un confronto con ciò che verrebbe automaticamente tradotto con l'utilizzo del Machine Learning  ad inizio 2023.
 >
 > La traduzione proposta contiene errori vari come:
 > - traduzione decontestualizzata e/o non corretta
@@ -426,4 +447,142 @@ Ed ecco che il file `ENDKANJI.1.bin` è pronto ad essere reinserito nell'EMI ori
 
 > Anche in questo caso il processo con le TIM è il medesimo utilizzando `raw2tim`.
 > 
-> Attenzione: se state convertendo una BMP "negativa" non c'è bisogno di specificare alcun ulteriore parametro in quanto la palette dei colori non è presente nella RAW.
+> **ATTENZIONE**: se state convertendo una BMP "negativa" non c'è bisogno di specificare alcun ulteriore parametro in quanto la palette dei colori non è presente nella RAW.
+
+## Dump di tutti i testi/grafiche/file binari da modificare
+All'interno del repository viene fornito uno script `dump.sh` bash che automatizza l'esportazione di tutti i contenuti che andranno tradotti/modificati.
+
+L'utilizzo dello script è pensato per essere eseguire tramite un **terminale bash** e sfrutta varie utiliy UNIX (ad es. find e rsync) ma dovrebbe essere cross compatibile su **Windows**, **Linux** e **MacOS** (a patto di avere il terminale a disposizione).
+
+### Prerequisiti
+Lo script `dump.sh` è pensato per essere eseguito su una cartella contenente la struttura dei file di **Breath Of Fire 3** **PSX** o **PSP**.
+
+Immaginando di avere la ISO del gioco a disposizione sarà necessario esportare la cartella **BIN** (per la versione PSX) o la cartella **USA** (per la versione PSP) e rinomicarle rispettivamente PSX e PSP.
+
+> Potete copiare la cartella PSX/PSP direttamente in questo repository.
+
+Ad es. ci ritroveremo con una cartella avente questa struttura:
+
+- PSX
+  - BATTLE
+  - BENEMY
+  - BGM
+  - BMAG_XA
+  - BMAGIC
+  - BOSS
+  - BPLCHAR
+  - ETC
+  - PLCHAR
+  - SCE_XA
+  - SCENARIO
+  - WORLD00
+  - WORLD01
+  - WORLD02
+  - WORLD03
+  - WORLD04
+
+A questo punto siamo pronti per l'estrazione.
+
+### Estrazione
+Per effettuare l'esportazione dei contenuti è sufficiente lanciare il tool sulla cartella originale:
+
+```./dump.sh PSX```
+
+Lo script inizierà a lavorare sul contenuto della cartella del gioco effettuando questi passaggi:
+
+1. Cancellazione dei file/cartelle non necessari/e
+2. Spacchetta tutti i file .EMI e dumpa testo e grafica
+3. Sposta i dump del gioco e dei menu nelle cartelle finali
+4. Sposta le grafiche nelle cartelle finali
+5. Rimuove le grafiche doppie
+6. Copia i file binari da modificare manualmente
+7. Indicizza i dump di gioco e di menu
+
+### Risultato finale
+Al termine della procedura otterremo le seguenti cartelle/file:
+
+- BINARY
+  - PSX
+    - AREA002.14.bin (**da modificare**)
+    - AREA003.11.bin (**da modificare**)
+    - ...
+- DUMP
+  - PSX
+    - MENU
+      - AFLDKWA.1.bin.json (*da ignorare*)
+      - BATTLE.12.bin.json (*da ignorare*)
+      - ...
+    - WORLD
+      - AREA000.12.bin.json (*da ignorare*)
+      - AREA001.12.bin.json (*da ignorare*)
+      - ...
+  - dump_menu_PSX.json (**da modificare**)
+  - pointers_menu_PSX.json (**da modificare**)
+  - dump_world_PSX.json (**da modificare**)
+  - pointers_world_PSX.json (**da modificare**)
+- GFX
+  - PSX
+    - AREA016.6.bin.8b.64w.64x32.1024r.bmp (**da modificare**)
+    - AREA016.8.bin.8b.64w.64x32.1024r.bmp (**da modificare**)
+    - ...
+- INJECT (*cartella vuota da utilizzare per iniettare file*)
+  - PSX
+    - Vuota
+- UNPACKED (cartella *da ignorare*)
+  - PSX
+    - BATTLE
+    - BMAGIC
+    - ...
+
+Ho evidenziato tutte le risorse che andranno modificate prima di effettuare il reinserimento dei contenuti.
+
+## Reinserimento di tutti i testi/grafiche/file binari modificati
+Sempre all'interno del repository è presente uno script `reinsert.sh` che effettua il reinserimento di tutti i contenuti precedentemente esportati.
+
+### Prerequisiti
+Prima di poter procedere al reinserimento dobbiamo **aver completato la procedura di dump** (vedere il **capito precedente**).
+
+Oltre a ciò, ovviamente, sarà necessario avere modificato i file descritti in precedenza.
+
+> **ATTENZIONE**: se necessario è possibile iniettare dei file aggiuntivi tramite la cartella **INJECT**, essi verranno reinseriti a valle di tutta la procedura prima del reimpacchettamento dei file **EMI**.
+
+### Reinserimento
+Per effettuare il reinserimento dei contenuti è sufficiente lanciare il tool sulla cartella originale:
+
+```./reinsert.sh PSX```
+
+Lo script inizierà a lavorare sul contenuto della cartella modificate effettuando questi passaggi:
+
+1. Cancella l'eventuale cartella temporanea **TEMP**
+2. Copia i dump indicizzati nella cartella **DUMP** nella **TEMP**
+3. Espande i dump indicizzati all'interno della cartella **TEMP**
+4. Trasforma i file di dump (**JSON**) del gioco e dei menu in file binari
+5. Copia le grafiche nella cartella **GFX** nella cartella **TEMP**
+6. Converte le grafiche sulla base del nome nuovamente in **RAW**
+7. Duplica le grafiche mancanti (molte sono ripetute in più file)
+8. Copia i file binari contenuti nella cartella **BINARY** in **TEMP**
+9. Duplica i file binari mancanti (molti sono ripetuti in più file)
+10. Se sono presenti dei file da iniettare nella cartella **INJECT** vengono ora copiati in **TEMP** ed eventualmente sovrascrivendo file già presenti
+11. Copia gli **EMI** spacchettati nella cartella **UNPACKED** in **TEMP**
+12. Sostituisce i file binari da reimpacchettare nelle destinazioni finali di **TEMP**
+13. Reimpacchetta tutti i file **EMI** in **TEMP**
+14. Crea la cartella di **OUTPUT** finale
+15. Copia tutti i file **EMI** generati nella cartella **OUTPUT**
+16. Elimina tutti i file **EMI** che risultano essere ancora identici agli originali
+
+### Risultato finale
+Al termine di tutta la procedura, se non ci sono stati errori, otterremo all'interno della cartella di **OUTPUT** i file **EMI** da reinserire nella **ISO** con questa struttura:
+
+- OUTPUT
+  - PSX
+    - BATTLE
+      - BATTLE.EMI
+      - BATTLE2.EMI
+      - ...
+    - ...
+    - WORLD00
+      - AREA000.EMI
+      - AREA001.EMI
+      - ...
+
+> **ATTENZIONE**: solo se gli **EMI** presentano dei file modificati al loro interno saranno presente nella cartella di **OUTPUT**.
