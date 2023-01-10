@@ -45,6 +45,23 @@ do
     python bof3tool.py bmp2raw -i "$file" -o "TEMP/BIN/$BIN/$bin_name" --bpp "$bpp" --tile-width "$tile_w" --tile-height "$tile_h" --resize-width "$resize_width"
 done
 
+# Duplico le grafiche necessarie
+while read -r original duplicate; do
+  if [ -f "TEMP/BIN/$BIN/$original" ]; then
+    cp TEMP/BIN/$BIN/$original TEMP/BIN/$BIN/$duplicate
+  fi
+done < gfx_to_duplicate.txt
+
+# Copio i file binari e duplico i mancanti
+if [ "$(ls -A BINARY/$BIN)" ]; then
+  cp -R BINARY/$BIN/* TEMP/BIN/$BIN
+fi
+while read -r original duplicate; do
+  if [ -f "TEMP/BIN/$BIN/$original" ]; then
+    cp TEMP/BIN/$BIN/$original TEMP/BIN/$BIN/$duplicate
+  fi
+done < bin_to_duplicate.txt
+
 # Copio i file da iniettare
 if [ "$(ls -A INJECT/$BIN)" ]; then
   cp -R INJECT/$BIN/* TEMP/BIN/$BIN

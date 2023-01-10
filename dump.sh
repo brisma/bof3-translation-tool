@@ -48,6 +48,19 @@ done
 mkdir -p GFX/$BIN
 find "UNPACKED/$BIN/" -name "*.bmp" -exec mv {} "GFX/$BIN" \;
 
+# Rimuovo le grafiche doppie
+for file in $(cat gfx_to_remove.txt); do
+  if [ -f "GFX/$BIN/$file" ]; then
+    rm GFX/$BIN/$file
+  fi
+done
+
+# Copio i file BIN da modificare
+mkdir -p BINARY/$BIN
+for file in $(cat bin_to_export.txt); do
+  cp UNPACKED/$BIN/$file BINARY/$BIN
+done
+
 # Crea la cartella dei file da iniettare
 mkdir -p INJECT/$BIN
 

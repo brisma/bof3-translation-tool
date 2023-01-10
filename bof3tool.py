@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.0.3'
+version = '1.0.4'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -74,7 +74,8 @@ gfx_map = {
     'AREA151.6.bin': '8b.64w.64x32.1024r',
     'AREA151.8.bin': '8b.64w.64x32.1024r',
     'AREA152.6.bin': '8b.64w.64x32.1024r',
-    'AREA152.8.bin': '8b.64w.64x32.1024r'
+    'AREA152.8.bin': '8b.64w.64x32.1024r',
+    'DEMO.5.bin': '8b.64w.64x32.256r'
 }
 
 def extract_gfx_values(format):
