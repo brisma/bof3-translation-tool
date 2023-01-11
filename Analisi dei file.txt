@@ -548,3 +548,27 @@ WORLD04/AREA173/AREA173.15.bin
 WORLD04/AREA174/AREA174.14.bin
 WORLD04/AREA188/AREA188.14.bin
 WORLD04/AREA199/AREA199.14.bin
+
+Estrazione Raw Dump:
+
+[BOF3 PSX PAL]
+
+GAME.1.bin:
+python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.menu.json --offset 0x324B8 --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.items.json --offset 0x331E8 --quantity 12 --skip 6 --repeat 92 --trim
+python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.key_items.json --offset 0x33860 --quantity 12 --skip 4 --repeat 16 --trim
+python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.weapons.json --offset 0x33960 --quantity 12 --skip 12 --repeat 83 --trim
+python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.armors.json --offset 0x34128 --quantity 12 --skip 10 --repeat 68 --trim
+python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.accessories.json --offset 0x34700 --quantity 12 --skip 8 --repeat 52 --trim
+python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.abilities.json --offset 0x34FA4 --quantity 12 --skip 8 --repeat 227 --trim
+
+[BOF3 PSX USA]
+
+GAME.1.bin:
+python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.menu.json --offset 0x32434 --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.items.json --offset 0x33164 --quantity 12 --skip 6 --repeat 92 --trim
+python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.key_items.json --offset 0x337DC --quantity 12 --skip 4 --repeat 16 --trim
+python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.weapons.json --offset 0x338DC --quantity 12 --skip 12 --repeat 83 --trim
+python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.armors.json --offset 0x340A4 --quantity 12 --skip 10 --repeat 68 --trim
+python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.accessories.json --offset 0x3467C --quantity 12 --skip 8 --repeat 52 --trim
+python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.abilities.json --offset 0x34F20 --quantity 12 --skip 8 --repeat 227 --trim

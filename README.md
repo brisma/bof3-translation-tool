@@ -7,8 +7,10 @@ Breath of Fire 3 Translation Tool
     - [Spacchettare file EMI](#spacchettare-file-emi)
     - [Reimpacchattare file EMI](#reimpacchattare-file-emi)
     - [Estrazione del testo](#estrazione-del-testo)
+    - [Estrazione del testo manualmente (Raw Dump)](#estrazione-del-testo-manualmente-raw-dump)
     - [Traduzione automatico con Amazon Translate (ML)](#traduzione-automatico-con-amazon-translate-ml)
     - [Reinserimento testo](#reinserimento-testo)
+    - [Reinserimento del testo manualmente (Raw Reinsert)](#reinserimento-del-testo-manualmente-raw-reinsert)
     - [Indicizzazione dei testi](#indicizzazione-dei-testi)
     - [Espansione testi indicizzati](#espansione-testi-indicizzati)
     - [Conversione grafica RAW in TIM/BMP](#conversione-grafica-raw-in-timbmp)
@@ -40,18 +42,20 @@ python bof3tool.py -h
 Ad esempio mostrerà cosa è in grado di fare;
 
 ```
-usage: bof3tool.py [-h] [-v] {unpack,pack,raw2tim,tim2raw,raw2bmp,bmp2raw,dump,reinsert,index,expand} ...
+usage: bof3tool.py [-h] [-v] {unpack,pack,dump,rawdump,translate,reinsert,rawreinsert,index,expand,raw2tim,tim2raw,raw2bmp,bmp2raw} ...
 
 Breath of Fire III Tool (PSX/PSP)
 
 positional arguments:
-  {unpack,pack,raw2tim,tim2raw,raw2bmp,bmp2raw,dump,reinsert,index,expand}
+  {unpack,pack,dump,rawdump,translate,reinsert,rawreinsert,index,expand,raw2tim,tim2raw,raw2bmp,bmp2raw}
                         Description
     unpack              unpack EMI files into BIN files
     pack                pack BIN files into EMI file
     dump                dump text from BIN file
+    rawdump             raw dump bytes from file
     translate           translate a JSON file using Amazon Translate (ML)
     reinsert            reinsert text into BIN file
+    rawreinsert         raw reinsert bytes into file
     index               index all texts into single file
     expand              expand an indexed file into multiple files
     raw2tim             convert graphic RAW to TIM (PSX)
@@ -68,8 +72,10 @@ I comandi a disposizione sono:
 * **unpack**: estrae il contenuto dei file EMI
 * **pack**: ricostruisce il file EMI precedentemente estratto
 * **dump**: estrae il testo da un file BIN in un file di testo JSON
+* **rawdump**: estrae sequenze di byte ripetutamente da un file come JSON
 * **translate**: traduce un file di testo JSON utilizzando Amazon Translate (ML)
 * **reinsert**: converte un file di testo JSON in formato BIN
+* **rawreinsert**: reinserisce sequenze di byte ripetutamente in un file da un JSON
 * **index**: indicizza più file di testo in un unico file (utile per i testi ripetuti)
 * **expand**: espande un file indicizzato negli originali file di testo (testi ripetuti)
 * **raw2tim**: converte un file grafico RAW in formato TIM riarraggiando i tile
@@ -150,7 +156,7 @@ output/AREA000.EMI created.
 > - se il file **supera** il **limite di 0x5800 (22528)** byte il reimpacchettamente andrà in **errore**
 
 ### Estrazione del testo
-Per estrarre il testo di gioco si può utilizzare il comando `dump` sul file BIN contenente il testo:
+Per estrarre il testo di gioco nel formato **puntatori+testo** possiamo utilizzare il comando `dump` sul file BIN contenente il testo:
 
 ```
 python bof3tool.py dump -i unpacked/AREA000/AREA000.12.bin -o AREA000.12.bin.json --extra-table 9A=à 9B=ò...
@@ -164,7 +170,7 @@ Dumping 256 strings from block0 of unpacked/AREA000/AREA00.12.bin into unpacked/
 Text dumped.
 ```
 
-Il file JSON creato conterrà il testo codificato in UTF-8 e tutti i comandi (pause, posizioni, nomi etc) come ad esempio:
+Il **file JSON** creato conterrà il testo codificato in **UTF-8** e tutti i comandi (pause, posizioni, nomi etc) come ad esempio:
 
 ```json
 {
@@ -181,6 +187,60 @@ Il file JSON creato conterrà il testo codificato in UTF-8 e tutti i comandi (pa
 ```
 
 Inoltre se è stato aggiunto il parametro opzionale `--extra-table` saranno dumpati anche eventuali caratteri extra come ad es. le accentate del precedente esempio.
+
+### Estrazione del testo manualmente (Raw Dump)
+Molti file binari del gioco presentano del testo al loro interno, tuttavia essi non sono il solito schema puntatori+testo ma sono pezzi di eseguibili PSX/PSP che necessitano di essere modificati manualmente. Al loro interno si possono notare degli schemi ripetuti a distanze fisse. La funzionalità `rawdump` serve proprio a gestire queste situazioni.
+
+Un esempio di file 'grezzo' contenente dei testo è **GAME.1.bin** (di seguito quello estratto dalla versione **PSX NTSC/USA**):
+
+![GAME.1.bin Example](./img/GAME.1.bin.png)
+
+Come si può notare il blocco di testo non è all'inizio del file ma parte da un **offset** più avanti (**0x33164**) ed inizia dalla parola ***Nothing*** ed è sempre incasellato in **quantità** da 12 byte, **ripetuto** per diverse righe. Per passare da un oggetto all'altro dobbiamo **saltare** 6 ulteriori byte per raggiungere l'oggetto successivo.
+
+Se volessimo estrarre questo blocco di testo possiamo utilizzare ad es. il seguente comando:
+
+```
+python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.items.json --offset 0x33164 --quantity 12 --skip 6 --repeat 92 --trim
+```
+
+Il risultato sarà:
+```
+--- Breath of Fire III Tool (PSX/PSP) ---
+
+Raw dumped 12 byte from GAME.1.bin into GAME.1.bin.items.json 92 times.
+```
+
+Così facendo otterremo un **file JSON GAME.1.bin.items.json** contenente i 92 oggetti estratti dal file originale avente questa forma:
+
+```json
+{
+    "data": {
+        "input": "GAME.1.bin",
+        "offset": 209252,
+        "quantity": 12,
+        "skip": 6,
+        "repeat": 92
+    },
+    "dump": [
+        "Nothing",
+        "Green Apple",
+        "Bread",
+        "Healing Herb",
+        "Vitamin",
+        "MultiVitamin",
+        "Vitamins",
+        ...
+    ]
+}
+```
+
+> **ATTENZIONE**: al fondo del comando è presente un `--trim`, esso serve a rimuovere i **byte 0x00** in eccesso al raggiungimento dei 12 caratteri.
+> 
+> Inolre bisogna fare attenzione che **non è possibile superare il limite fisico di 12 byte** in fase di traduzione (per questo esempio).
+
+> **ATTENZIONE**: anche in questo caso è possibile sfruttare il parametro `--extra-table` per aggiungere ulteriori caratteri all'estrazione.
+
+All'interno del **file JSON** generato saranno presenti tutte le informazioni necessarie al reinserimento del testo in quello specifico file. Possiamo immaginarlo come una sorta di ***patch*** da applicare al file originale.
 
 ### Traduzione automatico con Amazon Translate (ML)
 Utilizzando la funzione `translate` è possibile automatizzare la traduzione del testo sfruttando il Machine Learning di Amazon Translate.
@@ -253,6 +313,26 @@ Anche in questo caso la presenza del parametro opzionale `--extra-table` permett
 
 Il nuovo file BIN ottenuto potrà essere reinserito nel file EMI.
 
+### Reinserimento del testo manualmente (Raw Reinsert)
+Se abbiamo estratto del testo utilizzando la modalità **Raw Dump** ed intendiamo reinserirlo nel file originale di provenienza possiamo utilizzare la funzionalità di `rawreinsert`.
+
+Il suo funzionamento è estremamente semplice ma richiede che il **file JSON** ed il **file originale** siano all'interno della **stessa cartella**.
+
+Per procedere al reinserimento possiamo utilizzare il comando `rawreinsert`:
+
+```
+python bof3tool.py rawreinsert -i GAME.1.bin.items.json
+```
+
+Il risultato che otterremo sarà:
+```
+--- Breath of Fire III Tool (PSX/PSP) ---
+
+Raw reinserted 12 byte of new encoded data from GAME.1.bin.items.json into GAME.1.bin 92 times.
+```
+
+> **ATTENZIONE**: anche in questo caso è possibile sfruttare il parametro `--extra-table` per aggiungere ulteriori caratteri nell'inserimento.
+
 ### Indicizzazione dei testi
 Moltissimi file di testo di Breath of Fire III contengono del testo ripetuto in quanto sono semplicemente le medesime scene con leggere variazioni (tempo/personaggi).
 
@@ -274,7 +354,7 @@ Indexed 6365 strings (4475 repeated strings) for block0.
 ### Espansione testi indicizzati
 Da un file di testo indicizzato e dai suoi "puntatori" è possibile riottenere i file JSON originali da poter ritrasformare nei BIN da reinserire negli EMI.
 
-Per effettuare l'espansione si può utilizzare il seguente comando:
+Per effettuare l'espansione possiamo utilizzare il seguente comando:
 ```
 python bof3tool.py expand --input-strings strings_en.json --input-pointers pointers_en.json -o expanded
 ```
@@ -360,7 +440,7 @@ L'immagine che otterremo sarà la seguente:
 
 ![Font not arranged](./img/ENDKANJI.1.bin.4b.128w.bmp)
 
-Come si può notare l'immagine è corretta a livello di impostazioni ma è evidente che è suddivisa internamente in tile da 128x32 (il secondo blocco in verticale dovrebbe essere in realtà spostato a destra del primo blocco) secondo questo criterio:
+Come possiamo notare l'immagine è corretta a livello di impostazioni ma è evidente che è suddivisa internamente in tile da 128x32 (il secondo blocco in verticale dovrebbe essere in realtà spostato a destra del primo blocco) secondo questo criterio:
 - Tile 1
 - Tile 2
 - Tile 3
@@ -455,7 +535,7 @@ All'interno del repository viene fornito uno script `dump.sh` bash che automatiz
 L'utilizzo dello script è pensato per essere eseguire tramite un **terminale bash** e sfrutta varie utiliy UNIX (ad es. find e rsync) ma dovrebbe essere cross compatibile su **Windows**, **Linux** e **MacOS** (a patto di avere il terminale a disposizione).
 
 ### Prerequisiti
-Lo script `dump.sh` è pensato per essere eseguito su una cartella contenente la struttura dei file di **Breath Of Fire 3** **PSX** o **PSP**.
+Lo script `dump.sh` è pensato per essere eseguito su una cartella contenente la struttura dei file di **Breath of Fire 3** **PSX** o **PSP**.
 
 Immaginando di avere la ISO del gioco a disposizione sarà necessario esportare la cartella **BIN** (per la versione PSX) o la cartella **USA** (per la versione PSP) e rinomicarle rispettivamente PSX e PSP.
 
@@ -493,10 +573,11 @@ Lo script inizierà a lavorare sul contenuto della cartella del gioco effettuand
 1. Cancellazione dei file/cartelle non necessari/e
 2. Spacchetta tutti i file .EMI e dumpa testo e grafica
 3. Sposta i dump del gioco e dei menu nelle cartelle finali
-4. Sposta le grafiche nelle cartelle finali
-5. Rimuove le grafiche doppie
-6. Copia i file binari da modificare manualmente
-7. Indicizza i dump di gioco e di menu
+4. Estrae i nomi di tutti i nemici
+5. Sposta le grafiche nelle cartelle finali
+6. Rimuove le grafiche doppie
+7. Copia i file binari da modificare manualmente
+8. Indicizza i dump di gioco, menu e nemici
 
 ### Risultato finale
 Al termine della procedura otterremo le seguenti cartelle/file:
@@ -516,10 +597,17 @@ Al termine della procedura otterremo le seguenti cartelle/file:
       - AREA000.12.bin.json (*da ignorare*)
       - AREA001.12.bin.json (*da ignorare*)
       - ...
+    - ENEMIES
+      - AREA002.14.bin.json (*da ignorare*)
+      - AREA003.11.bin.json (*da ignorare*)
+      - ...
+  - dump_enemies_PSX.json (**da modificare**)
+  - pointers_enemies_PSX.json (**da modificare**)
   - dump_menu_PSX.json (**da modificare**)
   - pointers_menu_PSX.json (**da modificare**)
   - dump_world_PSX.json (**da modificare**)
   - pointers_world_PSX.json (**da modificare**)
+
 - GFX
   - PSX
     - AREA016.6.bin.8b.64w.64x32.1024r.bmp (**da modificare**)

@@ -198,13 +198,13 @@ cython_debug/
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,python
 
-PSX/
-PSP/
+PSX_PAL/
 PSX_FRA/
 PSX_USA/
 PSX_ITA/
 PSX_GER/
 PSX_ESP/
+PSP/
 DUMP/
 GFX/
 TEMP/
@@ -212,3 +212,5 @@ dump_world_*
 pointers_world_*
 dump_menu_*
 pointers_menu_*
+dump_enemies_*
+pointers_enemies_*

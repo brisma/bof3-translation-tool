@@ -1,5 +1,11 @@
 #!/bin/bash
 
+BIN=$1
+if [ -z "$1" ]; then
+  echo "Errore: non è stata specificata una cartella con i dati da dumpare"
+  exit 1
+fi
+
 BIN_TO_EXPORT="BATTLE/BATTLE/BATTLE.16.bin
 BATTLE/BATTLE/BATTLE.4.bin
 BMAGIC/MAGIC003/MAGIC003.4.bin
@@ -18,22 +24,33 @@ ETC/SISYOU/SISYOU.1.bin
 ETC/START/START.9.bin
 SCENARIO/SCENA10/SCENA10.1.bin
 SCENARIO/SCENA17/SCENA17.1.bin
-WORLD00/AREA002/AREA002.14.bin
+WORLD00/AREA030/AREA030.5.bin"
+
+ENEMIES_TO_DUMP="WORLD00/AREA002/AREA002.14.bin
 WORLD00/AREA003/AREA003.11.bin
 WORLD00/AREA005/AREA005.11.bin
 WORLD00/AREA008/AREA008.11.bin
+WORLD00/AREA009/AREA009.11.bin
+WORLD00/AREA010/AREA010.11.bin
+WORLD00/AREA011/AREA011.11.bin
+WORLD00/AREA012/AREA012.11.bin
 WORLD00/AREA015/AREA015.11.bin
+WORLD00/AREA018/AREA018.11.bin
+WORLD00/AREA019/AREA019.11.bin
 WORLD00/AREA020/AREA020.11.bin
 WORLD00/AREA022/AREA022.11.bin
 WORLD00/AREA023/AREA023.11.bin
+WORLD00/AREA026/AREA026.11.bin
 WORLD00/AREA027/AREA027.11.bin
 WORLD00/AREA028/AREA028.11.bin
-WORLD00/AREA030/AREA030.5.bin
 WORLD00/AREA032/AREA032.11.bin
 WORLD00/AREA035/AREA035.11.bin
 WORLD01/AREA040/AREA040.11.bin
+WORLD01/AREA041/AREA041.11.bin
 WORLD01/AREA042/AREA042.11.bin
+WORLD01/AREA043/AREA043.11.bin
 WORLD01/AREA044/AREA044.11.bin
+WORLD01/AREA048/AREA048.11.bin
 WORLD01/AREA051/AREA051.11.bin
 WORLD01/AREA052/AREA052.11.bin
 WORLD01/AREA054/AREA054.11.bin
@@ -43,12 +60,17 @@ WORLD01/AREA069/AREA069.11.bin
 WORLD01/AREA071/AREA071.11.bin
 WORLD01/AREA075/AREA075.11.bin
 WORLD02/AREA077/AREA077.11.bin
+WORLD02/AREA079/AREA079.11.bin
 WORLD02/AREA080/AREA080.11.bin
+WORLD02/AREA081/AREA081.11.bin
 WORLD02/AREA082/AREA082.11.bin
 WORLD02/AREA083/AREA083.11.bin
+WORLD02/AREA085/AREA085.11.bin
 WORLD02/AREA086/AREA086.11.bin
 WORLD02/AREA091/AREA091.11.bin
+WORLD02/AREA092/AREA092.11.bin
 WORLD02/AREA095/AREA095.11.bin
+WORLD02/AREA096/AREA096.11.bin
 WORLD02/AREA099/AREA099.11.bin
 WORLD02/AREA103/AREA103.11.bin
 WORLD02/AREA105/AREA105.11.bin
@@ -62,6 +84,7 @@ WORLD03/AREA119/AREA119.11.bin
 WORLD03/AREA120/AREA120.11.bin
 WORLD03/AREA134/AREA134.11.bin
 WORLD03/AREA135/AREA135.11.bin
+WORLD03/AREA136/AREA136.11.bin
 WORLD03/AREA140/AREA140.11.bin
 WORLD03/AREA141/AREA141.11.bin
 WORLD03/AREA142/AREA142.11.bin
@@ -79,7 +102,9 @@ WORLD04/AREA172/AREA172.11.bin
 WORLD04/AREA173/AREA173.11.bin
 WORLD04/AREA175/AREA175.11.bin
 WORLD04/AREA188/AREA188.11.bin
-WORLD04/AREA197/AREA197.11.bin"
+WORLD04/AREA196/AREA196.11.bin
+WORLD04/AREA197/AREA197.11.bin
+WORLD04/AREA198/AREA198.11.bin"
 
 GFX_TO_REMOVE="AREA030.21.bin.4b.128w.128x32.256r.bmp
 AREA089.21.bin.4b.128w.128x32.256r.bmp
@@ -107,12 +132,6 @@ STATUS.2.bin.4b.128w.128x32.256r.bmp
 TURIMODE.4.bin.4b.128w.128x32.256r.bmp
 TURISHAR.2.bin.8b.64w.64x32.256r.bmp
 TURISHAR.3.bin.8b.64w.64x32.256r.bmp"
-
-BIN=$1
-if [ -z "$1" ]; then
-  echo "Errore: non è stata specificata una cartella con i dati da dumpare"
-  exit 1
-fi
 
 # Rimuove le cartelle/file che non contengono testo da tradurre
 dirs_to_delete="BENEMY BGM BMAG_XA BPLCHAR PLCHAR SCE_XA MODULE PSMF dummy.bin"
@@ -143,14 +162,25 @@ do
 done
 
 # Muovi i dump di tutti i testi WORLD nella cartella DUMP/piattaforma/WORLD
+mkdir -p DUMP/$BIN/WORLD
 for world in WORLD00 WORLD01 WORLD02 WORLD03 WORLD04; do
-  find UNPACKED/$BIN/$world/ -name "*.bin.json" -execdir sh -c "mkdir -p ../../../../DUMP/$BIN/WORLD && mv \$1 ../../../../DUMP/$BIN/WORLD" sh {} \;
+  find UNPACKED/$BIN/$world/ -name "*.bin.json" -execdir sh -c "mv \$1 ../../../../DUMP/$BIN/WORLD" sh {} \;
 done
 
 # Muovi i dump di tutti i menu nella cartella DUMP/piattaforma/MENU
+mkdir -p DUMP/$BIN/MENU
 for menu in BATTLE BOSS ETC; do
-  find UNPACKED/$BIN/$menu/ -name "*.bin.json" -execdir sh -c "mkdir -p ../../../../DUMP/$BIN/MENU && mv \$1 ../../../../DUMP/$BIN/MENU" sh {} \;
+  find UNPACKED/$BIN/$menu/ -name "*.bin.json" -execdir sh -c "mv \$1 ../../../../DUMP/$BIN/MENU" sh {} \;
 done
+
+# Effettua il dump dei nomi dei nemici usando il rawdump
+mkdir -p DUMP/$BIN/ENEMIES
+while read -r file; do
+  if [ -f "UNPACKED/$BIN/$file" ]; then
+    python bof3tool.py rawdump -i UNPACKED/$BIN/$file --offset 0x48 --quantity 8 --skip 128 --repeat 8 --trim
+    mv UNPACKED/$BIN/$file.json DUMP/$BIN/ENEMIES
+  fi
+done <<< "$ENEMIES_TO_DUMP"
 
 # Sposta tutte le grafiche in GFX/piattaforma
 mkdir -p GFX/$BIN
@@ -174,8 +204,11 @@ done <<< "$BIN_TO_EXPORT"
 # Crea la cartella dei file da iniettare
 mkdir -p INJECT/$BIN
 
-# Indicizza i dump di WORLD
+# Indicizza i dump presenti in DUMP/piattaforma/WORLD
 python bof3tool.py index -i DUMP/$BIN/WORLD/*.json --output-strings DUMP/dump_world_$BIN.json --output-pointers DUMP/pointers_world_$BIN.json
 
-# Indicizza i dump di MENU
+# Indicizza i dump presenti in DUMP/piattaforma/MENU
 python bof3tool.py index -i DUMP/$BIN/MENU/*.json --output-strings DUMP/dump_menu_$BIN.json --output-pointers DUMP/pointers_menu_$BIN.json
+
+# Indicizza i dump presenti in DUMP/piattaforma/ENEMIES
+python bof3tool.py index -i DUMP/$BIN/ENEMIES/*.json --output-strings DUMP/dump_enemies_$BIN.json --output-pointers DUMP/pointers_enemies_$BIN.json

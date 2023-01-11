@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.0.4'
+version = '1.1.0'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -817,6 +817,50 @@ def dump_text(input, output=None, extra_table={}, verbose=False):
     write_json(output, json_data)
     print('Text dumped.')
 
+# Raw dump from file
+def raw_dump(input, output=None, extra_table={}, offset=0, quantity=0, skip=0, repeat=1, trim=False, verbose=False):
+    if not output:
+        output = input.parent / f'{input.name}.json'
+    else:
+        output = Path(output)
+
+    bin = read_file(input)
+    extra_table = dict((k.lower(), v) for k, v in extra_table.items()) # key in lower case when dumping
+    max_offset = offset + ((quantity + skip) * repeat) + quantity - skip
+
+    if max_offset > bin.size:
+        raise Exception(f'Raw Dump [offset + (quantity + skip) * repeat + quantity - skip] exceeds file size ({max_offset} > {bin.size}).')
+
+    json_data = {
+        'data': {
+            'input': input.name,
+            'offset': offset,
+            'quantity': quantity,
+            'skip': skip,
+            'repeat': repeat
+        },
+        'dump': []
+    }
+
+    if verbose:
+        print(f'Raw dumping from {input.name} - offset: {offset}, quantity: {quantity}, skip: {skip}, repeat: {repeat}, trim: {trim}')
+
+    for i in range(repeat):
+        start_offset = offset + i * (quantity + skip)
+        end_offset = offset + i * (quantity + skip) + quantity
+
+        raw_bin = bin[start_offset:end_offset]
+        raw_dump = decode_text(np.trim_zeros(raw_bin, 'b') if trim else raw_bin, extra_table)
+        if verbose:
+            print(f'Raw dumping from 0x{start_offset:X} to 0x{end_offset:X}:')
+            print(f' Original data: {" ".join(["{:02x}".format(x) for x in raw_bin])}')
+            print(f' Decoded text: {raw_dump}')
+
+        json_data['dump'].append(raw_dump)
+
+    write_json(output, json_data)
+    print(f'Raw dumped {quantity} byte from {input.name} into {output.name} {repeat} times.')
+
 # Translate a JSON using Amazon Translate (ML)
 def translate_texts(input, output, source_lang, target_lang, verbose=False):
     strings_json = read_json(input)
@@ -920,6 +964,47 @@ def reinsert_text(input, output=None, extra_table={}, verbose=False):
     write_file(output, np.array(output_data, dtype=np.ubyte))
     print('Text reinserted.')
 
+# Raw reinsert into file
+def raw_reinsert(input, extra_table={}, verbose=False):
+    json_data = read_json(input)
+    extra_table = dict((k, v.lower()) for k, v in extra_table.items()) # value in lower case when reinserting
+
+    bin_filename = input.parent / Path(json_data['data']['input'])
+    offset = json_data['data']['offset']
+    quantity = json_data['data']['quantity']
+    skip = json_data['data']['skip']
+    repeat = json_data['data']['repeat']
+
+    bin = read_file(bin_filename)
+    max_offset = offset + ((quantity + skip) * repeat) + quantity - skip
+
+    if max_offset > bin.size:
+        raise Exception(f'Raw Reinsert [offset + (quantity + skip) * repeat + quantity - skip] exceeds file size ({max_offset} > {bin.size}).')
+
+    if verbose:
+        print(f'Raw reinserting into {bin_filename.name} - offset: {offset}, quantity: {quantity}, skip: {skip}, repeat: {repeat}')
+
+    for i in range(repeat):
+        start_offset = offset + i * (quantity + skip)
+        end_offset = offset + i * (quantity + skip) + quantity
+
+        if len(json_data['dump'][i]) > quantity:
+            raise Exception(f'Raw Reinsert of "{json_data["dump"][i]}" exceeds quantity limit of {quantity} bytes."')
+
+        text_encoded = encode_text(json_data['dump'][i], extra_table)
+        raw_encoded = np.pad(text_encoded, (0, quantity - text_encoded.size), 'constant', constant_values = 0x00)
+
+        if verbose:
+            print(f'Raw reinserting from 0x{start_offset:X} to 0x{end_offset:X}:')
+            print(f' Original data: {" ".join(["{:02x}".format(x) for x in bin[start_offset:end_offset]])}')
+            print(f' Text to encode: {json_data["dump"][i]}')
+            print(f' Raw encoded bytes: {" ".join(["{:02x}".format(x) for x in raw_encoded])}')
+
+        bin[start_offset:end_offset] = raw_encoded
+
+    write_file(bin_filename, bin)
+    print(f'Raw reinserted {quantity} byte of new encoded data from {input.name} into {bin_filename.name} {repeat} times.')
+
 # Index all texts into single file
 def index_texts(inputs, output_strings, output_pointers, verbose=False):
     strings_json = {'blocks': [""]}
@@ -936,31 +1021,34 @@ def index_texts(inputs, output_strings, output_pointers, verbose=False):
             if input.name not in pointers_json:
                 pointers_json[input.name] = {}
 
-            pointers_json[input.name][block] = []
+            if type(json_data[block]) is list:
+                pointers_json[input.name][block] = []
 
-            if block not in info:
-                info[block] = {
-                    'repeated_lines': 0,
-                    'indexed_lines': 0
-                }
+                if block not in info:
+                    info[block] = {
+                        'repeated_lines': 0,
+                        'indexed_lines': 0
+                    }
 
-            if verbose:
-                print(f' Indexing {input.name} JSON {block}...')
+                if verbose:
+                    print(f' Indexing {input.name} JSON {block}...')
 
-            for string in json_data[block]:
-                if string in strings_json['blocks']:
-                    pointer = strings_json['blocks'].index(string)
-                    if verbose and string != '':
-                        print(f' String "{string}" found at position {pointer}.')
-                    pointers_json[input.name][block].append(pointer)
-                    if string != '':
-                        info[block]['repeated_lines'] += 1
-                else:
-                    strings_json['blocks'].append(string)
-                    if verbose and string != '':
-                        print(f' String "{string}" is new, adding at position {len(strings_json["blocks"]) - 1}.')
-                    pointers_json[input.name][block].append(strings_json['blocks'].index(string))
-                    info[block]['indexed_lines'] += 1
+                for string in json_data[block]:
+                    if string in strings_json['blocks']:
+                        pointer = strings_json['blocks'].index(string)
+                        if verbose and string != '':
+                            print(f' String "{string}" found at position {pointer}.')
+                        pointers_json[input.name][block].append(pointer)
+                        if string != '':
+                            info[block]['repeated_lines'] += 1
+                    else:
+                        strings_json['blocks'].append(string)
+                        if verbose and string != '':
+                            print(f' String "{string}" is new, adding at position {len(strings_json["blocks"]) - 1}.')
+                        pointers_json[input.name][block].append(strings_json['blocks'].index(string))
+                        info[block]['indexed_lines'] += 1
+            else:
+                pointers_json[input.name][block] = json_data[block]
 
     write_json(Path(output_strings), strings_json)
     write_json(Path(output_pointers), pointers_json)
@@ -987,17 +1075,20 @@ def expand_texts(input_strings, input_pointers, output_dir='', verbose=False):
             print(f' Recreating file {filename}...')
 
         for block in blocks:
-            if verbose:
-                print(f' Expanding block {block}...')
+            if type(pointers_json[filename][block]) is list:
+                if verbose:
+                    print(f' Expanding block {block}...')
 
-            strings[block] = []
+                strings[block] = []
 
-            for pointer in pointers_json[filename][block]:
-                if strings_json['blocks'][pointer] != "":
-                    string_expanded += 1
-                    if verbose:
-                        print(f' Adding string "{strings_json["blocks"][pointer]}" at position {pointer} into {filename} file.')
-                strings[block].append(strings_json['blocks'][pointer])
+                for pointer in pointers_json[filename][block]:
+                    if strings_json['blocks'][pointer] != "":
+                        string_expanded += 1
+                        if verbose:
+                            print(f' Adding string "{strings_json["blocks"][pointer]}" at position {pointer} into {filename} file.')
+                    strings[block].append(strings_json['blocks'][pointer])
+            else:
+                strings[block] = pointers_json[filename][block]
 
         write_json(Path(output_dir) / filename, strings)
         print(f'File {filename} recreated.')
@@ -1231,6 +1322,17 @@ def main(command_line=None):
     dump.add_argument('--extra-table', help="extra table (ex. A0=à A1=è A2=ò)", action=ParseExtraTable, required=False, nargs='+', default={})
     dump.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
 
+    rawdump = subparser.add_parser('rawdump', help='raw dump bytes from file')
+    rawdump.add_argument('-i', '--input', help='input .BIN (text) files', type=Path, required=True, nargs='*')
+    rawdump.add_argument('-o', '--output', help='output .JSON file', type=str, required=False, default=None)
+    rawdump.add_argument('--extra-table', help="extra table (ex. A0=à A1=è A2=ò)", action=ParseExtraTable, required=False, nargs='+', default={})
+    rawdump.add_argument('--offset', help="initial offset (dec or hex, ex. 2048 or 0x800)", type=lambda x: int(x, 0), required=False, default=0)
+    rawdump.add_argument('--quantity', help="how many bytes to dump", type=int, required=True, default=0)
+    rawdump.add_argument('--skip', help="how many bytes to skip (after dump)", type=int, required=False, default=0)
+    rawdump.add_argument('--repeat', help="how many times repeat", type=int, required=False, default=1)
+    rawdump.add_argument('--trim', help="trim all 0x00 from end", action='store_true', default=False)
+    rawdump.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
+
     translate = subparser.add_parser('translate', help='translate a JSON file using Amazon Translate (ML)')
     translate.add_argument('-i', '--input', help='input .JSON file', type=Path, required=True)
     translate.add_argument('-o', '--output', help='output .JSON file', type=str, required=False, default=None)
@@ -1243,6 +1345,11 @@ def main(command_line=None):
     reinsert.add_argument('-o', '--output', help='output .BIN (text) file', type=str, required=False, default=None)
     reinsert.add_argument('--extra-table', help="extra table (ex. à=A0 è=A1 ò=A2)", action=ParseExtraTable, required=False, nargs='+', default={})
     reinsert.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
+
+    rawreinsert = subparser.add_parser('rawreinsert', help='raw reinsert bytes into file')
+    rawreinsert.add_argument('-i', '--input', help='input .JSON files', type=Path, required=True, nargs='*')
+    rawreinsert.add_argument('--extra-table', help="extra table (ex. à=A0 è=A1 ò=A2)", action=ParseExtraTable, required=False, nargs='+', default={})
+    rawreinsert.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
 
     index = subparser.add_parser('index', help='index all texts into single file')
     index.add_argument('-i', '--input', help='input .JSON files', type=Path, required=True, nargs='*')
@@ -1305,11 +1412,17 @@ def main(command_line=None):
         elif args.command == 'dump':
             for path in args.input:
                 dump_text(input=path, output=args.output, extra_table=args.extra_table, verbose=args.verbose)
+        elif args.command == 'rawdump':
+            for path in args.input:
+                raw_dump(input=path, output=args.output, extra_table=args.extra_table, offset=args.offset, quantity=args.quantity, skip=args.skip, repeat=args.repeat, trim=args.trim, verbose=args.verbose)
         elif args.command == 'translate':
             translate_texts(input=args.input, output=args.output, source_lang=args.source_lang, target_lang=args.target_lang, verbose=args.verbose)
         elif args.command == 'reinsert':
             for path in args.input:
                 reinsert_text(input=path, output=args.output, extra_table=args.extra_table, verbose=args.verbose)
+        elif args.command == 'rawreinsert':
+            for path in args.input:
+                raw_reinsert(input=path, extra_table=args.extra_table, verbose=args.verbose)
         elif args.command == 'index':
             index_texts(inputs=args.input, output_strings=args.output_strings, output_pointers=args.output_pointers, verbose=args.verbose)
         elif args.command == 'expand':
