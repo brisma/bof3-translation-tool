@@ -195,6 +195,7 @@ WORLD00/AREA005/AREA005.11.bin
 WORLD00/AREA008/AREA008.11.bin
 WORLD00/AREA009/AREA009.11.bin
 WORLD00/AREA010/AREA010.11.bin
+WORLD00/AREA011/AREA011.11.bin
 WORLD00/AREA012/AREA012.11.bin
 WORLD00/AREA015/AREA015.11.bin
 WORLD00/AREA018/AREA018.11.bin
@@ -202,12 +203,15 @@ WORLD00/AREA019/AREA019.11.bin
 WORLD00/AREA020/AREA020.11.bin
 WORLD00/AREA022/AREA022.11.bin
 WORLD00/AREA023/AREA023.11.bin
+WORLD00/AREA026/AREA026.11.bin
 WORLD00/AREA027/AREA027.11.bin
 WORLD00/AREA028/AREA028.11.bin
 WORLD00/AREA032/AREA032.11.bin
 WORLD00/AREA035/AREA035.11.bin
 WORLD01/AREA040/AREA040.11.bin
+WORLD01/AREA041/AREA041.11.bin
 WORLD01/AREA042/AREA042.11.bin
+WORLD01/AREA043/AREA043.11.bin
 WORLD01/AREA044/AREA044.11.bin
 WORLD01/AREA048/AREA048.11.bin
 WORLD01/AREA051/AREA051.11.bin
@@ -219,11 +223,15 @@ WORLD01/AREA069/AREA069.11.bin
 WORLD01/AREA071/AREA071.11.bin
 WORLD01/AREA075/AREA075.11.bin
 WORLD02/AREA077/AREA077.11.bin
+WORLD02/AREA079/AREA079.11.bin
 WORLD02/AREA080/AREA080.11.bin
+WORLD02/AREA081/AREA081.11.bin
 WORLD02/AREA082/AREA082.11.bin
 WORLD02/AREA083/AREA083.11.bin
+WORLD02/AREA085/AREA085.11.bin
 WORLD02/AREA086/AREA086.11.bin
 WORLD02/AREA091/AREA091.11.bin
+WORLD02/AREA092/AREA092.11.bin
 WORLD02/AREA095/AREA095.11.bin
 WORLD02/AREA096/AREA096.11.bin
 WORLD02/AREA099/AREA099.11.bin
@@ -256,19 +264,10 @@ WORLD04/AREA171/AREA171.11.bin
 WORLD04/AREA172/AREA172.11.bin
 WORLD04/AREA173/AREA173.11.bin
 WORLD04/AREA175/AREA175.11.bin
-WORLD04/AREA175/AREA175.15.bin
-WORLD04/AREA176/AREA176.15.bin
-WORLD04/AREA177/AREA177.15.bin
-WORLD04/AREA178/AREA178.15.bin
-WORLD04/AREA179/AREA179.15.bin
-WORLD04/AREA180/AREA180.15.bin
-WORLD04/AREA181/AREA181.15.bin
-WORLD04/AREA182/AREA182.15.bin
-WORLD04/AREA183/AREA183.15.bin
-WORLD04/AREA184/AREA184.15.bin
-WORLD04/AREA185/AREA185.15.bin
 WORLD04/AREA188/AREA188.11.bin
+WORLD04/AREA196/AREA196.11.bin
 WORLD04/AREA197/AREA197.11.bin
+WORLD04/AREA198/AREA198.11.bin
 
 Testo Singolo (80010000 o 00010000):
 WORLD00/AREA000/AREA000.12.bin
@@ -549,11 +548,31 @@ WORLD04/AREA174/AREA174.14.bin
 WORLD04/AREA188/AREA188.14.bin
 WORLD04/AREA199/AREA199.14.bin
 
+---
+
 Estrazione Raw Dump:
 
 [BOF3 PSX PAL]
 
-GAME.1.bin:
+BATTLE.4.bin
+python bof3tool.py rawdump -i BATTLE.4.bin -o BATTLE.4.bin.atk_abl_use.json --offset 0x1A2B0 --quantity 4 --skip 4 --repeat 7 --trim
+python bof3tool.py rawdump -i BATTLE.4.bin -o BATTLE.4.bin.attack.json --offset 0x1A400 --quantity 12 --trim
+python bof3tool.py rawdump -i BATTLE.4.bin -o BATTLE.4.bin.examine.json --offset 0x1A41A --quantity 12 --trim
+python bof3tool.py rawdump -i BATTLE.4.bin -o BATTLE.4.bin.defend_charge_reprisal.json --offset 0x1A434 --quantity 12 --skip 1 --repeat 8 --trim
+
+BOSS025.14.bin
+python bof3tool.py rawdump -i BOSS025.14.bin -o BOSS025.14.bin.turns_left.json --offset 0x1AD4 --quantity 12 --repeat 2 --trim
+
+COMMU00.1.bin
+python bof3tool.py rawdump -i COMMU00.1.bin -o COMMU00.1.bin.names.json --offset 0x3B00 --quantity 5 --skip 4 --repeat 60 --trim
+
+COMMU01.8.bin
+python bof3tool.py rawdump -i COMMU01.8.bin -o COMMU01.8.bin.common.json --offset 0x40A8 --quantity 8 --repeat 20 --trim
+
+COMMU05.8.bin
+python bof3tool.py rawdump -i COMMU05.8.bin -o COMMU05.8.bin.faeries.json --offset 0xD5C --quantity 8 --repeat 4 --trim
+
+GAME.1.bin
 python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.menu.json --offset 0x324B8 --quantity 8 --repeat 5 --trim
 python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.items.json --offset 0x331E8 --quantity 12 --skip 6 --repeat 92 --trim
 python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.key_items.json --offset 0x33860 --quantity 12 --skip 4 --repeat 16 --trim
@@ -562,9 +581,38 @@ python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.armors.json --offset 0x34
 python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.accessories.json --offset 0x34700 --quantity 12 --skip 8 --repeat 52 --trim
 python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.abilities.json --offset 0x34FA4 --quantity 12 --skip 8 --repeat 227 --trim
 
+MAGIC060.1.bin
+python bof3tool.py rawdump -i MAGIC060.1.bin -o MAGIC060.1.bin.weak_exp_item.json --offset 0x1F64 --quantity 8 --repeat 5 --trim
+
+SCENA10.1
+python bof3tool.py rawdump -i SCENA10.1.bin -o SCENA10.1.bin.choose_parts.json --offset 0x7C74 --quantity 12 --trim
+
+SYSYOU.1.bin
+python bof3tool.py rawdump -i SISYOU.1.bin -o SISYOU.1.bin.pwr_def_int.json --offset 0x3438 --quantity 4 --repeat 7 --trim
+
+---
+
 [BOF3 PSX USA]
 
-GAME.1.bin:
+BATTLE.4.bin
+python bof3tool.py rawdump -i BATTLE.4.bin -o BATTLE.4.bin.atk_abl_use.json --offset 0x1A2B0 --quantity 4 --skip 4 --repeat 7 --trim
+python bof3tool.py rawdump -i BATTLE.4.bin -o BATTLE.4.bin.attack.json --offset 0x1A400 --quantity 12 --trim
+python bof3tool.py rawdump -i BATTLE.4.bin -o BATTLE.4.bin.examine.json --offset 0x1A41A --quantity 12 --trim
+python bof3tool.py rawdump -i BATTLE.4.bin -o BATTLE.4.bin.defend_charge_reprisal.json --offset 0x1A434 --quantity 12 --skip 1 --repeat 8 --trim
+
+BOSS025.14.bin
+python bof3tool.py rawdump -i BOSS025.14.bin -o BOSS025.14.bin.turns_left.json --offset 0x1AA8 --quantity 12 --trim
+
+COMMU00.1.bin
+python bof3tool.py rawdump -i COMMU00.1.bin -o COMMU00.1.bin.names.json --offset 0x3B00 --quantity 5 --skip 4 --repeat 60 --trim
+
+COMMU01.8.bin
+python bof3tool.py rawdump -i COMMU01.8.bin -o COMMU01.8.bin.common.json --offset 0x4134 --quantity 8 --repeat 20 --trim
+
+COMMU05.8.bin
+python bof3tool.py rawdump -i COMMU05.8.bin -o COMMU05.8.bin.faeries.json --offset 0xD5C --quantity 8 --repeat 4 --trim
+
+GAME.1.bin
 python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.menu.json --offset 0x32434 --quantity 8 --repeat 5 --trim
 python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.items.json --offset 0x33164 --quantity 12 --skip 6 --repeat 92 --trim
 python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.key_items.json --offset 0x337DC --quantity 12 --skip 4 --repeat 16 --trim
@@ -572,3 +620,20 @@ python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.weapons.json --offset 0x3
 python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.armors.json --offset 0x340A4 --quantity 12 --skip 10 --repeat 68 --trim
 python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.accessories.json --offset 0x3467C --quantity 12 --skip 8 --repeat 52 --trim
 python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.abilities.json --offset 0x34F20 --quantity 12 --skip 8 --repeat 227 --trim
+
+MAGIC060.1.bin
+python bof3tool.py rawdump -i MAGIC060.1.bin -o MAGIC060.1.bin.weak_exp_item.json --offset 0x1F64 --quantity 8 --repeat 5 --trim
+
+SCENA10.1
+python bof3tool.py rawdump -i SCENA10.1.bin -o SCENA10.1.bin.choose_parts.json --offset 0x7C74 --quantity 12 --trim
+
+SYSYOU.1.bin
+python bof3tool.py rawdump -i SISYOU.1.bin -o SISYOU.1.bin.pwr_def_int.json --offset 0x3438 --quantity 4 --repeat 7 --trim
+
+[BOF3 PSP]
+
+GAME.1.bin
+python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.item_weapon_armor.json --offset 0x3242C --quantity 8 --repeat 4 --trim
+
+MAGIC060.1.bin
+python bof3tool.py rawdump -i MAGIC060.1.bin -o MAGIC060.1.bin.weak_exp_item.json --offset 0x1F00 --quantity 8 --repeat 5 --trim

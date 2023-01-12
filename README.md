@@ -23,6 +23,7 @@ Breath of Fire 3 Translation Tool
     - [Prerequisiti](#prerequisiti-1)
     - [Reinserimento](#reinserimento)
     - [Risultato finale](#risultato-finale-1)
+  - [Cosa manca](#cosa-manca)
 
 ## Introduzione
 Questo tool è stato sviluppato per spacchettare e reimpacchettare i file in formato EMI di Breath of Fire 3 PSX/PSP. 
@@ -316,7 +317,7 @@ Il nuovo file BIN ottenuto potrà essere reinserito nel file EMI.
 ### Reinserimento del testo manualmente (Raw Reinsert)
 Se abbiamo estratto del testo utilizzando la modalità **Raw Dump** ed intendiamo reinserirlo nel file originale di provenienza possiamo utilizzare la funzionalità di `rawreinsert`.
 
-Il suo funzionamento è estremamente semplice ma richiede che il **file JSON** ed il **file originale** siano all'interno della **stessa cartella**.
+Il suo funzionamento richiedere il **file JSON** contenente le modifiche da applicazre ed opzionalmente il **file originale** (se diverso da quello specificato nel JSON).
 
 Per procedere al reinserimento possiamo utilizzare il comando `rawreinsert`:
 
@@ -324,11 +325,13 @@ Per procedere al reinserimento possiamo utilizzare il comando `rawreinsert`:
 python bof3tool.py rawreinsert -i GAME.1.bin.items.json
 ```
 
+> **ATTENZIONE**: possiamo aggiungere il parametro `-b nomefile` o `--bin nomefile` per indicare il file da modificare.
+
 Il risultato che otterremo sarà:
 ```
 --- Breath of Fire III Tool (PSX/PSP) ---
 
-Raw reinserted 12 byte of new encoded data from GAME.1.bin.items.json into GAME.1.bin 92 times.
+Raw reinserted 12 byte of new encoded text from GAME.1.bin.items.json into GAME.1.bin 92 times.
 ```
 
 > **ATTENZIONE**: anche in questo caso è possibile sfruttare il parametro `--extra-table` per aggiungere ulteriori caratteri nell'inserimento.
@@ -537,13 +540,13 @@ L'utilizzo dello script è pensato per essere eseguire tramite un **terminale ba
 ### Prerequisiti
 Lo script `dump.sh` è pensato per essere eseguito su una cartella contenente la struttura dei file di **Breath of Fire 3** **PSX** o **PSP**.
 
-Immaginando di avere la ISO del gioco a disposizione sarà necessario esportare la cartella **BIN** (per la versione PSX) o la cartella **USA** (per la versione PSP) e rinomicarle rispettivamente PSX e PSP.
+Immaginando di avere la ISO del gioco (PSX PAL, PSX USA o PSP) a disposizione sarà necessario esportare la cartella **BIN** (per le versioni PSX) o la cartella **USA** (per la versione PSP) e rinominarle rispettivamente PSX_PAL, PSX_USA o PSP.
 
-> Potete copiare la cartella PSX/PSP direttamente in questo repository.
+> Potete copiare la cartella PSX_PAL/PSX_USA/PSP direttamente in questo repository.
 
 Ad es. ci ritroveremo con una cartella avente questa struttura:
 
-- PSX
+- PSX_PAL
   - BATTLE
   - BENEMY
   - BGM
@@ -566,7 +569,7 @@ A questo punto siamo pronti per l'estrazione.
 ### Estrazione
 Per effettuare l'esportazione dei contenuti è sufficiente lanciare il tool sulla cartella originale:
 
-```./dump.sh PSX```
+```./dump.sh PSX_PAL```
 
 Lo script inizierà a lavorare sul contenuto della cartella del gioco effettuando questi passaggi:
 
@@ -574,55 +577,58 @@ Lo script inizierà a lavorare sul contenuto della cartella del gioco effettuand
 2. Spacchetta tutti i file .EMI e dumpa testo e grafica
 3. Sposta i dump del gioco e dei menu nelle cartelle finali
 4. Estrae i nomi di tutti i nemici
-5. Sposta le grafiche nelle cartelle finali
-6. Rimuove le grafiche doppie
-7. Copia i file binari da modificare manualmente
-8. Indicizza i dump di gioco, menu e nemici
+5. Estrae manualmente alcuni pezzi di menu dai file binari
+6. Sposta le grafiche nelle cartelle finali
+7. Rimuove le grafiche doppie
+8. Copia i file binari da modificare manualmente
+9. Crea le cartelle per l'injecting dei file (prima e/o dopo il reinsert)
+10. Indicizza i dump di gioco, menu e nemici
 
 ### Risultato finale
 Al termine della procedura otterremo le seguenti cartelle/file:
 
 - BINARY
-  - PSX
-    - AREA002.14.bin (**da modificare**)
-    - AREA003.11.bin (**da modificare**)
+  - PSX_PAL
+    - BATTLE.16.bin (**da modificare**)
+    - MAGIC003.4.bin (**da modificare**)
     - ...
 - DUMP
-  - PSX
-    - MENU
-      - AFLDKWA.1.bin.json (*da ignorare*)
-      - BATTLE.12.bin.json (*da ignorare*)
+  - PSX_PAL
+    - BINARY
+      - GAME.1.bin.abilities.json (**da modificare**)
+      - GAME.1.bin.accessories.json (**da modificare**)
       - ...
-    - WORLD
-      - AREA000.12.bin.json (*da ignorare*)
-      - AREA001.12.bin.json (*da ignorare*)
-      - ...
-    - ENEMIES
-      - AREA002.14.bin.json (*da ignorare*)
-      - AREA003.11.bin.json (*da ignorare*)
-      - ...
-  - dump_enemies_PSX.json (**da modificare**)
-  - pointers_enemies_PSX.json (**da modificare**)
-  - dump_menu_PSX.json (**da modificare**)
-  - pointers_menu_PSX.json (**da modificare**)
-  - dump_world_PSX.json (**da modificare**)
-  - pointers_world_PSX.json (**da modificare**)
+    - dump_enemies.json (**da modificare**)
+    - dump_menu.json (**da modificare**)
+    - dump_world.json (**da modificare**)
+    - pointers_enemies.json (*da ignorare*)
+    - pointers_menu.json (*da ignorare*)
+    - pointers_world.json (*da ignorare*)
 
 - GFX
-  - PSX
+  - PSX_PAL
     - AREA016.6.bin.8b.64w.64x32.1024r.bmp (**da modificare**)
     - AREA016.8.bin.8b.64w.64x32.1024r.bmp (**da modificare**)
     - ...
-- INJECT (*cartella vuota da utilizzare per iniettare file*)
-  - PSX
-    - Vuota
-- UNPACKED (cartella *da ignorare*)
-  - PSX
+- INJECT (*cartella vuota da **utilizzare per injectare i file***)
+  - PSX_PAL
+    - BEFORE_REINSERT(file da sostituire prima del raw reinsert)
+      - Vuota
+    - AFTER_REINSERT (file da sostituire dopo il raw reinsert)
+      - Vuota
+- UNPACKED (*cartella da ignorare*)
+  - PSX_PAL
     - BATTLE
     - BMAGIC
     - ...
 
 Ho evidenziato tutte le risorse che andranno modificate prima di effettuare il reinserimento dei contenuti.
+
+> **ATTENZIONE**: le cartelle `BEFORE_REINSERT` e `AFTER_REINSERT` sono utilizzate per la sostituzione di file binari in due fasi distinte.
+> 
+> Tutti i file contenuti nella cartella `BEFORE_REINSERT` saranno utilizzati come base prima dell'operazione di Raw Reinsert: possiamo quindi inserire al suo interno dei file già modificati (ad es. con editor esadecimali) che dovranno a loro volta essere manipolati dal processo di Raw Reinsert per inserire del nuovo testo.
+> 
+> Tutti i file contenuti nella cartella `AFTER_REINSERT` sostituiranno i precedenti creati/modificati. In parole semplici saranno loro quelli reimpacchettati nei file **EMI** finali.
 
 ## Reinserimento di tutti i testi/grafiche/file binari modificati
 Sempre all'interno del repository è presente uno script `reinsert.sh` che effettua il reinserimento di tutti i contenuti precedentemente esportati.
@@ -637,32 +643,34 @@ Oltre a ciò, ovviamente, sarà necessario avere modificato i file descritti in 
 ### Reinserimento
 Per effettuare il reinserimento dei contenuti è sufficiente lanciare il tool sulla cartella originale:
 
-```./reinsert.sh PSX```
+```./reinsert.sh PSX_PAL```
 
 Lo script inizierà a lavorare sul contenuto della cartella modificate effettuando questi passaggi:
 
 1. Cancella l'eventuale cartella temporanea **TEMP**
-2. Copia i dump indicizzati nella cartella **DUMP** nella **TEMP**
+2. Copia i dump indicizzati nella cartella **DUMP/piattaforma** nella **TEMP**
 3. Espande i dump indicizzati all'interno della cartella **TEMP**
 4. Trasforma i file di dump (**JSON**) del gioco e dei menu in file binari
-5. Copia le grafiche nella cartella **GFX** nella cartella **TEMP**
-6. Converte le grafiche sulla base del nome nuovamente in **RAW**
-7. Duplica le grafiche mancanti (molte sono ripetute in più file)
-8. Copia i file binari contenuti nella cartella **BINARY** in **TEMP**
-9. Duplica i file binari mancanti (molti sono ripetuti in più file)
-10. Se sono presenti dei file da iniettare nella cartella **INJECT** vengono ora copiati in **TEMP** ed eventualmente sovrascrivendo file già presenti
-11. Copia gli **EMI** spacchettati nella cartella **UNPACKED** in **TEMP**
-12. Sostituisce i file binari da reimpacchettare nelle destinazioni finali di **TEMP**
-13. Reimpacchetta tutti i file **EMI** in **TEMP**
-14. Crea la cartella di **OUTPUT** finale
-15. Copia tutti i file **EMI** generati nella cartella **OUTPUT**
-16. Elimina tutti i file **EMI** che risultano essere ancora identici agli originali
+5. Copia eventuali file binari dalla cartella INJECT/piattaforma/BEFORE_REINSERT
+6. Effettua il reinserimento manuale di alcune parti dei menu nei file binari
+7. Copia le grafiche nella cartella **GFX** nella cartella **TEMP**
+8. Converte le grafiche sulla base del nome nuovamente in **RAW**
+9. Duplica le grafiche mancanti (molte sono ripetute in più file)
+10. Copia i file binari contenuti nella cartella **BINARY** in **TEMP**
+11. Duplica i file binari mancanti (molti sono ripetuti in più file)
+12. Sostituisce eventuali file binari usando quelli della cartella INJECT/piattaforma/AFTER_REINSERT
+13. Copia gli **EMI** spacchettati nella cartella **UNPACKED** in **TEMP**
+14. Sostituisce i file binari da reimpacchettare nelle destinazioni finali di **TEMP**
+15. Reimpacchetta tutti i file **EMI** in **TEMP**
+16. Crea la cartella di **OUTPUT** finale
+17. Copia tutti i file **EMI** generati nella cartella **OUTPUT**
+18. Elimina tutti i file **EMI** che risultano essere ancora identici agli originali
 
 ### Risultato finale
 Al termine di tutta la procedura, se non ci sono stati errori, otterremo all'interno della cartella di **OUTPUT** i file **EMI** da reinserire nella **ISO** con questa struttura:
 
 - OUTPUT
-  - PSX
+  - PSX_PAL
     - BATTLE
       - BATTLE.EMI
       - BATTLE2.EMI
@@ -674,3 +682,13 @@ Al termine di tutta la procedura, se non ci sono stati errori, otterremo all'int
       - ...
 
 > **ATTENZIONE**: solo se gli **EMI** presentano dei file modificati al loro interno saranno presente nella cartella di **OUTPUT**.
+
+## Cosa manca
+
+Oltre alla traduzione vera a propria dei testi e delle grafiche manca ancora l'analisi completa di tutti i file binari alla ricerca di testi da iniettare per tutte e tre le versioni (PAL/USA/PSP).
+
+Ad es. è risaputo che i menu della versione **PSP** sono all'interno del file `BOOT.BIN`.
+
+Bisogna quindi modificare gli script `dump.sh` e `reinsert.sh` per gestire l'estrazione manuale (Raw Dump) ed il reinserimento manuale (Raw Reinsert) di questo file.
+
+Per comodità ho creato un file di nome `Analisi dei file.txt` in cui sono presenti degli appunti sulla varia scoperte per le tre versioni.

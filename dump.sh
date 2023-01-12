@@ -6,23 +6,72 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
-BIN_TO_EXPORT="BATTLE/BATTLE/BATTLE.16.bin
-BATTLE/BATTLE/BATTLE.4.bin
+# Verifica la piattaforma
+if [[ ! -f "$BIN/ETC/WARNING.EMI" && ! -f "$BIN/ETC/CAPLOGO.EMI" ]]; then
+  PLATFORM="USA"
+elif [[ -f "$BIN/ETC/WARNING.EMI" ]]; then
+  PLATFORM="PAL"
+elif [[ -f "$BIN/ETC/CAPLOGO.EMI" ]]; then
+  PLATFORM="PSP"
+fi
+
+echo "Platform detected: $PLATFORM"
+
+BIN_DUMP_COMMANDS_PAL=(
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.atk_abl_use.json --offset 0x1A2B0 --quantity 4 --skip 4 --repeat 7 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.attack.json --offset 0x1A400 --quantity 12 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.examine.json --offset 0x1A41A --quantity 12 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.defend_charge_reprisal.json --offset 0x1A434 --quantity 12 --skip 1 --repeat 8 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BOSS/BOSS025/BOSS025.14.bin -o DUMP/$BIN/BINARY/BOSS025.14.bin.turns_left.json --offset 0x1AD4 --quantity 12 --repeat 2 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/COMMU00/COMMU00.1.bin -o DUMP/$BIN/BINARY/COMMU00.1.bin.names.json --offset 0x3B00 --quantity 5 --skip 4 --repeat 60 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/COMMU01/COMMU01.8.bin -o DUMP/$BIN/BINARY/COMMU01.8.bin.common.json --offset 0x40A8 --quantity 8 --repeat 20 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/COMMU05/COMMU05.8.bin -o DUMP/$BIN/BINARY/COMMU05.8.bin.faeries.json --offset 0xD5C --quantity 8 --repeat 4 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.menu.json --offset 0x324B8 --quantity 8 --repeat 5 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.items.json --offset 0x331E8 --quantity 12 --skip 6 --repeat 92 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.key_items.json --offset 0x33860 --quantity 12 --skip 4 --repeat 16 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.weapons.json --offset 0x33960 --quantity 12 --skip 12 --repeat 83 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.armors.json --offset 0x34128 --quantity 12 --skip 10 --repeat 68 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.accessories.json --offset 0x34700 --quantity 12 --skip 8 --repeat 52 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.abilities.json --offset 0x34FA4 --quantity 12 --skip 8 --repeat 227 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BMAGIC/MAGIC060/MAGIC060.1.bin -o DUMP/$BIN/BINARY/MAGIC060.1.bin.weak_exp_item.json --offset 0x1F64 --quantity 8 --repeat 5 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/SCENARIO/SCENA10/SCENA10.1.bin -o DUMP/$BIN/BINARY/SCENA10.1.bin.choose_parts.json --offset 0x7C74 --quantity 12 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/SISYOU/SISYOU.1.bin -o DUMP/$BIN/BINARY/SISYOU.1.bin.pwr_def_int.json --offset 0x3438 --quantity 4 --repeat 7 --trim"
+)
+
+BIN_DUMP_COMMANDS_USA=(
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.atk_abl_use.json --offset 0x1A2B0 --quantity 4 --skip 4 --repeat 7 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.attack.json --offset 0x1A400 --quantity 12 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.examine.json --offset 0x1A41A --quantity 12 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.defend_charge_reprisal.json --offset 0x1A434 --quantity 12 --skip 1 --repeat 8 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BOSS/BOSS025/BOSS025.14.bin -o DUMP/$BIN/BINARY/BOSS025.14.bin.turns_left.json --offset 0x1AA8 --quantity 12 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/COMMU00/COMMU00.1.bin -o DUMP/$BIN/BINARY/COMMU00.1.bin.names.json --offset 0x3B00 --quantity 5 --skip 4 --repeat 60 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/COMMU01/COMMU01.8.bin -o DUMP/$BIN/BINARY/COMMU01.8.bin.common.json --offset 0x4134 --quantity 8 --repeat 20 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/COMMU05/COMMU05.8.bin -o DUMP/$BIN/BINARY/COMMU05.8.bin.faeries.json --offset 0xD5C --quantity 8 --repeat 4 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.menu.json --offset 0x32434 --quantity 8 --repeat 5 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.items.json --offset 0x33164 --quantity 12 --skip 6 --repeat 92 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.key_items.json --offset 0x337DC --quantity 12 --skip 4 --repeat 16 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.weapons.json --offset 0x338DC --quantity 12 --skip 12 --repeat 83 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.armors.json --offset 0x340A4 --quantity 12 --skip 10 --repeat 68 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.accessories.json --offset 0x3467C --quantity 12 --skip 8 --repeat 52 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.abilities.json --offset 0x34F20 --quantity 12 --skip 8 --repeat 227 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BMAGIC/MAGIC060/MAGIC060.1.bin -o DUMP/$BIN/BINARY/MAGIC060.1.bin.weak_exp_item.json --offset 0x1F64 --quantity 8 --repeat 5 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/SCENARIO/SCENA10/SCENA10.1.bin -o DUMP/$BIN/BINARY/SCENA10.1.bin.choose_parts.json --offset 0x7C74 --quantity 12 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/SISYOU/SISYOU.1.bin -o DUMP/$BIN/BINARY/SISYOU.1.bin.pwr_def_int.json --offset 0x3438 --quantity 4 --repeat 7 --trim"
+)
+
+BIN_DUMP_COMMANDS_PSP=(
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.item_weapon_armor.json --offset 0x3242C --quantity 8 --repeat 4 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BMAGIC/MAGIC060/MAGIC060.1.bin -o DUMP/$BIN/BINARY/MAGIC060.1.bin.weak_exp_item.json --offset 0x1F00 --quantity 8 --repeat 5 --trim"
+)
+
+BIN_TO_EDIT="BATTLE/BATTLE/BATTLE.16.bin
 BMAGIC/MAGIC003/MAGIC003.4.bin
-BMAGIC/MAGIC060/MAGIC060.1.bin
-BOSS/BOSS025/BOSS025.14.bin
 ETC/BATE/BATE.1.bin
-ETC/COMMU00/COMMU00.1.bin
-ETC/COMMU01/COMMU01.8.bin
 ETC/COMMU02/COMMU02.9.bin
 ETC/COMMU03/COMMU03.7.bin
-ETC/COMMU05/COMMU05.8.bin
-ETC/GAME/GAME.1.bin
 ETC/SHISU/SHISU.1.bin
 ETC/SHOP/SHOP.1.bin
-ETC/SISYOU/SISYOU.1.bin
 ETC/START/START.9.bin
-SCENARIO/SCENA10/SCENA10.1.bin
 SCENARIO/SCENA17/SCENA17.1.bin
 WORLD00/AREA030/AREA030.5.bin"
 
@@ -133,23 +182,50 @@ TURIMODE.4.bin.4b.128w.128x32.256r.bmp
 TURISHAR.2.bin.8b.64w.64x32.256r.bmp
 TURISHAR.3.bin.8b.64w.64x32.256r.bmp"
 
-# Rimuove le cartelle/file che non contengono testo da tradurre
-dirs_to_delete="BENEMY BGM BMAG_XA BPLCHAR PLCHAR SCE_XA MODULE PSMF dummy.bin"
+# Rimuove le cartelle che non contengono testo/grafica da tradurre
+dirs_to_delete="BENEMY BGM BMAG_XA BPLCHAR PLCHAR SCE_XA MODULE PSMF"
 
 for dir in $dirs_to_delete; do
   if [ -d "$BIN/$dir" ]; then
     rm -rf "$BIN/$dir"
   fi
-  if [ -f "$BIN/$dir" ]; then
-    rm "$BIN/$dir"
-  fi
 done
 
-# Rimuovi tutte le AREA non utilizzate per entrambe le versioni
-files_to_delete="AREA006 AREA025 AREA029 AREA036 AREA063 AREA064 AREA070 AREA072 AREA073 AREA076 AREA084 AREA093 AREA102 AREA106 AREA109 AREA110 AREA124 AREA125 AREA127 AREA137 AREA138 AREA139 AREA146 AREA156 AREA158 AREA159 AREA160 AREA161 AREA162 AREA163 AREA190"
+# Rimuovi tutti i file non utilizzati
+files_to_delete="dummy.bin AREA006.EMI
+AREA025.EMI
+AREA029.EMI
+AREA036.EMI
+AREA063.EMI
+AREA064.EMI
+AREA070.EMI
+AREA072.EMI
+AREA073.EMI
+AREA076.EMI
+AREA084.EMI
+AREA093.EMI
+AREA102.EMI
+AREA106.EMI
+AREA109.EMI
+AREA110.EMI
+AREA124.EMI
+AREA125.EMI
+AREA127.EMI
+AREA137.EMI
+AREA138.EMI
+AREA139.EMI
+AREA146.EMI
+AREA156.EMI
+AREA158.EMI
+AREA159.EMI
+AREA160.EMI
+AREA161.EMI
+AREA162.EMI
+AREA163.EMI
+AREA190.EMI"
 
 for file in $files_to_delete; do
-  find $BIN -name "$file.EMI" -delete
+  find $BIN -name "$file" -delete
 done
 
 # Unpack di tutti i file EMI
@@ -182,33 +258,48 @@ while read -r file; do
   fi
 done <<< "$ENEMIES_TO_DUMP"
 
+# Effettua il raw dump dei file binari della versione PAL
+if [ $PLATFORM == "PAL" ]; then
+  for cmd in "${BIN_DUMP_COMMANDS_PAL[@]}"; do
+    $cmd
+  done
+elif [ $PLATFORM == "USA" ]; then
+  for cmd in "${BIN_DUMP_COMMANDS_USA[@]}"; do
+    $cmd
+  done
+fi
+
 # Sposta tutte le grafiche in GFX/piattaforma
 mkdir -p GFX/$BIN
 find "UNPACKED/$BIN/" -name "*.bmp" -exec mv {} "GFX/$BIN" \;
 
-# Rimuovo le grafiche doppie
+# Rimuovi le grafiche doppie
 while read -r file; do
   if [ -f "GFX/$BIN/$file" ]; then
     rm GFX/$BIN/$file
   fi
 done <<< "$GFX_TO_REMOVE"
 
-# Copio i file BIN da modificare
+# Copia i file binali da modificare
 mkdir -p BINARY/$BIN
 while read -r file; do
   if [ -f "UNPACKED/$BIN/$file" ]; then
     cp UNPACKED/$BIN/$file BINARY/$BIN
   fi
-done <<< "$BIN_TO_EXPORT"
+done <<< "$BIN_TO_EDIT"
 
 # Crea la cartella dei file da iniettare
-mkdir -p INJECT/$BIN
+mkdir -p INJECT/$BIN/BEFORE_REINSERT
+mkdir -p INJECT/$BIN/AFTER_REINSERT
 
-# Indicizza i dump presenti in DUMP/piattaforma/WORLD
-python bof3tool.py index -i DUMP/$BIN/WORLD/*.json --output-strings DUMP/dump_world_$BIN.json --output-pointers DUMP/pointers_world_$BIN.json
+# Indicizza i dump presenti in DUMP/piattaforma/WORLD e rimuove i file duplicati
+python bof3tool.py index -i DUMP/$BIN/WORLD/*.json --output-strings DUMP/$BIN/dump_world.json --output-pointers DUMP/$BIN/pointers_world.json
+rm -rf DUMP/$BIN/WORLD
 
-# Indicizza i dump presenti in DUMP/piattaforma/MENU
-python bof3tool.py index -i DUMP/$BIN/MENU/*.json --output-strings DUMP/dump_menu_$BIN.json --output-pointers DUMP/pointers_menu_$BIN.json
+# Indicizza i dump presenti in DUMP/piattaforma/MENU e rimuove i file duplicati
+python bof3tool.py index -i DUMP/$BIN/MENU/*.json --output-strings DUMP/$BIN/dump_menu.json --output-pointers DUMP/$BIN/pointers_menu.json
+rm -rf DUMP/$BIN/MENU
 
-# Indicizza i dump presenti in DUMP/piattaforma/ENEMIES
-python bof3tool.py index -i DUMP/$BIN/ENEMIES/*.json --output-strings DUMP/dump_enemies_$BIN.json --output-pointers DUMP/pointers_enemies_$BIN.json
+# Indicizza i dump presenti in DUMP/piattaforma/ENEMIES e rimuove i file duplicati
+python bof3tool.py index -i DUMP/$BIN/ENEMIES/*.json --output-strings DUMP/$BIN/dump_enemies.json --output-pointers DUMP/$BIN/pointers_enemies.json
+rm -rf DUMP/$BIN/ENEMIES

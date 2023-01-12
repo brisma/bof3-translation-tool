@@ -6,6 +6,27 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
+# Verifica la piattaforma
+if [[ ! -f "$BIN/ETC/WARNING.EMI" && ! -f "$BIN/ETC/CAPLOGO.EMI" ]]; then
+  PLATFORM="USA"
+elif [[ -f "$BIN/ETC/WARNING.EMI" ]]; then
+  PLATFORM="PAL"
+elif [[ -f "$BIN/ETC/CAPLOGO.EMI" ]]; then
+  PLATFORM="PSP"
+fi
+
+echo "Platform detected: $PLATFORM"
+
+BIN_TO_RAW_REINSERT="BATTLE/BATTLE/BATTLE.4.bin
+BOSS/BOSS025/BOSS025.14.bin
+ETC/COMMU00/COMMU00.1.bin
+ETC/COMMU01/COMMU01.8.bin
+ETC/COMMU05/COMMU05.8.bin
+ETC/GAME/GAME.1.bin
+BMAGIC/MAGIC060/MAGIC060.1.bin
+SCENARIO/SCENA10/SCENA10.1.bin
+ETC/SISYOU/SISYOU.1.bin"
+
 ENEMIES_TO_REINSERT="WORLD00/AREA002/AREA002.14.bin
 WORLD00/AREA003/AREA003.11.bin
 WORLD00/AREA005/AREA005.11.bin
@@ -212,24 +233,19 @@ BATE.2.bin AREA129.21.bin
 AREA030.14.bin TURIMODE.4.bin
 AREA151.6.bin AREA152.6.bin"
 
-# Creo la cartella TEMP (e la elimino se esiste già)
+# Creo la cartella TEMP (o la elimino e la ricreo se esiste già)
 if [ -d "TEMP" ]; then
-  rm -r "TEMP"
+  rm -rf "TEMP"
 fi
 mkdir -p TEMP/DUMP
 
 # Copio dump e puntatori in TEMP/DUMP
-cp DUMP/dump_world_$BIN.json TEMP/DUMP
-cp DUMP/pointers_world_$BIN.json TEMP/DUMP
-cp DUMP/dump_menu_$BIN.json TEMP/DUMP
-cp DUMP/pointers_menu_$BIN.json TEMP/DUMP
-cp DUMP/dump_enemies_$BIN.json TEMP/DUMP
-cp DUMP/pointers_enemies_$BIN.json TEMP/DUMP
+cp -R DUMP/$BIN TEMP/DUMP
 
 # Espando i dump nei loro sottofile
-python bof3tool.py expand --input-strings TEMP/DUMP/dump_world_$BIN.json --input-pointers TEMP/DUMP/pointers_world_$BIN.json -o TEMP/DUMP/$BIN/WORLD
-python bof3tool.py expand --input-strings TEMP/DUMP/dump_menu_$BIN.json --input-pointers TEMP/DUMP/pointers_menu_$BIN.json -o TEMP/DUMP/$BIN/MENU
-python bof3tool.py expand --input-strings TEMP/DUMP/dump_enemies_$BIN.json --input-pointers TEMP/DUMP/pointers_enemies_$BIN.json -o TEMP/DUMP/$BIN/ENEMIES
+python bof3tool.py expand --input-strings TEMP/DUMP/$BIN/dump_world.json --input-pointers TEMP/DUMP/$BIN/pointers_world.json -o TEMP/DUMP/$BIN/WORLD
+python bof3tool.py expand --input-strings TEMP/DUMP/$BIN/dump_menu.json --input-pointers TEMP/DUMP/$BIN/pointers_menu.json -o TEMP/DUMP/$BIN/MENU
+python bof3tool.py expand --input-strings TEMP/DUMP/$BIN/dump_enemies.json --input-pointers TEMP/DUMP/$BIN/pointers_enemies.json -o TEMP/DUMP/$BIN/ENEMIES
 
 # Reinserisco i dump in file binari in BIN
 for file in TEMP/DUMP/$BIN/WORLD/*.json
@@ -252,6 +268,24 @@ while read -r file; do
 done <<< "$ENEMIES_TO_REINSERT"
 python bof3tool.py rawreinsert -i TEMP/DUMP/$BIN/ENEMIES/*.json
 mv TEMP/DUMP/$BIN/ENEMIES/*.bin TEMP/BIN/$BIN
+
+# Copio i file da iniettare prima del reinserimento
+mkdir -p TEMP/DUMP/$BIN/BINARY
+if [ "$(ls -A INJECT/$BIN/BEFORE_REINSERT)" ]; then
+  cp -R INJECT/$BIN/BEFORE_REINSERT/* TEMP/DUMP/$BIN/BINARY
+fi
+
+# Effettuo il raw reinsert dei dump (se esistono)
+while read -r filepath; do
+  filename=$(basename "$filepath")
+  if [[ -f "UNPACKED/$BIN/$filepath" && ! -f "TEMP/DUMP/$BIN/BINARY/$filename" ]]; then
+    cp UNPACKED/$BIN/$filepath TEMP/DUMP/$BIN/BINARY
+  fi
+done <<< "$BIN_TO_RAW_REINSERT"
+if [ -n "$(find "TEMP/DUMP/$BIN/BINARY" -name '*.json' -print -quit)" ]; then
+  python bof3tool.py rawreinsert -i TEMP/DUMP/$BIN/BINARY/*.json
+fi
+mv TEMP/DUMP/$BIN/BINARY/*.bin TEMP/BIN/$BIN
 
 # Copio le grafiche in TEMP/GFX
 mkdir -p TEMP/GFX/$BIN
@@ -276,7 +310,7 @@ while read -r original duplicate; do
   fi
 done <<< "$GFX_TO_DUPLICATE"
 
-# Copio i file binari e duplico i mancanti
+# Copio i file binari mancanti e duplico i necessari
 if [ "$(ls -A BINARY/$BIN)" ]; then
   cp -R BINARY/$BIN/* TEMP/BIN/$BIN
 fi
@@ -286,16 +320,17 @@ while read -r original duplicate; do
   fi
 done <<< "$BIN_TO_DUPLICATE"
 
-# Copio i file da iniettare
-if [ "$(ls -A INJECT/$BIN)" ]; then
-  cp -R INJECT/$BIN/* TEMP/BIN/$BIN
+# Copio i file da iniettare dopo il reinserimento
+if [ "$(ls -A INJECT/$BIN/AFTER_REINSERT)" ]; then
+  cp -R INJECT/$BIN/AFTER_REINSERT/* TEMP/BIN/$BIN
 fi
 
-# Copio la cartella contenente i file EMI spacchettati in TEMP
-cp -R UNPACKED/$BIN TEMP
+# Copio la cartella contenente i file EMI spacchettati in TEMP/UNPACKED
+mkdir -p TEMP/UNPACKED
+cp -R UNPACKED/$BIN TEMP/UNPACKED
 
 # Sostituisco i nuovi file binari creati (dump/gfx) nelle cartelle dei file spacchettati temporanee
-for file in $(find TEMP/$BIN -type f)
+for file in $(find TEMP/UNPACKED/$BIN -type f)
 do
   filename=$(basename "$file")
   if [ -f "TEMP/BIN/$BIN/$filename" ]
@@ -305,7 +340,7 @@ do
 done
 
 # Reimpacchetta tutti i file JSON in file EMI
-for file in $(find TEMP/$BIN -type f -name '*.json')
+for file in $(find TEMP/UNPACKED/$BIN -type f -name '*.json')
 do
   dir=$(dirname "$file")
   python bof3tool.py pack -i "$file" -o "$dir"
@@ -315,14 +350,13 @@ done
 mkdir -p OUTPUT/$BIN
 
 # Copia tutti i file EMI rigenerati in OUTPUT preservando l'alberatura
-rsync -aim --include="*/" --include="*.EMI" --exclude="*" --delete-excluded TEMP/$BIN/ OUTPUT/$BIN
+rsync -am --include="*/" --include="*.EMI" --exclude="*" --delete-excluded TEMP/UNPACKED/$BIN/ OUTPUT/$BIN
 
 # Elimino la cartella TEMP
 rm -rf TEMP
 
 # Verifico se il contenuto dei nuovi file è cambiato, se non lo è li cancello
 for file in $(find "$BIN" -type f); do
-  echo $file
   if [ -f "OUTPUT/$file" ]; then
     diff "$file" "OUTPUT/$file"
     if [ $? -eq 0 ]; then

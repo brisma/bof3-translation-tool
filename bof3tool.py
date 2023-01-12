@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.1.0'
+version = '1.1.1'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -215,6 +215,8 @@ def read_json(json_path):
 
 # Write JSON file
 def write_json(json_path, json_data):
+    Path(json_path).unlink(missing_ok=True)
+    Path(json_path.parent).mkdir(parents=True, exist_ok=True)
     with json_path.open("w", encoding="UTF-8") as target:
         try:
             json.dump(json_data, target, ensure_ascii=False, indent=4)
@@ -826,10 +828,10 @@ def raw_dump(input, output=None, extra_table={}, offset=0, quantity=0, skip=0, r
 
     bin = read_file(input)
     extra_table = dict((k.lower(), v) for k, v in extra_table.items()) # key in lower case when dumping
-    max_offset = offset + ((quantity + skip) * repeat) + quantity - skip
+    max_offset = offset + ((quantity + skip) * repeat) - skip
 
     if max_offset > bin.size:
-        raise Exception(f'Raw Dump [offset + (quantity + skip) * repeat + quantity - skip] exceeds file size ({max_offset} > {bin.size}).')
+        raise Exception(f'Raw Dump [offset + (quantity + skip) * repeat - skip] exceeds file size ({max_offset} > {bin.size}).')
 
     json_data = {
         'data': {
@@ -965,34 +967,34 @@ def reinsert_text(input, output=None, extra_table={}, verbose=False):
     print('Text reinserted.')
 
 # Raw reinsert into file
-def raw_reinsert(input, extra_table={}, verbose=False):
+def raw_reinsert(input, bin=None, extra_table={}, verbose=False):
     json_data = read_json(input)
     extra_table = dict((k, v.lower()) for k, v in extra_table.items()) # value in lower case when reinserting
 
-    bin_filename = input.parent / Path(json_data['data']['input'])
+    bin_path = Path(bin) if bin else input.parent / Path(json_data['data']['input'])
     offset = json_data['data']['offset']
     quantity = json_data['data']['quantity']
     skip = json_data['data']['skip']
     repeat = json_data['data']['repeat']
 
-    bin = read_file(bin_filename)
-    max_offset = offset + ((quantity + skip) * repeat) + quantity - skip
+    bin = read_file(bin_path)
+    max_offset = offset + ((quantity + skip) * repeat) - skip
 
     if max_offset > bin.size:
-        raise Exception(f'Raw Reinsert [offset + (quantity + skip) * repeat + quantity - skip] exceeds file size ({max_offset} > {bin.size}).')
+        raise Exception(f'Raw Reinsert [offset + (quantity + skip) * repeat - skip] exceeds file size ({max_offset} > {bin.size}).')
 
     if verbose:
-        print(f'Raw reinserting into {bin_filename.name} - offset: {offset}, quantity: {quantity}, skip: {skip}, repeat: {repeat}')
+        print(f'Raw reinserting into {bin_path.name} - offset: {offset}, quantity: {quantity}, skip: {skip}, repeat: {repeat}')
 
     for i in range(repeat):
         start_offset = offset + i * (quantity + skip)
         end_offset = offset + i * (quantity + skip) + quantity
 
-        if len(json_data['dump'][i]) > quantity:
-            raise Exception(f'Raw Reinsert of "{json_data["dump"][i]}" exceeds quantity limit of {quantity} bytes."')
-
         text_encoded = encode_text(json_data['dump'][i], extra_table)
         raw_encoded = np.pad(text_encoded, (0, quantity - text_encoded.size), 'constant', constant_values = 0x00)
+
+        if text_encoded.size > quantity:
+            raise Exception(f'Raw Reinsert of "{json_data["dump"][i]}" exceeds quantity limit of {quantity} bytes."')
 
         if verbose:
             print(f'Raw reinserting from 0x{start_offset:X} to 0x{end_offset:X}:')
@@ -1002,8 +1004,8 @@ def raw_reinsert(input, extra_table={}, verbose=False):
 
         bin[start_offset:end_offset] = raw_encoded
 
-    write_file(bin_filename, bin)
-    print(f'Raw reinserted {quantity} byte of new encoded data from {input.name} into {bin_filename.name} {repeat} times.')
+    write_file(bin_path, bin)
+    print(f'Raw reinserted {quantity} byte of new encoded text from {input.name} into {bin_path.name} {repeat} times.')
 
 # Index all texts into single file
 def index_texts(inputs, output_strings, output_pointers, verbose=False):
@@ -1348,6 +1350,7 @@ def main(command_line=None):
 
     rawreinsert = subparser.add_parser('rawreinsert', help='raw reinsert bytes into file')
     rawreinsert.add_argument('-i', '--input', help='input .JSON files', type=Path, required=True, nargs='*')
+    rawreinsert.add_argument('-b', '--bin', help='output binary file', type=Path, required=False, default=None)
     rawreinsert.add_argument('--extra-table', help="extra table (ex. à=A0 è=A1 ò=A2)", action=ParseExtraTable, required=False, nargs='+', default={})
     rawreinsert.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
 
@@ -1422,7 +1425,7 @@ def main(command_line=None):
                 reinsert_text(input=path, output=args.output, extra_table=args.extra_table, verbose=args.verbose)
         elif args.command == 'rawreinsert':
             for path in args.input:
-                raw_reinsert(input=path, extra_table=args.extra_table, verbose=args.verbose)
+                raw_reinsert(input=path, bin=args.bin, extra_table=args.extra_table, verbose=args.verbose)
         elif args.command == 'index':
             index_texts(inputs=args.input, output_strings=args.output_strings, output_pointers=args.output_pointers, verbose=args.verbose)
         elif args.command == 'expand':
