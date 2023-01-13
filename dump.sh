@@ -2,11 +2,11 @@
 
 BIN=$1
 if [ -z "$1" ]; then
-  echo "Errore: non è stata specificata una cartella con i dati da dumpare"
+  echo "Error: no folder was specified with data to dump"
   exit 1
 fi
 
-# Verifica la piattaforma
+# Platform detection
 if [[ ! -f "$BIN/ETC/WARNING.EMI" && ! -f "$BIN/ETC/CAPLOGO.EMI" ]]; then
   PLATFORM="USA"
 elif [[ -f "$BIN/ETC/WARNING.EMI" ]]; then
@@ -182,16 +182,17 @@ TURIMODE.4.bin.4b.128w.128x32.256r.bmp
 TURISHAR.2.bin.8b.64w.64x32.256r.bmp
 TURISHAR.3.bin.8b.64w.64x32.256r.bmp"
 
-# Rimuove le cartelle che non contengono testo/grafica da tradurre
+# Removes folders that do not contain text/graphics to be translated
 dirs_to_delete="BENEMY BGM BMAG_XA BPLCHAR PLCHAR SCE_XA MODULE PSMF"
 
 for dir in $dirs_to_delete; do
   if [ -d "$BIN/$dir" ]; then
+    echo "Removing unused folder $dir"...
     rm -rf "$BIN/$dir"
   fi
 done
 
-# Rimuovi tutti i file non utilizzati
+# Remove all unused files
 files_to_delete="dummy.bin AREA006.EMI
 AREA025.EMI
 AREA029.EMI
@@ -224,11 +225,14 @@ AREA162.EMI
 AREA163.EMI
 AREA190.EMI"
 
+echo "Removing all unused files if exists..."
 for file in $files_to_delete; do
   find $BIN -name "$file" -delete
 done
+echo "Done"
 
-# Unpack di tutti i file EMI
+# Unpack all EMI files
+echo "Unpacking all EMI files..."
 for dir in $BIN/*/
 do
     dir=${dir%*/}
@@ -236,29 +240,37 @@ do
         python bof3tool.py unpack -i $dir/*.EMI -o UNPACKED/$dir --dump-text --dump-graphic
     fi
 done
+echo "Done"
 
-# Muovi i dump di tutti i testi WORLD nella cartella DUMP/piattaforma/WORLD
+# Move all text dumps of WORLD in the DUMP/platform/WORLD folder
 mkdir -p DUMP/$BIN/WORLD
+echo "Moving all WORLD JSON files..."
 for world in WORLD00 WORLD01 WORLD02 WORLD03 WORLD04; do
-  find UNPACKED/$BIN/$world/ -name "*.bin.json" -execdir sh -c "mv \$1 ../../../../DUMP/$BIN/WORLD" sh {} \;
+  find UNPACKED/$BIN/$world/ -name "*.bin.json" -execdir sh -c "mv -v \$1 ../../../../DUMP/$BIN/WORLD" sh {} \;
 done
+echo "Done"
 
-# Muovi i dump di tutti i menu nella cartella DUMP/piattaforma/MENU
+# Move all text dumps of MENU in the DUMP/platform/MENU folder
 mkdir -p DUMP/$BIN/MENU
+echo "Moving all MENU JSON files..."
 for menu in BATTLE BOSS ETC; do
-  find UNPACKED/$BIN/$menu/ -name "*.bin.json" -execdir sh -c "mv \$1 ../../../../DUMP/$BIN/MENU" sh {} \;
+  find UNPACKED/$BIN/$menu/ -name "*.bin.json" -execdir sh -c "mv -v \$1 ../../../../DUMP/$BIN/MENU" sh {} \;
 done
+echo "Done"
 
-# Effettua il dump dei nomi dei nemici usando il rawdump
+# Raw Dump and move all enemies names from binary files to DUMP/platform/ENEMIES folder
 mkdir -p DUMP/$BIN/ENEMIES
+echo "Dumping and moving all ENEMY JSON files..."
 while read -r file; do
   if [ -f "UNPACKED/$BIN/$file" ]; then
     python bof3tool.py rawdump -i UNPACKED/$BIN/$file --offset 0x48 --quantity 8 --skip 128 --repeat 8 --trim
-    mv UNPACKED/$BIN/$file.json DUMP/$BIN/ENEMIES
+    mv -v UNPACKED/$BIN/$file.json DUMP/$BIN/ENEMIES
   fi
 done <<< "$ENEMIES_TO_DUMP"
+echo "Done"
 
-# Effettua il raw dump dei file binari della versione PAL
+# Raw Dump of all binary files to DUMP/platform/BINARY folder
+echo "Raw Dumping all BINARY files ($PLATFORM)..."
 if [ $PLATFORM == "PAL" ]; then
   for cmd in "${BIN_DUMP_COMMANDS_PAL[@]}"; do
     $cmd
@@ -267,39 +279,54 @@ elif [ $PLATFORM == "USA" ]; then
   for cmd in "${BIN_DUMP_COMMANDS_USA[@]}"; do
     $cmd
   done
+elif [ $PLATFORM == "PSP" ]; then
+  for cmd in "${BIN_DUMP_COMMANDS_PSP[@]}"; do
+    $cmd
+  done
 fi
+echo "Done"
 
-# Sposta tutte le grafiche in GFX/piattaforma
+# Move all graphics files to GFX/platform folder
 mkdir -p GFX/$BIN
-find "UNPACKED/$BIN/" -name "*.bmp" -exec mv {} "GFX/$BIN" \;
+echo "Moving all GFX files..."
+find "UNPACKED/$BIN/" -name "*.bmp" -exec mv -v {} "GFX/$BIN" \;
+echo "Done"
 
-# Rimuovi le grafiche doppie
+# Remove all duplicated graphics
+echo "Removing all duplicated GFX files..."
 while read -r file; do
   if [ -f "GFX/$BIN/$file" ]; then
-    rm GFX/$BIN/$file
+    rm -v GFX/$BIN/$file
   fi
 done <<< "$GFX_TO_REMOVE"
+echo "Done"
 
-# Copia i file binali da modificare
+# Copy binary files to be manual edited
 mkdir -p BINARY/$BIN
+echo "Copying all BINARY files..."
 while read -r file; do
   if [ -f "UNPACKED/$BIN/$file" ]; then
-    cp UNPACKED/$BIN/$file BINARY/$BIN
+    cp -v UNPACKED/$BIN/$file BINARY/$BIN
   fi
 done <<< "$BIN_TO_EDIT"
+echo "Done"
 
-# Crea la cartella dei file da iniettare
+# Create the folders of files to be injected (before/after raw reinsert)
 mkdir -p INJECT/$BIN/BEFORE_REINSERT
 mkdir -p INJECT/$BIN/AFTER_REINSERT
 
-# Indicizza i dump presenti in DUMP/piattaforma/WORLD e rimuove i file duplicati
+echo "Indexing WORLD, MENU and ENEMIES dumps..."
+
+# Index all dumps into DUMP/platform/WORLD and remove old duplicated files
 python bof3tool.py index -i DUMP/$BIN/WORLD/*.json --output-strings DUMP/$BIN/dump_world.json --output-pointers DUMP/$BIN/pointers_world.json
 rm -rf DUMP/$BIN/WORLD
 
-# Indicizza i dump presenti in DUMP/piattaforma/MENU e rimuove i file duplicati
+# Index all dumps into DUMP/platform/MENU and remove old duplicated files
 python bof3tool.py index -i DUMP/$BIN/MENU/*.json --output-strings DUMP/$BIN/dump_menu.json --output-pointers DUMP/$BIN/pointers_menu.json
 rm -rf DUMP/$BIN/MENU
 
-# Indicizza i dump presenti in DUMP/piattaforma/ENEMIES e rimuove i file duplicati
+# Index all dumps into DUMP/platform/ENEMIES and remove old duplicated files
 python bof3tool.py index -i DUMP/$BIN/ENEMIES/*.json --output-strings DUMP/$BIN/dump_enemies.json --output-pointers DUMP/$BIN/pointers_enemies.json
 rm -rf DUMP/$BIN/ENEMIES
+
+echo "Done"
