@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.1.1'
+version = '1.1.2'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -879,30 +879,31 @@ def translate_texts(input, output, source_lang, target_lang, verbose=False):
     characterd_translated = 0
 
     for block in strings_json.keys():
-        print(f"Translating {len(strings_json[block])} strings of {block} from '{source_lang}' to '{target_lang}' using Amazon Translate (ML)...")
-        translated_strings[block] = []
+        if type(strings_json[block]) is list:
+            print(f"Translating {len(strings_json[block])} strings of {block} from '{source_lang}' to '{target_lang}' using Amazon Translate (ML)...")
+            translated_strings[block] = []
 
-        for line in strings_json[block]:
-            if line != "":
-                translate_response = client.translate_text(
-                    Text=line,
-                    SourceLanguageCode=source_lang,
-                    TargetLanguageCode=target_lang,
-                    Settings={
-                        'Formality': 'INFORMAL'
-                    }
-                )
-                translated_line = translate_response['TranslatedText']
-                lines_translated = lines_translated + 1
-                characterd_translated = characterd_translated + len(line)
+            for line in strings_json[block]:
+                if line != "":
+                    translate_response = client.translate_text(
+                        Text=line,
+                        SourceLanguageCode=source_lang,
+                        TargetLanguageCode=target_lang,
+                        Settings={
+                            'Formality': 'INFORMAL'
+                        }
+                    )
+                    translated_line = translate_response['TranslatedText']
+                    lines_translated = lines_translated + 1
+                    characterd_translated = characterd_translated + len(line)
 
-                if verbose:
-                    print(f' Original text: {line}...')
-                    print(f' Translated text: {translated_line}...')
+                    if verbose:
+                        print(f' Original text: {line}...')
+                        print(f' Translated text: {translated_line}...')
 
-                translated_strings[block].append(translated_line)
-            else:
-                translated_strings[block].append(line)
+                    translated_strings[block].append(translated_line)
+                else:
+                    translated_strings[block].append(line)
 
     write_json(output, translated_strings)
     print(f"File {input} translated into {output} from '{source_lang}' to '{target_lang}' using Amazon Translate (ML).")
