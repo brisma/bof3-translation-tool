@@ -638,8 +638,6 @@ Prima di poter procedere al reinserimento dobbiamo **aver completato la procedur
 
 Oltre a ciò, ovviamente, sarà necessario avere modificato i file descritti in precedenza.
 
-> **ATTENZIONE**: se necessario è possibile iniettare dei file aggiuntivi tramite la cartella **INJECT**, essi verranno reinseriti a valle di tutta la procedura prima del reimpacchettamento dei file **EMI**.
-
 ### Reinserimento
 Per effettuare il reinserimento dei contenuti è sufficiente lanciare il tool sulla cartella originale:
 
@@ -651,14 +649,14 @@ Lo script inizierà a lavorare sul contenuto della cartella modificate effettuan
 2. Copia i dump indicizzati nella cartella **DUMP/piattaforma** nella **TEMP**
 3. Espande i dump indicizzati all'interno della cartella **TEMP**
 4. Trasforma i file di dump (**JSON**) del gioco e dei menu in file binari
-5. Copia eventuali file binari dalla cartella INJECT/piattaforma/BEFORE_REINSERT
+5. Copia eventuali file binari dalla cartella **INJECT/piattaforma/BEFORE_REINSERT**
 6. Effettua il reinserimento manuale di alcune parti dei menu nei file binari
 7. Copia le grafiche nella cartella **GFX** nella cartella **TEMP**
 8. Converte le grafiche sulla base del nome nuovamente in **RAW**
 9. Duplica le grafiche mancanti (molte sono ripetute in più file)
 10. Copia i file binari contenuti nella cartella **BINARY** in **TEMP**
 11. Duplica i file binari mancanti (molti sono ripetuti in più file)
-12. Sostituisce eventuali file binari usando quelli della cartella INJECT/piattaforma/AFTER_REINSERT
+12. Sostituisce eventuali file binari usando quelli della cartella **INJECT/piattaforma/AFTER_REINSERT**
 13. Copia gli **EMI** spacchettati nella cartella **UNPACKED** in **TEMP**
 14. Sostituisce i file binari da reimpacchettare nelle destinazioni finali di **TEMP**
 15. Reimpacchetta tutti i file **EMI** in **TEMP**
@@ -691,4 +689,4 @@ Ad es. è risaputo che i menu della versione **PSP** sono all'interno del file `
 
 Bisogna quindi modificare gli script `dump.sh` e `reinsert.sh` per gestire l'estrazione manuale (Raw Dump) ed il reinserimento manuale (Raw Reinsert) di questo file.
 
-Per comodità ho creato un file di nome `Analisi dei file.txt` in cui sono presenti degli appunti sulla varia scoperte per le tre versioni.
+Per comodità ho creato un file di nome `Analisi dei file.txt` in cui sono presenti degli appunti sulle varie scoperte per le tre versioni.
