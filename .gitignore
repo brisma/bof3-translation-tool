@@ -205,12 +205,11 @@ PSX_ITA/
 PSX_GER/
 PSX_ESP/
 PSP/
+
+BINARY/
 DUMP/
 GFX/
+INJECT/
+OUTPUT/
 TEMP/
-dump_world_*
-pointers_world_*
-dump_menu_*
-pointers_menu_*
-dump_enemies_*
-pointers_enemies_*
+UNPACKED/
