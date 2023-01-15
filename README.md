@@ -15,6 +15,8 @@ Breath of Fire 3 Translation Tool
     - [Espansione testi indicizzati](#espansione-testi-indicizzati)
     - [Conversione grafica RAW in TIM/BMP](#conversione-grafica-raw-in-timbmp)
     - [Conversione grafica TIM/BMP in RAW](#conversione-grafica-timbmp-in-raw)
+    - [Dividere la grafica RAW (split)](#dividere-la-grafica-raw-split)
+    - [Riunire le grafiche RAW divise (merge)](#riunire-le-grafiche-raw-divise-merge)
   - [Dump di tutti i testi/grafiche/file binari da modificare](#dump-di-tutti-i-testigrafichefile-binari-da-modificare)
     - [Prerequisiti](#prerequisiti)
     - [Estrazione](#estrazione)
@@ -380,40 +382,51 @@ Expanded 169 files using 10840 indexed strings.
 ### Conversione grafica RAW in TIM/BMP
 Tramite le funzioni `raw2tim` e `raw2bmp` è possibile convertire la grafica RAW in TIM/BMP e riarrangiare le tile internamente.
 
-Per spiegarne il funzionamento e mostrarne l'utilizzo prenderemo come esempio il file `ETC/ENDKANJI.EMI` della versione PSX.
+Per spiegarne il funzionamento e mostrarne l'utilizzo prenderemo come esempio il file `ETC/FIRST.EMI` della versione PSX.
 Iniziamo con estrarne il suo contenuto:
 
 ```
-python bof3tool.py unpack -i ENDKANJI.EMI   
+python bof3tool.py unpack -i FIRST.EMI   
 ```
 
 Otterremo:
 ```
 --- Breath of Fire III Tool (PSX/PSP) ---
 
-Unpacking ENDKANJI.EMI into ENDKANJI.json and data blocks(2)...
-ENDKANJI/ENDKANJI.1.bin created.
-ENDKANJI/ENDKANJI.2.bin created.
-EMI ENDKANJI.EMI unpacked into 2 files.
+Unpacking FIRST.EMI into FIRST.json and data blocks(14)...
+FIRST/FIRST.1.bin created
+FIRST/FIRST.2.bin created
+FIRST/FIRST.3.bin created
+FIRST/FIRST.4.bin created
+FIRST/FIRST.5.bin created
+FIRST/FIRST.6.bin created
+FIRST/FIRST.7.bin created
+FIRST/FIRST.8.bin created
+FIRST/FIRST.9.bin created
+FIRST/FIRST.10.bin created
+FIRST/FIRST.11.bin created
+FIRST/FIRST.12.bin created
+FIRST/FIRST.13.bin created
+FIRST/FIRST.14.bin created
+EMI FIRST.EMI unpacked into 14 files
 ```
-I due file BIN contengono entrambi grafica RAW.
+Alcuni di questi file contengono **grafica RAW** mentre altri contengono le **CLUT** (basta guardare i dettagli del **JSON**), come ad esempio il file `FIRST.4.bin`.
 
-Vediamo quindi cosa è possibile fare con la funzione `raw2bmp`:
+Vediamo quindi cosa è possibile fare con la funzione `raw2tim`:
 
 ```
-python bof3tool.py raw2bmp -h
+python bof3tool.py raw2tim -h
 ```
 
 ```
-usage: bof3tool.py raw2bmp [-h] -i [INPUT ...] [-o OUTPUT] --bpp {4,8} --width {64,128,256,512} [--tile-width TILE_W] [--tile-height TILE_H] [--resize-width RESIZE_WIDTH]
-                           [--negative]
+usage: bof3tool.py raw2tim [-h] -i [INPUT ...] [-o OUTPUT] --bpp {4,8} --width {64,128,256,512} [--tile-width TILE_W] [--tile-height TILE_H] [--resize-width RESIZE_WIDTH] [--clut CLUT]
 
 optional arguments:
   -h, --help            show this help message and exit
   -i [INPUT ...], --input [INPUT ...]
                         input .BIN (RAW) files
   -o OUTPUT, --output OUTPUT
-                        output .BMP file
+                        output .TIM (PSX) file
   --bpp {4,8}           bits per pixel
   --width {64,128,256,512}
                         image width
@@ -421,27 +434,27 @@ optional arguments:
   --tile-height TILE_H  tile height
   --resize-width RESIZE_WIDTH
                         resize width
-  --negative            negative colors
+  --clut CLUT           import CLUTs file
 ```
 
-Possiamo quindi provare a convertire il primo dei due in TIM o BMP usando:
+Possiamo quindi provare a convertire il file in TIM o BMP usando:
 ```
-python bof3tool.py raw2bmp -i ENDKANJI/ENDKANJI.1.bin --bpp 4 --width 128
+python bof3tool.py raw2tim -i FIRST/FIRST.4.bin --bpp 4 --width 128 --clut FIRST/FIRST.9.bin
 ````
 
-> Per ottenere una TIM è sufficiente utilizzare `raw2tim` con gli stessi parametri
+> Per ottenere una BMP è sufficiente utilizzare `raw2bmp` con gli stessi parametri ad eccezione di `--clut`
 
-Otterremo una BMP:
+Otterremo una TIM:
 ```
 --- Breath of Fire III Tool (PSX/PSP) ---
 
-Coverting RAW ENDKANJI.1.bin in BMP ENDKANJI/ENDKANJI.1.bin.4b.128w.bmp using 4bpp, size 128x512...
-Done.
+Coverting RAW FIRST.4.bin in TIM FIRST/FIRST.4.bin.4b.128w.tim using 4bpp, size 128x512...
+Done
 ```
 
 L'immagine che otterremo sarà la seguente:
 
-![Font not arranged](./img/ENDKANJI.1.bin.4b.128w.bmp)
+![Font not arranged](./img/FIRST.4.bin.4b.128w.bmp)
 
 Come possiamo notare l'immagine è corretta a livello di impostazioni ma è evidente che è suddivisa internamente in tile da 128x32 (il secondo blocco in verticale dovrebbe essere in realtà spostato a destra del primo blocco) secondo questo criterio:
 - Tile 1
@@ -464,28 +477,28 @@ Dovrebbe diventare:
 Ecco quindi che è possibile riarrangiare le tile internamente specificando la dimensione delle tile (128x32 in questo caso) e la larghezza finale dell'immagine (256):
 
 ```
-python bof3tool.py raw2bmp -i ENDKANJI/ENDKANJI.1.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256
+python bof3tool.py raw2tim -i FIRST/FIRST.4.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut FIRST/FIRST.9.bin
 ```
 
 Otterremo:
 ```
 --- Breath of Fire III Tool (PSX/PSP) ---
 
-Coverting RAW ENDKANJI.1.bin in BMP ENDKANJI/ENDKANJI.1.bin.4b.128w.128x32.256r.bmp using 4bpp, final width size 256 using tile of 128x32...
-Done.
+Coverting RAW FIRST.4.bin in TIM FIRST/FIRST.4.bin.4b.128w.128x32.256r.tim using 4bpp, final width size 256 using tile of 128x32...
+Done
 ```
 
 La nuova immagine riarrangiata sarà:
 
-![Font rearranged](./img/ENDKANJI.1.bin.4b.128w.128x32.256r.bmp)
+![Font rearranged](./img/FIRST.4.bin.4b.128w.128x32.256r.bmp)
 
 Decisamente meglio, no?
 
-> Quando si lavora con le BMP è possibile passare il parametro `--negative` per utilizzare una palette dei colori negativa, ad esempio:
+> Quando si lavora con le **BMP** è possibile passare il parametro `--negative` per utilizzare una palette dei colori negativa, ad esempio:
 > 
-> ![Font rearranged](./img/ENDKANJI.1.bin.4b.128w.128x32.256r_negative.bmp)
+> ![Font rearranged](./img/FIRST.4.bin.4b.128w.128x32.256r_negative.bmp)
 > 
-> Con le TIM ciò non è necessario in quanto le TIM generate possiedono già le due palette all'interno.
+> Con le TIM ciò non è necessario in quanto le TIM generate possiedono già le due palette predefine o le CLUT importate all'interno.
 
 ### Conversione grafica TIM/BMP in RAW
 Tramite le funzioni `tim2raw` e `bmp2raw` possiamo effettuare il processo inverso al precedente.
@@ -493,19 +506,18 @@ Tramite le funzioni `tim2raw` e `bmp2raw` possiamo effettuare il processo invers
 I parametri sono praticamente gli stessi:
 
 ```
-python bof3tool.py bmp2raw -h
+python bof3tool.py tim2raw -h
 ```
 
 ```
-usage: bof3tool.py bmp2raw [-h] -i [INPUT ...] [-o OUTPUT] --bpp {4,8} [--tile-width TILE_W] [--tile-height TILE_H] [--resize-width RESIZE_WIDTH]
+usage: bof3tool.py tim2raw [-h] -i [INPUT ...] [-o OUTPUT] --bpp {4,8} [--tile-width TILE_W] [--tile-height TILE_H] [--resize-width RESIZE_WIDTH]
 
 optional arguments:
   -h, --help            show this help message and exit
   -i [INPUT ...], --input [INPUT ...]
-                        input .BMP file files
+                        input .TIM (PSX) files
   -o OUTPUT, --output OUTPUT
                         output .BIN (RAW)
-  --bpp {4,8}           bits per pixel
   --tile-width TILE_W   tile width
   --tile-height TILE_H  tile height
   --resize-width RESIZE_WIDTH
@@ -515,22 +527,137 @@ optional arguments:
 Seguendo l'esempio precedente possiamo riottenere il file RAW (BIN) eseguendo un:
 
 ```
-python bof3tool.py bmp2raw -i ENDKANJI.1.bin.4b.128w.128x32.256r.bmp -o ENDKANJI.1.bin --bpp 4 --tile-width 128 --tile-height 32 --resize-width 256
+python bof3tool.py tim2raw -i FIRST.4.bin.4b.128w.128x32.256r.tim -o FIRST.4.bin --tile-width 128 --tile-height 32 --resize-width 256
 ```
 
 Otterremo:
 ```
 --- Breath of Fire III Tool (PSX/PSP) ---
 
-Coverting BMP ENDKANJI.1.bin.4b.128w.128x32.256r.bmp in RAW graphic ENDKANJI.1.bin using 4bpp, final width size 256 using tile of 128x32...
-Done.
+Extracting TIM info from FIRST.4.bin.4b.128w.128x32.256r.tim...
+Coverting TIM FIRST.4.bin.4b.128w.128x32.256r.tim in RAW graphic FIRST.4.bin using 8bpp, final width size 256 using tile of 128x32...
+Done
 ```
 
-Ed ecco che il file `ENDKANJI.1.bin` è pronto ad essere reinserito nell'EMI originale.
+Ed ecco che il file `FIRST.4.bin` è pronto ad essere reinserito nell'EMI originale.
 
-> Anche in questo caso il processo con le TIM è il medesimo utilizzando `raw2tim`.
+> Anche in questo caso il processo con le BMP è il medesimo utilizzando `raw2bmp`. L'unica accortezza è quella di specificare anche i bitplane utilizzati tramite `--bpp`.
 > 
 > **ATTENZIONE**: se state convertendo una BMP "negativa" non c'è bisogno di specificare alcun ulteriore parametro in quanto la palette dei colori non è presente nella RAW.
+
+### Dividere la grafica RAW (split)
+Alcune volte si possono riscontare delle grafiche **RAW** un po' particolari, come ad esempio `AREA030.14.bin`.
+
+Convertiamo nel classico modo:
+```
+python bof3tool.py raw2tim -i AREA030.14.bin --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 1024 --clut AREA030.15.bin
+```
+
+Risultato:
+```
+--- Breath of Fire III Tool (PSX/PSP) ---
+
+Coverting RAW AREA030.14.bin in TIM AREA030.14.bin.8b.64w.64x32.1024r.tim using 8bpp, final width size 1024 using tile of 64x32...
+Done
+```
+
+L'immagine che ne viene fuori è la seguente:
+
+![AREA030.14 Full](./img/AREA030.14_full.bmp)
+
+Come chiaramente si nota sembra a tutti gli effetti una immagine **composta da quattro immagini distinte**.
+
+Attenzione però ad un dettaglio, la **quarta immagine** non è pensata per essere renderizzata a **8BPP** ma bensì a **4BPP** poiché l'intera texture che stiamo manipolando verrà divise in **pagine** all'interno della **VRAM**.
+
+Ecco che a questo punto ci viene in aiuto la funzionalità di `split` delle immagini **RAW** (che ricordo essere arrangiate in modo particolare all'interno dei file):
+
+```
+python bof3tool.py split -i AREA030.14.bin --bpp 8 --tile-width 64 --tile-height 32 --resize-width 1024 --quantity 4
+```
+
+Risultato:
+
+```
+--- Breath of Fire III Tool (PSX/PSP) ---
+
+Splitting RAW AREA030.14.bin into 4 parts using 64x32 tile from original width of 1024...
+Done
+```
+
+In questo modo stiamo chiedendo di dividerci la **RAW riarrangiata** in 4 immagini (che avranno larghezza 256 pixel): `AREA030.14.bin.1`, `AREA030.14.bin.2`, `AREA030.14.bin.3` e `AREA030.14.bin.4`.
+
+A questo punto possiamo provare a convertire come al solito le **RAW risultanti** tenendo conto delle nuova larghezza:
+
+```
+python bof3tool.py raw2tim -i AREA030.14.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut AREA030.15.bin
+```
+
+Risultato:
+
+```
+--- Breath of Fire III Tool (PSX/PSP) ---
+
+Coverting RAW AREA030.14.bin.1 in TIM AREA030.14.bin.1.8b.64w.64x32.256r.tim using 8bpp, final width size 256 using tile of 64x32...
+Done
+```
+
+Che corrisponde alla seguente immagine:
+
+![AREA030.14.1](./img/AREA030.14.bin.1_8bpp.bmp)
+
+Ovviamente se ripetessimo lo stesso comando per la **quarta** avremmo lo stesso problema dell'inizio:
+```
+python bof3tool.py raw2tim -i AREA030.14.bin.4 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut AREA030.15.bin
+```
+
+Risultato:
+```
+--- Breath of Fire III Tool (PSX/PSP) ---
+
+Coverting RAW AREA030.14.bin.4 in TIM AREA030.14.bin.4.8b.64w.64x32.256r.tim using 8bpp, final width size 256 using tile of 64x32...
+Done
+```
+
+Che corrisponde alla seguente immagine:
+
+![AREA030.14.4 8BPP](./img/AREA030.14.bin.4_8bpp.bmp)
+
+Tuttavia sarà sufficiente convertirla con le giuste impostazioni:
+```
+python bof3tool.py raw2tim -i AREA030.14.bin.4 --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 512 --clut AREA030.15.bin
+```
+
+Risultato:
+```
+--- Breath of Fire III Tool (PSX/PSP) ---
+
+Coverting RAW AREA030.14.bin.4 in TIM AREA030.14.bin.4.4b.128w.128x32.512r.tim using 4bpp, final width size 512 using tile of 128x32...
+Done
+```
+
+Così facendo otterremo l'immagine corretta (ricordate che sono multi palette, i colori posso differire nelle **BMP** qui mostrate):
+
+![AREA030.14.4 4BPP](./img/AREA030.14.bin.4_4bpp.bmp)
+
+### Riunire le grafiche RAW divise (merge)
+Se abbiamo utilizzato la funzionalità precedente per dividere una **RAW** in più immagini al fine di modificarle e vogliamo riottenere il file iniziale possiamo utilizzare la funzionalità di `merge` per ricostruire il file:
+
+```
+python bof3tool.py merge -i AREA030.14.bin.1 AREA030.14.bin.2 AREA030.14.bin.3 AREA030.14.bin.4 --bpp 8 --tile-width 64 --tile-height 32 --resize-width 1024
+```
+
+Risultato:
+
+```
+--- Breath of Fire III Tool (PSX/PSP) ---
+
+Merging 4 files into AREA030.14.bin using 64x32 tile from original width of 1024...
+Done
+```
+
+Ed ecco che verrà ricostruito il file originale `AREA030.14.bin` a partire dalle immagini separate.
+
+> **ATTENZIONE**: ricordate di utilizzare il giusto `--resize-width` che sarà la somma di tutte le larghezze di tutte le immagini.
 
 ## Dump di tutti i testi/grafiche/file binari da modificare
 All'interno del repository viene fornito uno script `dump.sh` bash che automatizza l'esportazione di tutti i contenuti che andranno tradotti/modificati.

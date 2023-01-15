@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.1.2'
+version = '1.2.0'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -221,7 +221,7 @@ def write_json(json_path, json_data):
         try:
             json.dump(json_data, target, ensure_ascii=False, indent=4)
         except Exception as err:
-            print(f'Error writing JSON file {json_path}: {err}.')
+            print(f'Error writing JSON file {json_path}: {err}')
 
 # Decode BIN data into UTF-8 text
 def decode_text(data, extra_table):
@@ -504,7 +504,7 @@ def encode_text(data, extra_table):
                     else:
                         raise Exception(f'Tag <{" ".join(tag)}> in string "{data}" not valid.')
                 else:
-                    print(f'Tag <{" ".join(tag)}> not managed, skipped.')
+                    print(f'Tag <{" ".join(tag)}> not managed, skipped')
         else:
             # Normal characters
             if ord(b) >= 0x30 and ord(b) <= 0x39: # 0-9
@@ -641,6 +641,7 @@ def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, extra_table={},
 
         is_graphic = data_block_type == '0300'
         is_text = data_block_ram_location in ['80010000', '00010000', '8001A000', '0001A000']
+        is_clut = int(data_block_ram_location, 16) > 0x80033000 and int(data_block_ram_location, 16) < 0x80037000
 
         data_block = {
             'data_block_file_name': str(Path(f'{input.stem}/{input.stem}.{data_block_number}.bin')),
@@ -652,7 +653,8 @@ def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, extra_table={},
             'data_block_type': data_block_type,
             'data_block_toc_padding': data_block_toc_padding,
             'is_graphic': is_graphic,
-            'is_text': is_text
+            'is_text': is_text,
+            'is_clut': is_clut
         }
 
         json_data['data_blocks'].append(data_block)
@@ -667,12 +669,13 @@ def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, extra_table={},
             print(f' Padding Hex: {data_block_toc_padding}')
             print(f' Contains graphic: {is_graphic}')
             print(f' Contains text: {is_text}')
+            print(f' Contains CLUTs: {is_clut}')
             if is_text:
                 print(f' Text block full at {data_block_size * 100 / (data_block_size + data_block_padding_size):.0f}%')
 
         write_file(bin_path, emi_file[emi_current_offset:emi_current_offset + data_block_size])
         emi_current_offset = emi_current_offset + data_block_size + data_block_padding_size
-        print(f'{bin_path} created.')
+        print(f'{bin_path} created')
 
         if is_text and dump_txt:
             dump_text(input=bin_path, extra_table=extra_table)
@@ -683,7 +686,7 @@ def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, extra_table={},
                 raw_to_bmp(bin_path, None, img_data['bpp'], img_data['width'], img_data['tile_w'], img_data['tile_h'], img_data['width_resized'])
 
     write_json(json_path=json_path, json_data=json_data)
-    print(f'EMI {input} unpacked into {emi_data_blocks} files.')
+    print(f'EMI {input} unpacked into {emi_data_blocks} files')
 
 # Pack BIN files into EMI file
 def pack(input, output_dir='', verbose=False):
@@ -722,6 +725,7 @@ def pack(input, output_dir='', verbose=False):
         data_block_toc_padding = data_block.get('data_block_toc_padding')
         is_graphic = data_block.get('is_graphic')
         is_text = data_block.get('is_text')
+        is_clut = data_block.get('is_clut')
         data_bin = read_file(input.parent / data_block_file_name)
         data_bin_size = data_bin.size
         data_bin_padding_size = 2048 - (data_bin_size % 2048) if 2048 - (data_bin_size % 2048) != 2048 else 0
@@ -742,6 +746,7 @@ def pack(input, output_dir='', verbose=False):
             if is_text:
                 print(f' Original text block full at {data_block_size * 100 / (data_block_size + data_block_padding_size):.0f}%')
                 print(f' New text block full at {data_bin_size * 100 / (data_bin_size + data_bin_padding_size):.0f}%')
+            print(f' Contains CLUTs: {is_clut}')
 
         if not data_bin_size <= data_block_size + data_block_padding_size:
             if is_text:
@@ -763,7 +768,7 @@ def pack(input, output_dir='', verbose=False):
         data_blocks_offset = data_blocks_offset + data_bin_size + data_bin_padding_size
 
     write_file(emi_path, np.concatenate([emi_toc, data_blocks]))
-    print(f'{emi_path} created.')
+    print(f'{emi_path} created')
 
 # Dump text from BIN file
 def dump_text(input, output=None, extra_table={}, verbose=False):
@@ -799,7 +804,7 @@ def dump_text(input, output=None, extra_table={}, verbose=False):
 
             if end_offset < start_offset:
                 finish = True
-                print('Reached end of valid pointers, skipping next.')
+                print('Reached end of valid pointers, skipping next')
                 decoded_text = decode_text(data[start_offset:end_offset if end_offset >= start_offset else data.size], extra_table)
                 strings.append(decoded_text)
                 continue
@@ -817,7 +822,7 @@ def dump_text(input, output=None, extra_table={}, verbose=False):
         json_data[block] = strings
 
     write_json(output, json_data)
-    print('Text dumped.')
+    print('Text dumped')
 
 # Raw dump from file
 def raw_dump(input, output=None, extra_table={}, offset=0, quantity=0, skip=0, repeat=1, trim=False, verbose=False):
@@ -861,7 +866,7 @@ def raw_dump(input, output=None, extra_table={}, offset=0, quantity=0, skip=0, r
         json_data['dump'].append(raw_dump)
 
     write_json(output, json_data)
-    print(f'Raw dumped {quantity} byte from {input.name} into {output.name} {repeat} times.')
+    print(f'Raw dumped {quantity} byte from {input.name} into {output.name} {repeat} times')
 
 # Translate a JSON using Amazon Translate (ML)
 def translate_texts(input, output, source_lang, target_lang, verbose=False):
@@ -906,8 +911,8 @@ def translate_texts(input, output, source_lang, target_lang, verbose=False):
                     translated_strings[block].append(line)
 
     write_json(output, translated_strings)
-    print(f"File {input} translated into {output} from '{source_lang}' to '{target_lang}' using Amazon Translate (ML).")
-    print(f"{lines_translated} strings translated for a total of {characterd_translated} characters.")
+    print(f"File {input} translated into {output} from '{source_lang}' to '{target_lang}' using Amazon Translate (ML)")
+    print(f"{lines_translated} strings translated for a total of {characterd_translated} characters")
 
 # Reinsert text into BIN file
 def reinsert_text(input, output=None, extra_table={}, verbose=False):
@@ -965,7 +970,7 @@ def reinsert_text(input, output=None, extra_table={}, verbose=False):
         output_data = np.concatenate([output_data, np.concatenate([bin_pointers, bin_text], dtype=np.ubyte)], dtype=np.ubyte)
 
     write_file(output, np.array(output_data, dtype=np.ubyte))
-    print('Text reinserted.')
+    print('Text reinserted')
 
 # Raw reinsert into file
 def raw_reinsert(input, bin=None, extra_table={}, verbose=False):
@@ -1006,7 +1011,7 @@ def raw_reinsert(input, bin=None, extra_table={}, verbose=False):
         bin[start_offset:end_offset] = raw_encoded
 
     write_file(bin_path, bin)
-    print(f'Raw reinserted {quantity} byte of new encoded text from {input.name} into {bin_path.name} {repeat} times.')
+    print(f'Raw reinserted {quantity} byte of new encoded text from {input.name} into {bin_path.name} {repeat} times')
 
 # Index all texts into single file
 def index_texts(inputs, output_strings, output_pointers, verbose=False):
@@ -1040,14 +1045,14 @@ def index_texts(inputs, output_strings, output_pointers, verbose=False):
                     if string in strings_json['blocks']:
                         pointer = strings_json['blocks'].index(string)
                         if verbose and string != '':
-                            print(f' String "{string}" found at position {pointer}.')
+                            print(f' String "{string}" found at position {pointer}')
                         pointers_json[input.name][block].append(pointer)
                         if string != '':
                             info[block]['repeated_lines'] += 1
                     else:
                         strings_json['blocks'].append(string)
                         if verbose and string != '':
-                            print(f' String "{string}" is new, adding at position {len(strings_json["blocks"]) - 1}.')
+                            print(f' String "{string}" is new, adding at position {len(strings_json["blocks"]) - 1}')
                         pointers_json[input.name][block].append(strings_json['blocks'].index(string))
                         info[block]['indexed_lines'] += 1
             else:
@@ -1057,7 +1062,7 @@ def index_texts(inputs, output_strings, output_pointers, verbose=False):
     write_json(Path(output_pointers), pointers_json)
 
     for block in info:
-        print(f"Indexed {info[block]['indexed_lines']} strings ({info[block]['repeated_lines']} repeated strings) for {block}.")
+        print(f"Indexed {info[block]['indexed_lines']} strings ({info[block]['repeated_lines']} repeated strings) for {block}")
 
 # Expand an indexed file into multiple files
 def expand_texts(input_strings, input_pointers, output_dir='', verbose=False):
@@ -1088,18 +1093,18 @@ def expand_texts(input_strings, input_pointers, output_dir='', verbose=False):
                     if strings_json['blocks'][pointer] != "":
                         string_expanded += 1
                         if verbose:
-                            print(f' Adding string "{strings_json["blocks"][pointer]}" at position {pointer} into {filename} file.')
+                            print(f' Adding string "{strings_json["blocks"][pointer]}" at position {pointer} into {filename} file')
                     strings[block].append(strings_json['blocks'][pointer])
             else:
                 strings[block] = pointers_json[filename][block]
 
         write_json(Path(output_dir) / filename, strings)
-        print(f'File {filename} recreated.')
+        print(f'File {filename} recreated')
     
-    print(f'Expanded {len(pointers_json)} files using {string_expanded} indexed strings.')
+    print(f'Expanded {len(pointers_json)} files using {string_expanded} indexed strings')
 
 # Convert RAW graphic to TIM (PSX)
-def raw_to_tim(input, output, bpp, raw_width, tile_w=None, tile_h = None, resize_width = None):
+def raw_to_tim(input, output, bpp, raw_width, tile_w=None, tile_h=None, resize_width=None, clut_file=None):
     if not output:
         if tile_w and tile_h and resize_width:
             output = input.parent / f'{input.name}.{bpp}b.{raw_width}w.{tile_w}x{tile_h}.{resize_width}r.tim'
@@ -1122,7 +1127,17 @@ def raw_to_tim(input, output, bpp, raw_width, tile_w=None, tile_h = None, resize
     else:
         print(f'Coverting RAW {input.name} in TIM {output} using {bpp}bpp, size {raw_width}x{raw_height}...')
 
-    tim_header = np.full(96 if bpp == 4 else 1056, 0x00, dtype=np.ubyte) # TIM hedaer + CLUTs
+    clut = None
+
+    if clut_file:
+        clut = read_file(Path(clut_file))
+    else:
+        if bpp == 4:
+            clut = np.concatenate([palette_4bpp, palette_4bpp_negative])
+        elif bpp == 8:
+            clut = np.concatenate([palette_8bpp, palette_8bpp_negative])
+
+    tim_header = np.full(32 + clut.size, 0x00, dtype=np.ubyte) # TIM hedaer + CLUTs
     tim_header[0:4] = np.frombuffer(struct.pack('<I', 0x10), dtype=np.ubyte) # TIM Header 10 00 00 00
 
     if bpp == 4:
@@ -1133,19 +1148,18 @@ def raw_to_tim(input, output, bpp, raw_width, tile_w=None, tile_h = None, resize
             raw = rearrange_tile(raw, resize_width // 2, tile_w // 2, tile_h)
 
         tim_header[4:8] = np.frombuffer(struct.pack('<I', 0x08), dtype=np.ubyte) # TIM 4bpp 08 00 00 00
-        tim_header[8:12] = np.frombuffer(struct.pack('<I', 12 + 32 + 32), dtype=np.ubyte) # size of CLUTs + 12
+        tim_header[8:12] = np.frombuffer(struct.pack('<I', 12 + clut.size), dtype=np.ubyte) # CLUTs size + 12
         tim_header[12:14] = np.frombuffer(struct.pack('<H', 0), dtype=np.ubyte) # palette memory address X
         tim_header[14:16] = np.frombuffer(struct.pack('<H', 0), dtype=np.ubyte) # palette memory address Y
         tim_header[16:18] = np.frombuffer(struct.pack('<H', 16), dtype=np.ubyte) # number of colors in each CLUT
-        tim_header[18:20] = np.frombuffer(struct.pack('<H', 2), dtype=np.ubyte) # number of CLUTs
-        tim_header[20:52] = palette_4bpp # positive 4bpp palette
-        tim_header[52:84] = palette_4bpp_negative # negative 4bpp palette
-        tim_header[84:88] = np.frombuffer(struct.pack('<I', 12 + raw.nbytes), dtype=np.ubyte) # size of raw
-        tim_header[88:90] = np.frombuffer(struct.pack('<H', 0), dtype=np.ubyte) # image memory address X
-        tim_header[90:92] = np.frombuffer(struct.pack('<H', 0), dtype=np.ubyte) # image memory address Y
+        tim_header[18:20] = np.frombuffer(struct.pack('<H', clut.size // 32), dtype=np.ubyte) # number of CLUTs
+        tim_header[20:20+clut.size] = clut
+        tim_header[20+clut.size:20+clut.size+4] = np.frombuffer(struct.pack('<I', 12 + raw.nbytes), dtype=np.ubyte) # size of raw
+        tim_header[20+clut.size+4:20+clut.size+6] = np.frombuffer(struct.pack('<H', 0), dtype=np.ubyte) # image memory address X
+        tim_header[20+clut.size+6:20+clut.size+8] = np.frombuffer(struct.pack('<H', 0), dtype=np.ubyte) # image memory address Y
         h, w = raw.shape
-        tim_header[92:94] = np.frombuffer(struct.pack('<H', w // 2), dtype=np.ubyte) # width / 2
-        tim_header[94:96] = np.frombuffer(struct.pack('<H', h), dtype=np.ubyte) # size of raw / width * 2
+        tim_header[20+clut.size+8:20+clut.size+10] = np.frombuffer(struct.pack('<H', w // 2), dtype=np.ubyte) # width / 2
+        tim_header[20+clut.size+10:20+clut.size+12] = np.frombuffer(struct.pack('<H', h), dtype=np.ubyte) # size of raw / width * 2
 
     if bpp == 8:
         raw = raw.reshape(raw_height, raw_width)
@@ -1155,22 +1169,21 @@ def raw_to_tim(input, output, bpp, raw_width, tile_w=None, tile_h = None, resize
             raw = rearrange_tile(raw, resize_width, tile_w, tile_h)
 
         tim_header[4:8] = np.frombuffer(struct.pack('<I', 0x09), dtype=np.ubyte) # TIM 8bpp 09 00 00 00
-        tim_header[8:12] = np.frombuffer(struct.pack('<I', 12 + 512 + 512), dtype=np.ubyte) # size of CLUTs + 12
+        tim_header[8:12] = np.frombuffer(struct.pack('<I', 12 + clut.size), dtype=np.ubyte) # CLUTs size + 12
         tim_header[12:14] = np.frombuffer(struct.pack('<H', 0), dtype=np.ubyte) # palette memory address X
         tim_header[14:16] = np.frombuffer(struct.pack('<H', 0), dtype=np.ubyte) # palette memory address Y
         tim_header[16:18] = np.frombuffer(struct.pack('<H', 256), dtype=np.ubyte) # number of colors in each CLUT
-        tim_header[18:20] = np.frombuffer(struct.pack('<H', 2), dtype=np.ubyte) # number of CLUTs
-        tim_header[20:532] = palette_8bpp # positive 8bpp palette
-        tim_header[532:1044] = palette_8bpp_negative # negative 8bpp palette
-        tim_header[1044:1048] = np.frombuffer(struct.pack('<I', 12 + raw.nbytes), dtype=np.ubyte) # size of raw
-        tim_header[1048:1050] = np.frombuffer(struct.pack('<H', 0), dtype=np.ubyte) # image memory address X
-        tim_header[1050:1052] = np.frombuffer(struct.pack('<H', 0), dtype=np.ubyte) # image memory address Y
+        tim_header[18:20] = np.frombuffer(struct.pack('<H', clut.size // 256), dtype=np.ubyte) # number of CLUTs
+        tim_header[20:20+clut.size] = clut
+        tim_header[20+clut.size:20+clut.size+4] = np.frombuffer(struct.pack('<I', 12 + raw.nbytes), dtype=np.ubyte) # size of raw
+        tim_header[20+clut.size+4:20+clut.size+6] = np.frombuffer(struct.pack('<H', 0), dtype=np.ubyte) # image memory address X
+        tim_header[20+clut.size+6:20+clut.size+8] = np.frombuffer(struct.pack('<H', 0), dtype=np.ubyte) # image memory address Y
         h, w = raw.shape
-        tim_header[1052:1054] = np.frombuffer(struct.pack('<H', w // 2), dtype=np.ubyte) # width
-        tim_header[1054:1056] = np.frombuffer(struct.pack('<H', h), dtype=np.ubyte) # size of raw / width
+        tim_header[20+clut.size+8:20+clut.size+10] = np.frombuffer(struct.pack('<H', w // 2), dtype=np.ubyte) # width / 2
+        tim_header[20+clut.size+10:20+clut.size+12] = np.frombuffer(struct.pack('<H', h), dtype=np.ubyte) # size of raw / width
     
     write_file(output, np.concatenate([tim_header, raw.flatten()]))
-    print('Done.')
+    print('Done')
 
 # Convert TIM (PSX) to RAW graphic
 def tim_to_raw(input, output, tile_w=None, tile_h = None, resize_width = None):
@@ -1211,7 +1224,7 @@ def tim_to_raw(input, output, tile_w=None, tile_h = None, resize_width = None):
         raw = rearrange_tile(raw, resize_width // 2 if bpp == 8 else resize_width, tile_w // 2 if bpp == 8 else tile_w, tile_h)
         
     write_file(output, raw.flatten())
-    print('Done.')
+    print('Done')
 
 # Convert RAW graphic to BMP
 def raw_to_bmp(input, output, bpp, raw_width, tile_w=None, tile_h = None, resize_width = None, negative=False):
@@ -1257,7 +1270,7 @@ def raw_to_bmp(input, output, bpp, raw_width, tile_w=None, tile_h = None, resize
         image.putpalette(palette)
 
     image.save(output, 'BMP')
-    print('Done.')
+    print('Done')
 
 # Convert BMP to RAW graphic
 def bmp_to_raw(input, output, bpp, tile_w=None, tile_h = None, resize_width = None):
@@ -1292,7 +1305,74 @@ def bmp_to_raw(input, output, bpp, tile_w=None, tile_h = None, resize_width = No
         image = np.frombuffer(bmp.tobytes(encoder_name='raw'), dtype=np.ubyte)
         write_file(output, image)
     
-    print('Done.')
+    print('Done')
+
+def split_image(input, bpp, tile_w, tile_h, resize_width, quantity):
+    if tile_w <= 1:
+        raise Exception(f'Tile width {tile_w} must be greater or equal 2')
+
+    if tile_h <= 1:
+        raise Exception(f'Tile height {tile_h} must be greater or equal 2')
+
+    if not resize_width % tile_w == 0:
+        raise Exception(f'Resize width {resize_width} must be multiple of tile width {tile_w}')
+
+    if quantity < 1:
+        raise Exception(f'Quantity {quantity} must be greater or equal 1')
+
+    raw = read_file(input)
+
+    if raw.size == 0:
+        raise Exception(f'Empty input file {input.name} is not valid')
+
+    tile_size = (tile_w * tile_h) // 2 if bpp == 4 else tile_w * tile_h
+    image_width = resize_width // quantity
+    block_size = (image_width // tile_w) * tile_size
+
+    print(f'Splitting RAW {input.name} into {quantity} parts using {tile_w}x{tile_h} tile from original width of {resize_width}...')
+    blocks = np.split(raw, range(block_size, raw.size, block_size))
+
+    for i in range(quantity):
+        Path(f"{input.name}.{(i % quantity) + 1}").unlink(missing_ok=True)
+
+    for i, block in enumerate(blocks):
+        output_file_name = f"{input.name}.{(i % quantity) + 1}"
+        with open(output_file_name, 'ab') as output:
+            block.tofile(output)
+
+    print('Done')
+
+def merge_images(inputs, bpp, tile_w, tile_h, resize_width):
+    if tile_w <= 1:
+        raise Exception(f'Tile width {tile_w} must be greater or equal 2')
+
+    if tile_h <= 1:
+        raise Exception(f'Tile height {tile_h} must be greater or equal 2')
+
+    if not resize_width % tile_w == 0:
+        raise Exception(f'Resize width {resize_width} must be multiple of tile width {tile_w}')
+
+    tile_size = (tile_w * tile_h) // 2 if bpp == 4 else tile_w * tile_h
+    image_width = resize_width // len(inputs)
+    block_size = (image_width // tile_w) * tile_size
+
+    output = Path(inputs[0].stem)
+    output.unlink(missing_ok=True)
+
+    print(f'Merging {len(inputs)} files into {output} using {tile_w}x{tile_h} tile from original width of {resize_width}...')
+    current_position = [0] * len(inputs)
+    
+    with open(output, 'ab') as out_file:
+        for i in range(0, max(read_file(input).size for input in inputs), block_size):
+            for part in range(len(inputs)):
+                with open(inputs[part], 'rb') as in_file:
+                    in_file.seek(current_position[part])
+                    data = np.fromfile(in_file, np.uint8, block_size)
+                    if data.size != 0:
+                        data.tofile(out_file)
+                        current_position[part] = in_file.tell()
+
+    print('Done')
 
 def main(command_line=None):
     # Parser for extra table characters
@@ -1330,7 +1410,7 @@ def main(command_line=None):
     rawdump.add_argument('-o', '--output', help='output .JSON file', type=str, required=False, default=None)
     rawdump.add_argument('--extra-table', help="extra table (ex. A0=à A1=è A2=ò)", action=ParseExtraTable, required=False, nargs='+', default={})
     rawdump.add_argument('--offset', help="initial offset (dec or hex, ex. 2048 or 0x800)", type=lambda x: int(x, 0), required=False, default=0)
-    rawdump.add_argument('--quantity', help="how many bytes to dump", type=int, required=True, default=0)
+    rawdump.add_argument('--quantity', help="how many bytes to dump", type=int, required=True)
     rawdump.add_argument('--skip', help="how many bytes to skip (after dump)", type=int, required=False, default=0)
     rawdump.add_argument('--repeat', help="how many times repeat", type=int, required=False, default=1)
     rawdump.add_argument('--trim', help="trim all 0x00 from end", action='store_true', default=False)
@@ -1375,6 +1455,7 @@ def main(command_line=None):
     raw2tim.add_argument('--tile-width', dest='tile_w', help='tile width', type=int, required=False, default=None)
     raw2tim.add_argument('--tile-height', dest='tile_h', help='tile height', type=int, required=False, default=None)
     raw2tim.add_argument('--resize-width', dest='resize_width', help='resize width', type=int, required=False, default=None)
+    raw2tim.add_argument('--clut', help='import CLUTs file', type=Path, required=False, default=None)
 
     tim2raw = subparser.add_parser('tim2raw', help='convert TIM (PSX) to graphic RAW')
     tim2raw.add_argument('-i', '--input', help='input .TIM (PSX) files', type=Path, required=True, nargs='*')
@@ -1401,6 +1482,21 @@ def main(command_line=None):
     bmp2raw.add_argument('--tile-height', dest='tile_h', help='tile height', type=int, required=False, default=None)
     bmp2raw.add_argument('--resize-width', dest='resize_width', help='resize width', type=int, required=False, default=None)
 
+    split = subparser.add_parser('split', help='split raw image')
+    split.add_argument('-i', '--input', help='input .BIN (RAW) files', type=Path, required=True, nargs='*')
+    split.add_argument('--bpp', dest="bpp", help='bits per pixel', type=int, required=True, choices=[4, 8])
+    split.add_argument('--tile-width', dest='tile_w', help='tile width', type=int, required=True)
+    split.add_argument('--tile-height', dest='tile_h', help='tile height', type=int, required=True)
+    split.add_argument('--resize-width', dest='resize_width', help='resize width', type=int, required=True)
+    split.add_argument('--quantity', dest='quantity', help='number of parts', type=int, required=True)
+
+    merge = subparser.add_parser('merge', help='merge splitted raw image')
+    merge.add_argument('-i', '--input', help='input raw splitted files (*.1, *.2, *.3...)', type=Path, required=True, nargs='*')
+    merge.add_argument('--bpp', dest="bpp", help='bits per pixel', type=int, required=True, choices=[4, 8])
+    merge.add_argument('--tile-width', dest='tile_w', help='tile width', type=int, required=True)
+    merge.add_argument('--tile-height', dest='tile_h', help='tile height', type=int, required=True)
+    merge.add_argument('--resize-width', dest='resize_width', help='resize width', type=int, required=True)
+
     parser.add_argument('-v', '--version', action='version', version=f'{parser.prog} {version}')
     args = parser.parse_args(command_line)
 
@@ -1418,7 +1514,8 @@ def main(command_line=None):
                 dump_text(input=path, output=args.output, extra_table=args.extra_table, verbose=args.verbose)
         elif args.command == 'rawdump':
             for path in args.input:
-                raw_dump(input=path, output=args.output, extra_table=args.extra_table, offset=args.offset, quantity=args.quantity, skip=args.skip, repeat=args.repeat, trim=args.trim, verbose=args.verbose)
+                raw_dump(input=path, output=args.output, extra_table=args.extra_table, offset=args.offset, quantity=args.quantity,
+                skip=args.skip, repeat=args.repeat, trim=args.trim, verbose=args.verbose)
         elif args.command == 'translate':
             translate_texts(input=args.input, output=args.output, source_lang=args.source_lang, target_lang=args.target_lang, verbose=args.verbose)
         elif args.command == 'reinsert':
@@ -1433,8 +1530,8 @@ def main(command_line=None):
             expand_texts(input_strings=args.input_strings, input_pointers=args.input_pointers, output_dir=args.output_dir, verbose=args.verbose)
         elif args.command == 'raw2tim':
             for path in args.input:
-                raw_to_tim(input=path, output=args.output, bpp=args.bpp, raw_width=args.width,
-                    tile_w=args.tile_w, tile_h=args.tile_h, resize_width=args.resize_width)
+                raw_to_tim(input=path, output=args.output, bpp=args.bpp, raw_width=args.width, tile_w=args.tile_w,
+                tile_h=args.tile_h, resize_width=args.resize_width, clut_file=args.clut)
         elif args.command == 'tim2raw':
             for path in args.input:
                 tim_to_raw(input=path, output=args.output, tile_w=args.tile_w, tile_h=args.tile_h, resize_width=args.resize_width)
@@ -1445,6 +1542,11 @@ def main(command_line=None):
         elif args.command == 'bmp2raw':
             for path in args.input:
                 bmp_to_raw(input=path, output=args.output, bpp=args.bpp, tile_w=args.tile_w, tile_h=args.tile_h, resize_width=args.resize_width)
+        elif args.command == 'split':
+            for path in args.input:
+                split_image(input=path, bpp=args.bpp, tile_w=args.tile_w, tile_h=args.tile_h, resize_width=args.resize_width, quantity=args.quantity)
+        elif args.command == 'merge':
+            merge_images(inputs=args.input, bpp=args.bpp, tile_w=args.tile_w, tile_h=args.tile_h, resize_width=args.resize_width)
     except Exception as err:
         print(f'Error: {err}')
 
