@@ -45,7 +45,7 @@ python bof3tool.py -h
 Ad esempio mostrerà cosa è in grado di fare;
 
 ```
-usage: bof3tool.py [-h] [-v] {unpack,pack,dump,rawdump,translate,reinsert,rawreinsert,index,expand,raw2tim,tim2raw,raw2bmp,bmp2raw} ...
+usage: bof3tool.py [-h] [-v] {unpack,pack,dump,rawdump,translate,reinsert,rawreinsert,index,expand,raw2tim,tim2raw,raw2bmp,bmp2raw,split,merge} ...
 
 Breath of Fire III Tool (PSX/PSP)
 
@@ -65,6 +65,8 @@ positional arguments:
     tim2raw             convert TIM (PSX) to graphic RAW
     raw2bmp             convert graphic RAW to BMP
     bmp2raw             convert BMP to graphic RAW
+    split               split raw image
+    merge               merge splitted raw image
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -85,6 +87,8 @@ I comandi a disposizione sono:
 * **tim2raw**: converte un file in formato TIM in grafica RAW riarraggiando i tile
 * **raw2bmp**: converte un file grafico RAW in formato BMP riarraggiando i tile
 * **bmp2raw**: converte un file in formato BMP in grafica RAW riarraggiando i tile
+* **split**: divide un file grafico RAW in più file
+* **merge**: unisce più file grafici RAW in un unico file
 
 ### Spacchettare file EMI
 Per estrarre uno o più file EMI è sufficiente dare ad esempio un:
