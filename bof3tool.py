@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.2.0'
+version = '1.3.0'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -1307,7 +1307,12 @@ def bmp_to_raw(input, output, bpp, tile_w=None, tile_h = None, resize_width = No
     
     print('Done')
 
-def split_image(input, bpp, tile_w, tile_h, resize_width, quantity):
+def split_image(input, output, bpp, tile_w, tile_h, resize_width, quantity):
+    if output:
+        output = Path(output)
+    else:
+        output = Path(input.stem)
+
     if tile_w <= 1:
         raise Exception(f'Tile width {tile_w} must be greater or equal 2')
 
@@ -1332,17 +1337,26 @@ def split_image(input, bpp, tile_w, tile_h, resize_width, quantity):
     print(f'Splitting RAW {input.name} into {quantity} parts using {tile_w}x{tile_h} tile from original width of {resize_width}...')
     blocks = np.split(raw, range(block_size, raw.size, block_size))
 
+    (Path(output)).mkdir(parents=True, exist_ok=True)
+
     for i in range(quantity):
-        Path(f"{input.name}.{(i % quantity) + 1}").unlink(missing_ok=True)
+        old_part = Path(output) / Path(f"{input.name}.{(i % quantity) + 1}")
+        old_part.unlink(missing_ok=True)
 
     for i, block in enumerate(blocks):
-        output_file_name = f"{input.name}.{(i % quantity) + 1}"
-        with open(output_file_name, 'ab') as output:
-            block.tofile(output)
+        output_file_name = Path(output) / Path(f"{input.name}.{(i % quantity) + 1}")
+
+        with open(output_file_name, 'ab') as f:
+            block.tofile(f)
 
     print('Done')
 
-def merge_images(inputs, bpp, tile_w, tile_h, resize_width):
+def merge_images(inputs, output, bpp, tile_w, tile_h, resize_width):
+    if output:
+        output = Path(output)
+    else:
+        output = Path(inputs[0].stem)
+
     if tile_w <= 1:
         raise Exception(f'Tile width {tile_w} must be greater or equal 2')
 
@@ -1356,20 +1370,20 @@ def merge_images(inputs, bpp, tile_w, tile_h, resize_width):
     image_width = resize_width // len(inputs)
     block_size = (image_width // tile_w) * tile_size
 
-    output = Path(inputs[0].stem)
+    Path(output.parent).mkdir(parents=True, exist_ok=True)
     output.unlink(missing_ok=True)
 
     print(f'Merging {len(inputs)} files into {output} using {tile_w}x{tile_h} tile from original width of {resize_width}...')
     current_position = [0] * len(inputs)
     
-    with open(output, 'ab') as out_file:
+    with open(output, 'ab') as output_file:
         for i in range(0, max(read_file(input).size for input in inputs), block_size):
             for part in range(len(inputs)):
                 with open(inputs[part], 'rb') as in_file:
                     in_file.seek(current_position[part])
                     data = np.fromfile(in_file, np.uint8, block_size)
                     if data.size != 0:
-                        data.tofile(out_file)
+                        data.tofile(output_file)
                         current_position[part] = in_file.tell()
 
     print('Done')
@@ -1483,7 +1497,8 @@ def main(command_line=None):
     bmp2raw.add_argument('--resize-width', dest='resize_width', help='resize width', type=int, required=False, default=None)
 
     split = subparser.add_parser('split', help='split raw image')
-    split.add_argument('-i', '--input', help='input .BIN (RAW) files', type=Path, required=True, nargs='*')
+    split.add_argument('-i', '--input', help='input RAW file', type=Path, required=True, nargs='*')
+    split.add_argument('-o', '--output-directory', dest='output', help='output directory', type=str, required=False, default=None)
     split.add_argument('--bpp', dest="bpp", help='bits per pixel', type=int, required=True, choices=[4, 8])
     split.add_argument('--tile-width', dest='tile_w', help='tile width', type=int, required=True)
     split.add_argument('--tile-height', dest='tile_h', help='tile height', type=int, required=True)
@@ -1492,6 +1507,7 @@ def main(command_line=None):
 
     merge = subparser.add_parser('merge', help='merge splitted raw image')
     merge.add_argument('-i', '--input', help='input raw splitted files (*.1, *.2, *.3...)', type=Path, required=True, nargs='*')
+    merge.add_argument('-o', '--output', help='output merged RAW file', type=str, required=False, default=None)
     merge.add_argument('--bpp', dest="bpp", help='bits per pixel', type=int, required=True, choices=[4, 8])
     merge.add_argument('--tile-width', dest='tile_w', help='tile width', type=int, required=True)
     merge.add_argument('--tile-height', dest='tile_h', help='tile height', type=int, required=True)
@@ -1544,9 +1560,9 @@ def main(command_line=None):
                 bmp_to_raw(input=path, output=args.output, bpp=args.bpp, tile_w=args.tile_w, tile_h=args.tile_h, resize_width=args.resize_width)
         elif args.command == 'split':
             for path in args.input:
-                split_image(input=path, bpp=args.bpp, tile_w=args.tile_w, tile_h=args.tile_h, resize_width=args.resize_width, quantity=args.quantity)
+                split_image(input=path, output=args.output, bpp=args.bpp, tile_w=args.tile_w, tile_h=args.tile_h, resize_width=args.resize_width, quantity=args.quantity)
         elif args.command == 'merge':
-            merge_images(inputs=args.input, bpp=args.bpp, tile_w=args.tile_w, tile_h=args.tile_h, resize_width=args.resize_width)
+            merge_images(inputs=args.input, output=args.output, bpp=args.bpp, tile_w=args.tile_w, tile_h=args.tile_h, resize_width=args.resize_width)
     except Exception as err:
         print(f'Error: {err}')
 

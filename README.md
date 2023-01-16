@@ -576,7 +576,7 @@ Attenzione però ad un dettaglio, la **quarta immagine** non è pensata per esse
 Ecco che a questo punto ci viene in aiuto la funzionalità di `split` delle immagini **RAW** (che ricordo essere arrangiate in modo particolare all'interno dei file):
 
 ```
-python bof3tool.py split -i AREA030.14.bin --bpp 8 --tile-width 64 --tile-height 32 --resize-width 1024 --quantity 4
+python bof3tool.py split -i AREA030.14.bin -o . --bpp 8 --tile-width 64 --tile-height 32 --resize-width 1024 --quantity 4
 ```
 
 Risultato:
@@ -589,6 +589,10 @@ Done
 ```
 
 In questo modo stiamo chiedendo di dividerci la **RAW riarrangiata** in 4 immagini (che avranno larghezza 256 pixel): `AREA030.14.bin.1`, `AREA030.14.bin.2`, `AREA030.14.bin.3` e `AREA030.14.bin.4`.
+
+> **ATTENZIONE**: possiamo specificare una cartella di destinazione diversa con il parametro `--output`, in alternativa verrà usato il nome del file di input senza estensione.
+> 
+> Nell'esempio appena mostrato abbiamo usato il **. (punto)** per indicare la **cartella corrente**.
 
 A questo punto possiamo provare a convertire come al solito le **RAW risultanti** tenendo conto delle nuova larghezza:
 
@@ -662,6 +666,8 @@ Done
 Ed ecco che verrà ricostruito il file originale `AREA030.14.bin` a partire dalle immagini separate.
 
 > **ATTENZIONE**: ricordate di utilizzare il giusto `--resize-width` che sarà la somma di tutte le larghezze di tutte le immagini.
+>
+> Inoltre, utilizzando il parametro `--output` possiamo specificare un nome per il file di output, in alternativa verrà usato il nome del primo file da mergiare privato dell'estensione.
 
 ## Dump di tutti i testi/grafiche/file binari da modificare
 All'interno del repository viene fornito uno script `dump.sh` bash che automatizza l'esportazione di tutti i contenuti che andranno tradotti/modificati.
