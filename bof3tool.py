@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.3.1'
+version = '1.3.2'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -1188,7 +1188,7 @@ def raw_to_tim(input, output, bpp, raw_width, tile_w=None, tile_h=None, resize_w
         tim_header[12:14] = np.frombuffer(struct.pack('<H', 0), dtype=np.ubyte) # palette memory address X
         tim_header[14:16] = np.frombuffer(struct.pack('<H', 0), dtype=np.ubyte) # palette memory address Y
         tim_header[16:18] = np.frombuffer(struct.pack('<H', 256), dtype=np.ubyte) # number of colors in each CLUT
-        tim_header[18:20] = np.frombuffer(struct.pack('<H', clut.size // 256), dtype=np.ubyte) # number of CLUTs
+        tim_header[18:20] = np.frombuffer(struct.pack('<H', clut.size // 512), dtype=np.ubyte) # number of CLUTs
         tim_header[20:20+clut.size] = clut
         tim_header[20+clut.size:20+clut.size+4] = np.frombuffer(struct.pack('<I', 12 + raw.nbytes), dtype=np.ubyte) # size of raw
         tim_header[20+clut.size+4:20+clut.size+6] = np.frombuffer(struct.pack('<H', 0), dtype=np.ubyte) # image memory address X
