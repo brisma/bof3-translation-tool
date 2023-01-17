@@ -17,27 +17,6 @@ fi
 
 echo "Platform detected: $PLATFORM"
 
-BIN_DUMP_COMMANDS_PAL=(
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.atk_abl_use.json --offset 0x1A2B0 --quantity 4 --skip 4 --repeat 7 --trim"
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.attack.json --offset 0x1A400 --quantity 12 --trim"
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.examine.json --offset 0x1A41A --quantity 12 --trim"
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.defend_charge_reprisal.json --offset 0x1A434 --quantity 12 --skip 1 --repeat 8 --trim"
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/BOSS/BOSS025/BOSS025.14.bin -o DUMP/$BIN/BINARY/BOSS025.14.bin.turns_left.json --offset 0x1AD4 --quantity 12 --repeat 2 --trim"
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/COMMU00/COMMU00.1.bin -o DUMP/$BIN/BINARY/COMMU00.1.bin.names.json --offset 0x3B00 --quantity 5 --skip 4 --repeat 60 --trim"
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/COMMU01/COMMU01.8.bin -o DUMP/$BIN/BINARY/COMMU01.8.bin.common.json --offset 0x40A8 --quantity 8 --repeat 20 --trim"
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/COMMU05/COMMU05.8.bin -o DUMP/$BIN/BINARY/COMMU05.8.bin.faeries.json --offset 0xD5C --quantity 8 --repeat 4 --trim"
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.menu.json --offset 0x324B8 --quantity 8 --repeat 5 --trim"
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.items.json --offset 0x331E8 --quantity 12 --skip 6 --repeat 92 --trim"
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.key_items.json --offset 0x33860 --quantity 12 --skip 4 --repeat 16 --trim"
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.weapons.json --offset 0x33960 --quantity 12 --skip 12 --repeat 83 --trim"
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.armors.json --offset 0x34128 --quantity 12 --skip 10 --repeat 68 --trim"
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.accessories.json --offset 0x34700 --quantity 12 --skip 8 --repeat 52 --trim"
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.abilities.json --offset 0x34FA4 --quantity 12 --skip 8 --repeat 227 --trim"
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/BMAGIC/MAGIC060/MAGIC060.1.bin -o DUMP/$BIN/BINARY/MAGIC060.1.bin.weak_exp_item.json --offset 0x1F64 --quantity 8 --repeat 5 --trim"
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/SCENARIO/SCENA10/SCENA10.1.bin -o DUMP/$BIN/BINARY/SCENA10.1.bin.choose_parts.json --offset 0x7C74 --quantity 12 --trim"
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/SISYOU/SISYOU.1.bin -o DUMP/$BIN/BINARY/SISYOU.1.bin.pwr_def_int.json --offset 0x3438 --quantity 4 --repeat 7 --trim"
-)
-
 BIN_DUMP_COMMANDS_USA=(
   "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.atk_abl_use.json --offset 0x1A2B0 --quantity 4 --skip 4 --repeat 7 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.attack.json --offset 0x1A400 --quantity 12 --trim"
@@ -54,6 +33,27 @@ BIN_DUMP_COMMANDS_USA=(
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.armors.json --offset 0x340A4 --quantity 12 --skip 10 --repeat 68 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.accessories.json --offset 0x3467C --quantity 12 --skip 8 --repeat 52 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.abilities.json --offset 0x34F20 --quantity 12 --skip 8 --repeat 227 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BMAGIC/MAGIC060/MAGIC060.1.bin -o DUMP/$BIN/BINARY/MAGIC060.1.bin.weak_exp_item.json --offset 0x1F64 --quantity 8 --repeat 5 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/SCENARIO/SCENA10/SCENA10.1.bin -o DUMP/$BIN/BINARY/SCENA10.1.bin.choose_parts.json --offset 0x7C74 --quantity 12 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/SISYOU/SISYOU.1.bin -o DUMP/$BIN/BINARY/SISYOU.1.bin.pwr_def_int.json --offset 0x3438 --quantity 4 --repeat 7 --trim"
+)
+
+BIN_DUMP_COMMANDS_PAL=(
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.atk_abl_use.json --offset 0x1A2B0 --quantity 4 --skip 4 --repeat 7 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.attack.json --offset 0x1A400 --quantity 12 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.examine.json --offset 0x1A41A --quantity 12 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.defend_charge_reprisal.json --offset 0x1A434 --quantity 12 --skip 1 --repeat 8 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BOSS/BOSS025/BOSS025.14.bin -o DUMP/$BIN/BINARY/BOSS025.14.bin.turns_left.json --offset 0x1AD4 --quantity 12 --repeat 2 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/COMMU00/COMMU00.1.bin -o DUMP/$BIN/BINARY/COMMU00.1.bin.names.json --offset 0x3B00 --quantity 5 --skip 4 --repeat 60 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/COMMU01/COMMU01.8.bin -o DUMP/$BIN/BINARY/COMMU01.8.bin.common.json --offset 0x40A8 --quantity 8 --repeat 20 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/COMMU05/COMMU05.8.bin -o DUMP/$BIN/BINARY/COMMU05.8.bin.faeries.json --offset 0xD5C --quantity 8 --repeat 4 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.menu.json --offset 0x324B8 --quantity 8 --repeat 5 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.items.json --offset 0x331E8 --quantity 12 --skip 6 --repeat 92 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.key_items.json --offset 0x33860 --quantity 12 --skip 4 --repeat 16 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.weapons.json --offset 0x33960 --quantity 12 --skip 12 --repeat 83 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.armors.json --offset 0x34128 --quantity 12 --skip 10 --repeat 68 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.accessories.json --offset 0x34700 --quantity 12 --skip 8 --repeat 52 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.abilities.json --offset 0x34FA4 --quantity 12 --skip 8 --repeat 227 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/BMAGIC/MAGIC060/MAGIC060.1.bin -o DUMP/$BIN/BINARY/MAGIC060.1.bin.weak_exp_item.json --offset 0x1F64 --quantity 8 --repeat 5 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/SCENARIO/SCENA10/SCENA10.1.bin -o DUMP/$BIN/BINARY/SCENA10.1.bin.choose_parts.json --offset 0x7C74 --quantity 12 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/SISYOU/SISYOU.1.bin -o DUMP/$BIN/BINARY/SISYOU.1.bin.pwr_def_int.json --offset 0x3438 --quantity 4 --repeat 7 --trim"
@@ -155,32 +155,69 @@ WORLD04/AREA196/AREA196.11.bin
 WORLD04/AREA197/AREA197.11.bin
 WORLD04/AREA198/AREA198.11.bin"
 
-GFX_TO_REMOVE="AREA030.21.bin.4b.128w.128x32.256r.bmp
-AREA089.21.bin.4b.128w.128x32.256r.bmp
-AREA129.21.bin.4b.128w.128x32.256r.bmp
-AREA152.6.bin.8b.64w.64x32.1024r.bmp
-COMMU01.1.bin.4b.128w.128x32.256r.bmp
-COMMU02B.1.bin.4b.128w.128x32.256r.bmp
-COMMU05.1.bin.4b.128w.128x32.256r.bmp
-MAGIC013.5.bin.4b.128w.128x32.256r.bmp
-MAGIC038.8.bin.4b.128w.128x32.256r.bmp
-MAGIC039.5.bin.4b.128w.128x32.256r.bmp
-MAGIC040.5.bin.4b.128w.128x32.256r.bmp
-MAGIC043.5.bin.4b.128w.128x32.256r.bmp
-MAGIC062.5.bin.4b.128w.128x32.256r.bmp
-MAGIC069.5.bin.4b.128w.128x32.256r.bmp
-MAGIC082.5.bin.4b.128w.128x32.256r.bmp
-MAGIC083.5.bin.4b.128w.128x32.256r.bmp
-MAGIC088.5.bin.4b.128w.128x32.256r.bmp
-MAGIC225.5.bin.4b.128w.128x32.256r.bmp
-SHISU.2.bin.4b.128w.128x32.256r.bmp
-SHOP.2.bin.4b.128w.128x32.256r.bmp
-SISYOU.2.bin.4b.128w.128x32.256r.bmp
-START.4.bin.4b.128w.128x32.256r.bmp
-STATUS.2.bin.4b.128w.128x32.256r.bmp
-TURIMODE.4.bin.4b.128w.128x32.256r.bmp
-TURISHAR.2.bin.8b.64w.64x32.256r.bmp
-TURISHAR.3.bin.8b.64w.64x32.256r.bmp"
+GFX_RAW_FILES="AREA016.6.bin
+AREA016.8.bin
+AREA030.14.bin
+AREA033.6.bin
+AREA045.6.bin
+AREA065.6.bin
+AREA087.6.bin
+AREA088.6.bin
+AREA115.6.bin
+AREA121.6.bin
+AREA128.8.bin
+AREA151.6.bin
+BATE.2.bin
+BATL_DRA.1.bin
+BATL_OVR.2.bin
+DEMO.5.bin
+DEMO.6.bin
+FIRST.4.bin
+FIRST.5.bin
+FIRST.6.bin
+LOAD.1.bin
+MAGIC008.2.bin
+MAGIC067.7.bin
+SCENA17.2.bin
+SCENA17.3.bin
+START.6.bin"
+
+GFX_DUMP_COMMANDS_USA=(
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA016.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD00/AREA016/AREA016.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA016.8.bin.4.2 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 128 --clut UNPACKED/$BIN/WORLD00/AREA016/AREA016.9.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA030.14.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD00/AREA030/AREA030.15.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA030.14.bin.3 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD00/AREA030/AREA030.15.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA030.14.bin.4.2 --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD00/AREA030/AREA030.15.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA033.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD00/AREA033/AREA033.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA045.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD01/AREA045/AREA045.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA065.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD01/AREA065/AREA065.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA087.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD02/AREA087/AREA087.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA088.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD02/AREA088/AREA088.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA115.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD03/AREA115/AREA115.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA121.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD03/AREA121/AREA121.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA128.8.bin.4.1 --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD03/AREA128/AREA128.9.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA151.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD03/AREA151/AREA151.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/BATE.2.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/BATE/BATE.5.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/BATL_DRA.1.bin --bpp 8 --width 64 --tile-width 64 --tile-height 64 --resize-width 128 --clut UNPACKED/$BIN/BATTLE/BATL_DRA/BATL_DRA.2.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/BATL_OVR.2.bin --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/BATTLE/BATL_OVR/BATL_OVR.3.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/DEMO.5.bin --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/DEMO/DEMO.8.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/DEMO.6.bin --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/DEMO/DEMO.8.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/FIRST.4.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/FIRST/FIRST.9.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/FIRST.5.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/FIRST/FIRST.11.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/FIRST.6.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/FIRST/FIRST.9.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/MAGIC008.2.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/BMAGIC/MAGIC008/MAGIC008.3.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/MAGIC067.7.bin --bpp 4 --width 128 --tile-width 64 --tile-height 16 --resize-width 64 --clut UNPACKED/$BIN/BMAGIC/MAGIC067/MAGIC067.8.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/SCENA17.2.bin --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/SCENARIO/SCENA17/SCENA17.4.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/SCENA17.3.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/SCENARIO/SCENA17/SCENA17.5.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/START.6.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/START/START.7.bin"
+)
+
+GFX_DUMP_COMMANDS_PAL=("${GFX_DUMP_COMMANDS_USA[@]}")
+GFX_DUMP_COMMANDS_PAL+=(
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/LOAD.1.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/LOAD/LOAD.2.bin"
+)
+
+GFX_DUMP_COMMANDS_PSP=("${GFX_DUMP_COMMANDS_USA[@]}")
 
 # Removes folders that do not contain text/graphics to be translated
 dirs_to_delete="BENEMY BGM BMAG_XA BPLCHAR PLCHAR SCE_XA MODULE PSMF"
@@ -237,7 +274,7 @@ for dir in $BIN/*/
 do
     dir=${dir%*/}
     if [ -d "$dir" ] && [ -n "$(find "$dir" -name '*.EMI' -print -quit)" ]; then
-        python bof3tool.py unpack -i $dir/*.EMI -o UNPACKED/$dir --dump-text --dump-graphic
+        python bof3tool.py unpack -i $dir/*.EMI -o UNPACKED/$dir --dump-text
     fi
 done
 echo "Done"
@@ -246,7 +283,7 @@ echo "Done"
 mkdir -p DUMP/$BIN/WORLD
 echo "Moving all WORLD JSON files..."
 for world in WORLD00 WORLD01 WORLD02 WORLD03 WORLD04; do
-  find UNPACKED/$BIN/$world/ -name "*.bin.json" -execdir sh -c "mv -v \$1 ../../../../DUMP/$BIN/WORLD" sh {} \;
+  find UNPACKED/$BIN/$world -name "*.bin.json" -exec mv -v {} DUMP/$BIN/WORLD \;
 done
 echo "Done"
 
@@ -254,7 +291,7 @@ echo "Done"
 mkdir -p DUMP/$BIN/MENU
 echo "Moving all MENU JSON files..."
 for menu in BATTLE BOSS ETC; do
-  find UNPACKED/$BIN/$menu/ -name "*.bin.json" -execdir sh -c "mv -v \$1 ../../../../DUMP/$BIN/MENU" sh {} \;
+  find UNPACKED/$BIN/$menu -name "*.bin.json" -exec mv -v {} DUMP/$BIN/MENU \;
 done
 echo "Done"
 
@@ -271,12 +308,12 @@ echo "Done"
 
 # Raw Dump of all binary files to DUMP/platform/BINARY folder
 echo "Raw Dumping all BINARY files ($PLATFORM)..."
-if [ $PLATFORM == "PAL" ]; then
-  for cmd in "${BIN_DUMP_COMMANDS_PAL[@]}"; do
+if [ $PLATFORM == "USA" ]; then
+  for cmd in "${BIN_DUMP_COMMANDS_USA[@]}"; do
     $cmd
   done
-elif [ $PLATFORM == "USA" ]; then
-  for cmd in "${BIN_DUMP_COMMANDS_USA[@]}"; do
+elif [ $PLATFORM == "PAL" ]; then
+  for cmd in "${BIN_DUMP_COMMANDS_PAL[@]}"; do
     $cmd
   done
 elif [ $PLATFORM == "PSP" ]; then
@@ -286,19 +323,47 @@ elif [ $PLATFORM == "PSP" ]; then
 fi
 echo "Done"
 
-# Move all graphics files to GFX/platform folder
-mkdir -p GFX/$BIN
-echo "Moving all GFX files..."
-find "UNPACKED/$BIN/" -name "*.bmp" -exec mv -v {} "GFX/$BIN" \;
+# Moving all RAW images to GFX/platform/RAW
+mkdir -p GFX/$BIN/RAW
+echo "Moving all RAW images files..."
+for raw in $GFX_RAW_FILES; do
+  find UNPACKED/$BIN -name $raw -exec cp -v {} "GFX/$BIN/RAW" \;
+done
 echo "Done"
 
-# Remove all duplicated graphics
-echo "Removing all duplicated GFX files..."
-while read -r file; do
-  if [ -f "GFX/$BIN/$file" ]; then
-    rm -v GFX/$BIN/$file
-  fi
-done <<< "$GFX_TO_REMOVE"
+# Splitting all AREA RAW images into 4 parts
+echo "Splitting all AREA RAW images into 4 parts in GFX/platform/RAW..."
+python bof3tool.py split -i GFX/$BIN/RAW/AREA* -o GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 1024 --quantity 4
+echo "Done"
+
+# Split again the 4BPP RAW images parts...
+echo "Splitting 4BPP RAW images parts..."
+python bof3tool.py split -i GFX/$BIN/RAW/AREA016.8.bin.4 -o GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256 --quantity 2
+python bof3tool.py split -i GFX/$BIN/RAW/AREA030.14.bin.4 -o GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256 --quantity 2
+python bof3tool.py split -i GFX/$BIN/RAW/AREA128.8.bin.4 -o GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256 --quantity 2
+echo "Done"
+
+# Convert all RAW splitted files to TIM files
+echo "Converting all RAW splitted files to TIM files..."
+if [ $PLATFORM == "USA" ]; then
+  for cmd in "${GFX_DUMP_COMMANDS_USA[@]}"; do
+    $cmd
+  done
+elif [ $PLATFORM == "PAL" ]; then
+  for cmd in "${GFX_DUMP_COMMANDS_PAL[@]}"; do
+    $cmd
+  done
+elif [ $PLATFORM == "PSP" ]; then
+  for cmd in "${GFX_DUMP_COMMANDS_PSP[@]}"; do
+    $cmd
+  done
+fi
+echo "Done"
+
+# Move all TIM files to GFX/platform folder and remove RAW folder
+echo "Moving all TIM files..."
+find "GFX/$BIN/RAW" -name "*.tim" -exec mv -v {} "GFX/$BIN" \;
+rm -rf GFX/$BIN/RAW
 echo "Done"
 
 # Copy binary files to be manual edited

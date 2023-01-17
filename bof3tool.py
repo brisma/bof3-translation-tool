@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.3.0'
+version = '1.3.1'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -223,7 +223,7 @@ def write_json(json_path, json_data):
         except Exception as err:
             print(f'Error writing JSON file {json_path}: {err}')
 
-# Decode BIN data into UTF-8 text
+# Decode bin data into UTF-8 text
 def decode_text(data, extra_table):
     text = ''
     data_offset = 0
@@ -414,7 +414,7 @@ def decode_text(data, extra_table):
 
     return text
 
-# Encode UTF-8 text into BIN data
+# Encode UTF-8 text into bin data
 def encode_text(data, extra_table):
     text_bytes = np.array([], dtype=np.ubyte)
     data_offset = 0
@@ -594,7 +594,19 @@ def encode_text(data, extra_table):
 
     return text_bytes
 
-# Unpack EMI file into BIN files
+# Return type of bin file
+def get_unpack_type(is_sound, is_graphic, is_text, is_clut):
+    if is_sound:
+        return "(Sound)"
+    if is_graphic:
+        return "(RAW Graphic)"
+    if is_text:
+        return "(Text blocks)"
+    if is_clut:
+        return "(CLUTs)"
+    return ""
+
+# Unpack EMI file into bin files
 def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, extra_table={}, verbose=False):
     json_path = Path(output_dir) / f'{input.stem}.json'
 
@@ -639,6 +651,7 @@ def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, extra_table={},
         data_block_type = data_block_toc[12:14].tobytes().hex().upper() # uint16 little endian
         data_block_toc_padding = data_block_toc[14:16].tobytes().hex().upper() # uint16 little endian
 
+        is_sound = data_block_crc in ['70424156', '50504844']
         is_graphic = data_block_type == '0300'
         is_text = data_block_ram_location in ['80010000', '00010000', '8001A000', '0001A000']
         is_clut = int(data_block_ram_location, 16) > 0x80033000 and int(data_block_ram_location, 16) < 0x80037000
@@ -652,6 +665,7 @@ def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, extra_table={},
             'data_block_crc': data_block_crc,
             'data_block_type': data_block_type,
             'data_block_toc_padding': data_block_toc_padding,
+            'is_sound': is_sound,
             'is_graphic': is_graphic,
             'is_text': is_text,
             'is_clut': is_clut
@@ -667,15 +681,16 @@ def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, extra_table={},
             print(f' CRC Hex: {data_block_crc}')
             print(f' Type Hex: {data_block_type}')
             print(f' Padding Hex: {data_block_toc_padding}')
+            print(f' Contains sound: {is_sound}')
             print(f' Contains graphic: {is_graphic}')
             print(f' Contains text: {is_text}')
-            print(f' Contains CLUTs: {is_clut}')
             if is_text:
                 print(f' Text block full at {data_block_size * 100 / (data_block_size + data_block_padding_size):.0f}%')
+            print(f' Contains CLUTs: {is_clut}')
 
         write_file(bin_path, emi_file[emi_current_offset:emi_current_offset + data_block_size])
         emi_current_offset = emi_current_offset + data_block_size + data_block_padding_size
-        print(f'{bin_path} created')
+        print(f'{bin_path} created {get_unpack_type(is_sound, is_graphic, is_text, is_clut)}')
 
         if is_text and dump_txt:
             dump_text(input=bin_path, extra_table=extra_table)
@@ -688,7 +703,7 @@ def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, extra_table={},
     write_json(json_path=json_path, json_data=json_data)
     print(f'EMI {input} unpacked into {emi_data_blocks} files')
 
-# Pack BIN files into EMI file
+# Pack bin files into EMI file
 def pack(input, output_dir='', verbose=False):
     emi_path = Path(output_dir) / f'{input.stem}.EMI'
 
@@ -770,7 +785,7 @@ def pack(input, output_dir='', verbose=False):
     write_file(emi_path, np.concatenate([emi_toc, data_blocks]))
     print(f'{emi_path} created')
 
-# Dump text from BIN file
+# Dump text from bin file
 def dump_text(input, output=None, extra_table={}, verbose=False):
     if not output:
         output = input.parent / f'{input.name}.json'
@@ -914,7 +929,7 @@ def translate_texts(input, output, source_lang, target_lang, verbose=False):
     print(f"File {input} translated into {output} from '{source_lang}' to '{target_lang}' using Amazon Translate (ML)")
     print(f"{lines_translated} strings translated for a total of {characterd_translated} characters")
 
-# Reinsert text into BIN file
+# Reinsert text into bin file
 def reinsert_text(input, output=None, extra_table={}, verbose=False):
     if not output:
         output = input.parent / f'{input.stem}.bin'
@@ -1199,7 +1214,7 @@ def tim_to_raw(input, output, tile_w=None, tile_h = None, resize_width = None):
 
     print(f'Extracting TIM info from {input.name}...')
 
-    bpp = struct.unpack('<I', tim[4:8])[0] # 8 -> 4bpp, 9 -> 8bpp
+    bpp = 4 if struct.unpack('<I', tim[4:8])[0] == 8 else 8 # 8 -> 4bpp, 9 -> 8bpp
     clut_size = struct.unpack('<I', tim[8:12])[0] - 12
     image_width = struct.unpack('<H', tim[20 + clut_size + 8:20 + clut_size + 10])[0] * 2
     image_height = struct.unpack('<H', tim[20 + clut_size + 10:20 + clut_size + 12])[0]
@@ -1215,13 +1230,13 @@ def tim_to_raw(input, output, tile_w=None, tile_h = None, resize_width = None):
     if resize_width and tile_w and tile_h:
         print(f'Coverting TIM {input.name} in RAW graphic {output} using {bpp}bpp, final width size {resize_width} using tile of {tile_w}x{tile_h}...')
     else:
-        print(f'Coverting TIM {input.name} in RAW graphic {output} using {bpp}bpp, size {image_width if bpp == 9 else image_width // 2}x{image_height}...')
+        print(f'Coverting TIM {input.name} in RAW graphic {output} using {bpp}bpp, size {image_width if bpp == 8 else image_width // 2}x{image_height}...')
 
     raw = raw.reshape(image_height, image_width)
 
     # Rearrange tile inside image
     if resize_width and tile_w and tile_h:
-        raw = rearrange_tile(raw, resize_width // 2 if bpp == 8 else resize_width, tile_w // 2 if bpp == 8 else tile_w, tile_h)
+        raw = rearrange_tile(raw, resize_width // 2 if bpp == 4 else resize_width, tile_w // 2 if bpp == 4 else tile_w, tile_h)
         
     write_file(output, raw.flatten())
     print('Done')
@@ -1400,7 +1415,7 @@ def main(command_line=None):
     parser = argparse.ArgumentParser(prog='bof3tool.py', description='Breath of Fire III Tool (PSX/PSP)')
     subparser = parser.add_subparsers(help='Description', required=True, dest='command')
 
-    unpack_parser = subparser.add_parser('unpack', help='unpack EMI files into BIN files', )
+    unpack_parser = subparser.add_parser('unpack', help='unpack EMI files into bin files', )
     unpack_parser.add_argument('-i', '--input', help='input .EMI files', type=Path, required=True, nargs='*')
     unpack_parser.add_argument('-o', '--output-directory', dest='output_dir', help='output directory', type=str, required=False, default='')
     unpack_parser.add_argument('--dump-text', dest='dump_txt', default=False, action='store_true', help='dump text')
@@ -1408,19 +1423,19 @@ def main(command_line=None):
     unpack_parser.add_argument('--extra-table', help="extra table (ex. A0=à A1=è A2=ò)", action=ParseExtraTable, required=False, nargs='+', default={})
     unpack_parser.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
 
-    pack_parser = subparser.add_parser('pack', help='pack BIN files into EMI file')
+    pack_parser = subparser.add_parser('pack', help='pack bin files into EMI file')
     pack_parser.add_argument('-i', '--input', help='input .JSON files', type=Path, required=True, nargs='*')
     pack_parser.add_argument('-o', '--output-directory', dest='output_dir', help='output directory', type=str, required=False, default='')
     pack_parser.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
 
-    dump = subparser.add_parser('dump', help='dump text from BIN file')
-    dump.add_argument('-i', '--input', help='input .BIN (text) files', type=Path, required=True, nargs='*')
+    dump = subparser.add_parser('dump', help='dump text from bin file')
+    dump.add_argument('-i', '--input', help='input .bin (text) files', type=Path, required=True, nargs='*')
     dump.add_argument('-o', '--output', help='output .JSON file', type=str, required=False, default=None)
     dump.add_argument('--extra-table', help="extra table (ex. A0=à A1=è A2=ò)", action=ParseExtraTable, required=False, nargs='+', default={})
     dump.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
 
     rawdump = subparser.add_parser('rawdump', help='raw dump bytes from file')
-    rawdump.add_argument('-i', '--input', help='input .BIN (text) files', type=Path, required=True, nargs='*')
+    rawdump.add_argument('-i', '--input', help='input .bin (text) files', type=Path, required=True, nargs='*')
     rawdump.add_argument('-o', '--output', help='output .JSON file', type=str, required=False, default=None)
     rawdump.add_argument('--extra-table', help="extra table (ex. A0=à A1=è A2=ò)", action=ParseExtraTable, required=False, nargs='+', default={})
     rawdump.add_argument('--offset', help="initial offset (dec or hex, ex. 2048 or 0x800)", type=lambda x: int(x, 0), required=False, default=0)
@@ -1437,9 +1452,9 @@ def main(command_line=None):
     translate.add_argument('--target-language', dest='target_lang', help='target language code (fr, de, it...)', type=str, required=True, default=None)
     translate.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
 
-    reinsert = subparser.add_parser('reinsert', help='reinsert text into BIN file')
+    reinsert = subparser.add_parser('reinsert', help='reinsert text into bin file')
     reinsert.add_argument('-i', '--input', help='input .JSON files', type=Path, required=True, nargs='*')
-    reinsert.add_argument('-o', '--output', help='output .BIN (text) file', type=str, required=False, default=None)
+    reinsert.add_argument('-o', '--output', help='output .bin (text) file', type=str, required=False, default=None)
     reinsert.add_argument('--extra-table', help="extra table (ex. à=A0 è=A1 ò=A2)", action=ParseExtraTable, required=False, nargs='+', default={})
     reinsert.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
 
@@ -1462,7 +1477,7 @@ def main(command_line=None):
     expand.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
 
     raw2tim = subparser.add_parser('raw2tim', help='convert graphic RAW to TIM (PSX)')
-    raw2tim.add_argument('-i', '--input', help='input .BIN (RAW) files', type=Path, required=True, nargs='*')
+    raw2tim.add_argument('-i', '--input', help='input .bin (RAW) files', type=Path, required=True, nargs='*')
     raw2tim.add_argument('-o', '--output', help='output .TIM (PSX) file', type=str, required=False, default=None)
     raw2tim.add_argument('--bpp', help='bits per pixel', type=int, required=True, choices=[4, 8])
     raw2tim.add_argument('--width', help='image width', type=int, required=True, choices=[64, 128, 256, 512])
@@ -1473,13 +1488,13 @@ def main(command_line=None):
 
     tim2raw = subparser.add_parser('tim2raw', help='convert TIM (PSX) to graphic RAW')
     tim2raw.add_argument('-i', '--input', help='input .TIM (PSX) files', type=Path, required=True, nargs='*')
-    tim2raw.add_argument('-o', '--output', help='output .BIN (RAW) file', type=str, required=False, default=None)
+    tim2raw.add_argument('-o', '--output', help='output .bin (RAW) file', type=str, required=False, default=None)
     tim2raw.add_argument('--tile-width', dest='tile_w', help='tile width', type=int, required=False, default=None)
     tim2raw.add_argument('--tile-height', dest='tile_h', help='tile height', type=int, required=False, default=None)
     tim2raw.add_argument('--resize-width', dest='resize_width', help='resize width', type=int, required=False, default=None)
 
     raw2bmp = subparser.add_parser('raw2bmp', help='convert graphic RAW to BMP')
-    raw2bmp.add_argument('-i', '--input', help='input .BIN (RAW) files', type=Path, required=True, nargs='*')
+    raw2bmp.add_argument('-i', '--input', help='input .bin (RAW) files', type=Path, required=True, nargs='*')
     raw2bmp.add_argument('-o', '--output', help='output .BMP file', type=str, required=False, default=None)
     raw2bmp.add_argument('--bpp', dest='bpp', help='bits per pixel', type=int, required=True, choices=[4, 8])
     raw2bmp.add_argument('--width', dest='width', help='image width', type=int, required=True, choices=[64, 128, 256, 512])
@@ -1490,14 +1505,14 @@ def main(command_line=None):
 
     bmp2raw = subparser.add_parser('bmp2raw', help='convert BMP to graphic RAW')
     bmp2raw.add_argument('-i', '--input', help='input .BMP file files', type=Path, required=True, nargs='*')
-    bmp2raw.add_argument('-o', '--output', help='output .BIN (RAW)', type=str, required=False, default=None)
+    bmp2raw.add_argument('-o', '--output', help='output .bin (RAW)', type=str, required=False, default=None)
     bmp2raw.add_argument('--bpp', help='bits per pixel', type=int, required=True, choices=[4, 8])
     bmp2raw.add_argument('--tile-width', dest='tile_w', help='tile width', type=int, required=False, default=None)
     bmp2raw.add_argument('--tile-height', dest='tile_h', help='tile height', type=int, required=False, default=None)
     bmp2raw.add_argument('--resize-width', dest='resize_width', help='resize width', type=int, required=False, default=None)
 
     split = subparser.add_parser('split', help='split raw image')
-    split.add_argument('-i', '--input', help='input RAW file', type=Path, required=True, nargs='*')
+    split.add_argument('-i', '--input', help='input RAW files', type=Path, required=True, nargs='*')
     split.add_argument('-o', '--output-directory', dest='output', help='output directory', type=str, required=False, default=None)
     split.add_argument('--bpp', dest="bpp", help='bits per pixel', type=int, required=True, choices=[4, 8])
     split.add_argument('--tile-width', dest='tile_w', help='tile width', type=int, required=True)

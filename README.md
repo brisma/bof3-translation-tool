@@ -28,12 +28,12 @@ Breath of Fire 3 Translation Tool
   - [Cosa manca](#cosa-manca)
 
 ## Introduzione
-Questo tool è stato sviluppato per spacchettare e reimpacchettare i file in formato EMI di Breath of Fire 3 PSX/PSP. 
-Con ogni probabilità funziona anche con Breath of Fire 4 (almeno per la gestione degli EMI, non ho verificato testi/grafica).
+Questo tool è stato sviluppato per spacchettare e reimpacchettare i file in formato **EMI** di Breath of Fire 3 PSX/PSP. 
+Con ogni probabilità funziona anche con Breath of Fire 4 (almeno per la gestione degli **EMI**, non ho verificato testi/grafica).
 
-Oltre alla gestione degli EMI supporta anche l'estrazione ed il reinserimento dei testi di gioco presenti nei file EMI e permette l'indicizzazione dei testi duplicati nei vari file in un unico file e, viceversa, ne permette l'espansione in multipli file.
+Oltre alla gestione degli **EMI** supporta anche l'estrazione ed il reinserimento dei testi di gioco presenti nei file **EMI** e permette l'indicizzazione dei testi duplicati nei vari file in un unico file e, viceversa, ne permette l'espansione in multipli file.
 
-Oltre a ciò ingloba anche la gestione della grafica RAW in TIM/BMP ed il riordinamento dei tile al loro interno (le RAW non sono "ordinate").
+Oltre a ciò ingloba anche la gestione della grafica **RAW** in **TIM**/**BMP** ed il riordinamento dei tile al loro interno (le **RAW** non sono "ordinate").
 
 ## Utilizzo
 L'utilizzo del tool è molto semplice:
@@ -52,12 +52,12 @@ Breath of Fire III Tool (PSX/PSP)
 positional arguments:
   {unpack,pack,dump,rawdump,translate,reinsert,rawreinsert,index,expand,raw2tim,tim2raw,raw2bmp,bmp2raw}
                         Description
-    unpack              unpack EMI files into BIN files
-    pack                pack BIN files into EMI file
-    dump                dump text from BIN file
+    unpack              unpack EMI files into bin files
+    pack                pack bin files into EMI file
+    dump                dump text from bin file
     rawdump             raw dump bytes from file
     translate           translate a JSON file using Amazon Translate (ML)
-    reinsert            reinsert text into BIN file
+    reinsert            reinsert text into bin file
     rawreinsert         raw reinsert bytes into file
     index               index all texts into single file
     expand              expand an indexed file into multiple files
@@ -74,37 +74,37 @@ optional arguments:
 ```
 
 I comandi a disposizione sono:
-* **unpack**: estrae il contenuto dei file EMI
-* **pack**: ricostruisce il file EMI precedentemente estratto
-* **dump**: estrae il testo da un file BIN in un file di testo JSON
-* **rawdump**: estrae sequenze di byte ripetutamente da un file come JSON
-* **translate**: traduce un file di testo JSON utilizzando Amazon Translate (ML)
-* **reinsert**: converte un file di testo JSON in formato BIN
-* **rawreinsert**: reinserisce sequenze di byte ripetutamente in un file da un JSON
+* **unpack**: estrae il contenuto dei file **EMI**
+* **pack**: ricostruisce il file **EMI** precedentemente estratto
+* **dump**: estrae il testo da un file **bin** in un file di testo **JSON**
+* **rawdump**: estrae sequenze di byte ripetutamente da un file come **JSON**
+* **translate**: traduce un file di testo **JSON** utilizzando **Amazon Translate (ML)**
+* **reinsert**: converte un file di testo **JSON** in formato **bin**
+* **rawreinsert**: reinserisce sequenze di byte ripetutamente in un file da un **JSON**
 * **index**: indicizza più file di testo in un unico file (utile per i testi ripetuti)
 * **expand**: espande un file indicizzato negli originali file di testo (testi ripetuti)
-* **raw2tim**: converte un file grafico RAW in formato TIM riarraggiando i tile
-* **tim2raw**: converte un file in formato TIM in grafica RAW riarraggiando i tile
-* **raw2bmp**: converte un file grafico RAW in formato BMP riarraggiando i tile
-* **bmp2raw**: converte un file in formato BMP in grafica RAW riarraggiando i tile
-* **split**: divide un file grafico RAW in più file
-* **merge**: unisce più file grafici RAW in un unico file
+* **raw2tim**: converte un file grafico **RAW** in formato **TIM** riarraggiando i tile
+* **tim2raw**: converte un file in formato **TIM** in grafica **RAW** riarraggiando i tile
+* **raw2bmp**: converte un file grafico **RAW** in formato **BMP** riarraggiando i tile
+* **bmp2raw**: converte un file in formato **BMP** in grafica **RAW** riarraggiando i tile
+* **split**: divide un file grafico **RAW** in più file
+* **merge**: unisce più file grafici **RAW** in un unico file
 
 ### Spacchettare file EMI
-Per estrarre uno o più file EMI è sufficiente dare ad esempio un:
+Per estrarre uno o più file **EMI** è sufficiente dare ad esempio un:
 ```
 python bof3tool.py unpack -i BIN/WORLD00/*.EMI -o unpacked/WORLD00
 ```
 
-Così facendo diremo di spacchettare tutti i file EMI contenuti nella cartella `BIN/WORLD00` all'interno della cartella `unpacked/WORLD00`.
+Così facendo diremo di spacchettare tutti i file **EMI** contenuti nella cartella `BIN/WORLD00` all'interno della cartella `unpacked/WORLD00`.
 
 All'interno ci troveremo una struttura composta da:
-* un file JSON contenente le informazioni del file originale
-* una cartella contenente i file estratti dall'EMI
+* un file **JSON** contenente le informazioni del file originale
+* una cartella contenente i file estratti dall'**EMI**
 
 Se al comando precedente aggiungiamo anche i parametri `--dump-text`, `--dump-graphic` e `--extra-table 9A=à 9B=ò...` avremo inoltre:
-* l'eventuale dump del testo rilevato in formato JSON (potrebbe non essere testo di gioco ma materiale di debug)
-* la grafica esportata in formato BMP secondo la mappa dei file conosciuti aventi grafica da tradurre
+* l'eventuale dump del testo rilevato in formato **JSON** (potrebbe non essere testo di gioco ma materiale di debug)
+* la grafica esportata in formato **BMP** secondo la mappa dei file conosciuti aventi grafica da tradurre (solo per debug, palette preimpostata)
 * nel dump dei testi saranno gestiti eventuali caratteri extra (ad es. le accentate)
 
 Esempio di estrazione di un singolo file:
@@ -117,31 +117,34 @@ Risultato:
 --- Breath of Fire III Tool (PSX/PSP) ---
 
 Unpacking AREA033.EMI into unpacked/AREA033.json and data blocks(14)...
-unpacked/AREA033/AREA033.1.bin created.
-unpacked/AREA033/AREA033.2.bin created.
-unpacked/AREA033/AREA033.3.bin created.
-unpacked/AREA033/AREA033.4.bin created.
-unpacked/AREA033/AREA033.5.bin created.
-unpacked/AREA033/AREA033.6.bin created.
+--- Breath of Fire III Tool (PSX/PSP) ---
+
+Unpacking AREA033.EMI into unpacked/AREA033.json and data blocks(14)...
+unpacked/AREA033/AREA033.1.bin created (Sound)
+unpacked/AREA033/AREA033.2.bin created 
+unpacked/AREA033/AREA033.3.bin created 
+unpacked/AREA033/AREA033.4.bin created 
+unpacked/AREA033/AREA033.5.bin created 
+unpacked/AREA033/AREA033.6.bin created (RAW Graphic)
 Coverting RAW AREA033.6.bin in BMP unpacked/AREA033/AREA033.6.bin.8b.64w.64x32.1024r.bmp using 8bpp, final width size 1024 using tile of 64x32...
-Done.
-unpacked/AREA033/AREA033.7.bin created.
-unpacked/AREA033/AREA033.8.bin created.
+Done
+unpacked/AREA033/AREA033.7.bin created (CLUTs)
+unpacked/AREA033/AREA033.8.bin created (RAW Graphic)
 Coverting RAW AREA033.8.bin in BMP unpacked/AREA033/AREA033.8.bin.8b.64w.64x32.1024r.bmp using 8bpp, final width size 1024 using tile of 64x32...
-Done.
-unpacked/AREA033/AREA033.9.bin created.
-unpacked/AREA033/AREA033.10.bin created.
-unpacked/AREA033/AREA033.11.bin created.
-unpacked/AREA033/AREA033.12.bin created.
+Done
+unpacked/AREA033/AREA033.9.bin created (CLUTs)
+unpacked/AREA033/AREA033.10.bin created 
+unpacked/AREA033/AREA033.11.bin created 
+unpacked/AREA033/AREA033.12.bin created (Text blocks)
 Dumping 256 strings from block0 of unpacked/AREA033/AREA033.12.bin into unpacked/AREA033/AREA033.12.bin.json...
-Text dumped.
-unpacked/AREA033/AREA033.13.bin created.
-unpacked/AREA033/AREA033.14.bin created.
-EMI AREA033.EMI unpacked into 14 files.
+Text dumped
+unpacked/AREA033/AREA033.13.bin created 
+unpacked/AREA033/AREA033.14.bin created 
+EMI AREA033.EMI unpacked into 14 files
 ```
 
 ### Reimpacchattare file EMI
-Una volta estratti i file EMI nei rispettivi BIN è possibile ricostruirne uno o più EMI utilizzando il seguente comando:
+Una volta estratti i file **EMI** nei rispettivi **bin** è possibile ricostruirne uno o più **EMI** utilizzando il seguente comando:
 
 ```
 python bof3tool.py pack -i unpacked/AREA000.json -o output
@@ -163,7 +166,7 @@ output/AREA000.EMI created.
 > - se il file **supera** il **limite di 0x5800 (22528)** byte il reimpacchettamente andrà in **errore**
 
 ### Estrazione del testo
-Per estrarre il testo di gioco nel formato **puntatori+testo** possiamo utilizzare il comando `dump` sul file BIN contenente il testo:
+Per estrarre il testo di gioco nel formato **puntatori+testo** possiamo utilizzare il comando `dump` sul file **bin** contenente il testo:
 
 ```
 python bof3tool.py dump -i unpacked/AREA000/AREA000.12.bin -o AREA000.12.bin.json --extra-table 9A=à 9B=ò...
@@ -302,7 +305,7 @@ Ribadisco: la traduzione proposta **va controllata frase per frase e corretta**.
 Nel repository, all'interno della cartella ***autotranslate*** potete trovare i testi originali del gioco versione PSX nel file `strings_en.json` e la **traduzione italiana da revisionare** proposta da Amazon Translate nel file `strings_it.json`.
 
 ### Reinserimento testo
-Allo stesso modo è possibile ricostruire un file BIN di testo partendo da un JSON utilizzando:
+Allo stesso modo è possibile ricostruire un file **bin** di testo partendo da un **JSON** utilizzando:
 
 ```
 python bof3tool.py reinsert -i AREA000.12.bin.json -o AREA000.12.bin --extra-table 9A=à 9B=ò...
@@ -318,12 +321,12 @@ Text reinserted.
 
 Anche in questo caso la presenza del parametro opzionale `--extra-table` permette di gestire eventuali caratteri UTF8 presenti nel dump con i suoi corrispettivi valori byte (ad es. la lettera **à** verrà inserite come byte **0x9A** e via dicendo).
 
-Il nuovo file BIN ottenuto potrà essere reinserito nel file EMI.
+Il nuovo file **bin** ottenuto potrà essere reinserito nel file **EMI**.
 
 ### Reinserimento del testo manualmente (Raw Reinsert)
 Se abbiamo estratto del testo utilizzando la modalità **Raw Dump** ed intendiamo reinserirlo nel file originale di provenienza possiamo utilizzare la funzionalità di `rawreinsert`.
 
-Il suo funzionamento richiedere il **file JSON** contenente le modifiche da applicazre ed opzionalmente il **file originale** (se diverso da quello specificato nel JSON).
+Il suo funzionamento richiedere il **file JSON** contenente le modifiche da applicazre ed opzionalmente il **file originale** (se diverso da quello specificato nel **JSON**).
 
 Per procedere al reinserimento possiamo utilizzare il comando `rawreinsert`:
 
@@ -347,7 +350,7 @@ Moltissimi file di testo di Breath of Fire III contengono del testo ripetuto in 
 
 Al fine di evitare di ritradurre le stesse frasi più e più volte è possibile indicizzarle in un unico grande file che conterrà, di fatto, il testo di tutto il gioco più un file di "puntatori" per l'espansione futura.
 
-Una volta raggruppati i JSON di tutti i testi in una cartella è sufficiente eseguire il seguente comando per indicizzare tutti i file:
+Una volta raggruppati i **JSON** di tutti i testi in una cartella è sufficiente eseguire il seguente comando per indicizzare tutti i file:
 ```
 python bof3tool.py index -i texts/*.json --output-strings strings_en.json --output-pointers pointers_en.json
 ```
@@ -361,14 +364,14 @@ Indexed 6365 strings (4475 repeated strings) for block0.
 ```
 
 ### Espansione testi indicizzati
-Da un file di testo indicizzato e dai suoi "puntatori" è possibile riottenere i file JSON originali da poter ritrasformare nei BIN da reinserire negli EMI.
+Da un file di testo indicizzato e dai suoi "puntatori" è possibile riottenere i file **JSON** originali da poter ritrasformare nei **bin** da reinserire negli **EMI**.
 
 Per effettuare l'espansione possiamo utilizzare il seguente comando:
 ```
 python bof3tool.py expand --input-strings strings_en.json --input-pointers pointers_en.json -o expanded
 ```
 
-Il comando ricostruirà i file JSON originale all'interno della cartella `expanded`:
+Il comando ricostruirà i file **JSON** originale all'interno della cartella `expanded`:
 
 ```
 --- Breath of Fire III Tool (PSX/PSP) ---
@@ -384,7 +387,7 @@ Expanded 169 files using 10840 indexed strings.
 ```
 
 ### Conversione grafica RAW in TIM/BMP
-Tramite le funzioni `raw2tim` e `raw2bmp` è possibile convertire la grafica RAW in TIM/BMP e riarrangiare le tile internamente.
+Tramite le funzioni `raw2tim` e `raw2bmp` è possibile convertire la grafica **RAW** in **TIM**/**BMP** e riarrangiare le tile internamente.
 
 Per spiegarne il funzionamento e mostrarne l'utilizzo prenderemo come esempio il file `ETC/FIRST.EMI` della versione PSX.
 Iniziamo con estrarne il suo contenuto:
@@ -398,23 +401,23 @@ Otterremo:
 --- Breath of Fire III Tool (PSX/PSP) ---
 
 Unpacking FIRST.EMI into FIRST.json and data blocks(14)...
-FIRST/FIRST.1.bin created
-FIRST/FIRST.2.bin created
-FIRST/FIRST.3.bin created
-FIRST/FIRST.4.bin created
-FIRST/FIRST.5.bin created
-FIRST/FIRST.6.bin created
-FIRST/FIRST.7.bin created
-FIRST/FIRST.8.bin created
-FIRST/FIRST.9.bin created
-FIRST/FIRST.10.bin created
-FIRST/FIRST.11.bin created
-FIRST/FIRST.12.bin created
-FIRST/FIRST.13.bin created
-FIRST/FIRST.14.bin created
+FIRST/FIRST.1.bin created (Sound)
+FIRST/FIRST.2.bin created 
+FIRST/FIRST.3.bin created 
+FIRST/FIRST.4.bin created (RAW Graphic)
+FIRST/FIRST.5.bin created (RAW Graphic)
+FIRST/FIRST.6.bin created (RAW Graphic)
+FIRST/FIRST.7.bin created (RAW Graphic)
+FIRST/FIRST.8.bin created (RAW Graphic)
+FIRST/FIRST.9.bin created (CLUTs)
+FIRST/FIRST.10.bin created (CLUTs)
+FIRST/FIRST.11.bin created (CLUTs)
+FIRST/FIRST.12.bin created (Text blocks)
+FIRST/FIRST.13.bin created (RAW Graphic)
+FIRST/FIRST.14.bin created (CLUTs)
 EMI FIRST.EMI unpacked into 14 files
 ```
-Alcuni di questi file contengono **grafica RAW** mentre altri contengono le **CLUT** (basta guardare i dettagli del **JSON**), come ad esempio il file `FIRST.4.bin`.
+Alcuni di questi file contengono **grafica RAW** mentre altri contengono le **CLUT** (i dettagli sono presenti anche nel **JSON** `FIRST.json`), come ad esempio il file `FIRST.4.bin`.
 
 Vediamo quindi cosa è possibile fare con la funzione `raw2tim`:
 
@@ -428,7 +431,7 @@ usage: bof3tool.py raw2tim [-h] -i [INPUT ...] [-o OUTPUT] --bpp {4,8} --width {
 optional arguments:
   -h, --help            show this help message and exit
   -i [INPUT ...], --input [INPUT ...]
-                        input .BIN (RAW) files
+                        input .bin (RAW) files
   -o OUTPUT, --output OUTPUT
                         output .TIM (PSX) file
   --bpp {4,8}           bits per pixel
@@ -441,14 +444,14 @@ optional arguments:
   --clut CLUT           import CLUTs file
 ```
 
-Possiamo quindi provare a convertire il file in TIM o BMP usando:
+Possiamo quindi provare a convertire il file in **TIM** (o **BMP**) usando:
 ```
 python bof3tool.py raw2tim -i FIRST/FIRST.4.bin --bpp 4 --width 128 --clut FIRST/FIRST.9.bin
 ````
 
-> Per ottenere una BMP è sufficiente utilizzare `raw2bmp` con gli stessi parametri ad eccezione di `--clut`
+> Per ottenere una **BMP** è sufficiente utilizzare `raw2bmp` con gli stessi parametri ad eccezione di `--clut`
 
-Otterremo una TIM:
+Otterremo una **TIM**:
 ```
 --- Breath of Fire III Tool (PSX/PSP) ---
 
@@ -502,7 +505,7 @@ Decisamente meglio, no?
 > 
 > ![Font rearranged](./img/FIRST.4.bin.4b.128w.128x32.256r_negative.bmp)
 > 
-> Con le TIM ciò non è necessario in quanto le TIM generate possiedono già le due palette predefine o le CLUT importate all'interno.
+> Con le **TIM** ciò non è necessario in quanto le **TIM** generate possiedono già le due palette predefine o le **CLUT** importate all'interno.
 
 ### Conversione grafica TIM/BMP in RAW
 Tramite le funzioni `tim2raw` e `bmp2raw` possiamo effettuare il processo inverso al precedente.
@@ -521,29 +524,31 @@ optional arguments:
   -i [INPUT ...], --input [INPUT ...]
                         input .TIM (PSX) files
   -o OUTPUT, --output OUTPUT
-                        output .BIN (RAW)
+                        output .bin (RAW)
   --tile-width TILE_W   tile width
   --tile-height TILE_H  tile height
   --resize-width RESIZE_WIDTH
                         resize width
 ```
 
-Seguendo l'esempio precedente possiamo riottenere il file RAW (BIN) eseguendo un:
+Seguendo l'esempio precedente possiamo riottenere il file RAW (**bin**) eseguendo un:
 
 ```
-python bof3tool.py tim2raw -i FIRST.4.bin.4b.128w.128x32.256r.tim -o FIRST.4.bin --tile-width 128 --tile-height 32 --resize-width 256
+python bof3tool.py tim2raw -i FIRST.4.bin.4b.128w.128x32.256r.tim -o FIRST.4.bin --tile-width 128 --tile-height 32 --resize-width 128
 ```
+
+> **ATTENZIONE**: prestare attenzione a `--resize-width` che torna ad essere **128** come la `--width` originale (quando è stato effettuato il raw2tim) poiché dobbiamo riarrangiare i tile come nel file originale.
 
 Otterremo:
 ```
 --- Breath of Fire III Tool (PSX/PSP) ---
 
 Extracting TIM info from FIRST.4.bin.4b.128w.128x32.256r.tim...
-Coverting TIM FIRST.4.bin.4b.128w.128x32.256r.tim in RAW graphic FIRST.4.bin using 8bpp, final width size 256 using tile of 128x32...
+Coverting TIM FIRST.4.bin.4b.128w.128x32.256r.tim in RAW graphic FIRST.4.bin using 8bpp, final width size 128 using tile of 128x32...
 Done
 ```
 
-Ed ecco che il file `FIRST.4.bin` è pronto ad essere reinserito nell'EMI originale.
+Ed ecco che il file `FIRST.4.bin` è pronto ad essere reinserito nell'**EMI** originale.
 
 > Anche in questo caso il processo con le BMP è il medesimo utilizzando `raw2bmp`. L'unica accortezza è quella di specificare anche i bitplane utilizzati tramite `--bpp`.
 > 
@@ -677,9 +682,9 @@ L'utilizzo dello script è pensato per essere eseguire tramite un **terminale ba
 ### Prerequisiti
 Lo script `dump.sh` è pensato per essere eseguito su una cartella contenente la struttura dei file di **Breath of Fire 3** **PSX** o **PSP**.
 
-Immaginando di avere la ISO del gioco (PSX PAL, PSX USA o PSP) a disposizione sarà necessario esportare la cartella **BIN** (per le versioni PSX) o la cartella **USA** (per la versione PSP) e rinominarle rispettivamente PSX_PAL, PSX_USA o PSP.
+Immaginando di avere la **ISO** del gioco (**PSX PAL**, **PSX USA** o **PSP**) a disposizione sarà necessario esportare la cartella `BIN` (per le versioni **PSX**) o la cartella `USA` (per la versione **PSP**) e rinominarle rispettivamente **PSX_PAL**, **PSX_USA** o **PSP**.
 
-> Potete copiare la cartella PSX_PAL/PSX_USA/PSP direttamente in questo repository.
+> Potete copiare la cartella **PSX_PAL**/**PSX_USA**/**PSP** direttamente in questo repository.
 
 Ad es. ci ritroveremo con una cartella avente questa struttura:
 
@@ -711,15 +716,16 @@ Per effettuare l'esportazione dei contenuti è sufficiente lanciare il tool sull
 Lo script inizierà a lavorare sul contenuto della cartella del gioco effettuando questi passaggi:
 
 1. Cancellazione dei file/cartelle non necessari/e
-2. Spacchetta tutti i file .EMI e dumpa testo e grafica
+2. Spacchetta tutti i file **.EMI** e dumpa testo
 3. Sposta i dump del gioco e dei menu nelle cartelle finali
 4. Estrae i nomi di tutti i nemici
 5. Estrae manualmente alcuni pezzi di menu dai file binari
-6. Sposta le grafiche nelle cartelle finali
-7. Rimuove le grafiche doppie
-8. Copia i file binari da modificare manualmente
-9. Crea le cartelle per l'injecting dei file (prima e/o dopo il reinsert)
-10. Indicizza i dump di gioco, menu e nemici
+6. Copia e splitta tutte le grafiche **RAW**
+7. Converte le grafiche **RAW** in **TIM**
+8. Sposta le grafiche **TIM** nelle cartelle finali
+9.  Copia i file binari da modificare manualmente
+10. Crea le cartelle per l'injecting dei file (prima e/o dopo il reinsert)
+11. Indicizza i dump di gioco, menu e nemici
 
 ### Risultato finale
 Al termine della procedura otterremo le seguenti cartelle/file:
@@ -744,8 +750,8 @@ Al termine della procedura otterremo le seguenti cartelle/file:
 
 - GFX
   - PSX_PAL
-    - AREA016.6.bin.8b.64w.64x32.1024r.bmp (**da modificare**)
-    - AREA016.8.bin.8b.64w.64x32.1024r.bmp (**da modificare**)
+    - AREA016.6.bin.1.8b.64w.64x32.256r.tim (**da modificare**)
+    - AREA016.8.bin.4.2.8b.64w.64x32.128r.tim (**da modificare**)
     - ...
 - INJECT (*cartella vuota da **utilizzare per injectare i file***)
   - PSX_PAL
@@ -788,18 +794,21 @@ Lo script inizierà a lavorare sul contenuto della cartella modificate effettuan
 4. Trasforma i file di dump (**JSON**) del gioco e dei menu in file binari
 5. Copia eventuali file binari dalla cartella **INJECT/piattaforma/BEFORE_REINSERT**
 6. Effettua il reinserimento manuale di alcune parti dei menu nei file binari
-7. Copia le grafiche nella cartella **GFX** nella cartella **TEMP**
-8. Converte le grafiche sulla base del nome nuovamente in **RAW**
-9. Duplica le grafiche mancanti (molte sono ripetute in più file)
-10. Copia i file binari contenuti nella cartella **BINARY** in **TEMP**
-11. Duplica i file binari mancanti (molti sono ripetuti in più file)
-12. Sostituisce eventuali file binari usando quelli della cartella **INJECT/piattaforma/AFTER_REINSERT**
-13. Copia gli **EMI** spacchettati nella cartella **UNPACKED** in **TEMP**
-14. Sostituisce i file binari da reimpacchettare nelle destinazioni finali di **TEMP**
-15. Reimpacchetta tutti i file **EMI** in **TEMP**
-16. Crea la cartella di **OUTPUT** finale
-17. Copia tutti i file **EMI** generati nella cartella **OUTPUT**
-18. Elimina tutti i file **EMI** che risultano essere ancora identici agli originali
+7. Copia le grafiche **TIM** tradotte della cartella **GFX** nella cartella **TEMP**
+8. Copia e splitta le grafiche **RAW** originali
+9. Converte le grafiche **TIM** tradotte in **RAW**
+10. Sovrascrive le grafiche splittate **RAW** con le grafiche **RAW** tradotte
+11. Rimergia le grafiche **RAW** spittate
+12. Duplica le grafiche **RAW** mancanti (molte sono ripetute in più file)
+13. Copia i file binari contenuti nella cartella **BINARY** in **TEMP**
+14. Duplica i file binari mancanti (molti sono ripetuti in più file)
+15. Sostituisce eventuali file binari usando quelli della cartella **INJECT/piattaforma/AFTER_REINSERT**
+16. Copia gli **EMI** spacchettati nella cartella **UNPACKED** in **TEMP**
+17. Sostituisce i file binari da reimpacchettare nelle destinazioni finali di **TEMP**
+18. Reimpacchetta tutti i file **EMI** in **TEMP**
+19. Crea la cartella di **OUTPUT** finale
+20. Copia tutti i file **EMI** generati nella cartella **OUTPUT**
+21. Elimina tutti i file **EMI** che risultano essere ancora identici agli originali
 
 ### Risultato finale
 Al termine di tutta la procedura, se non ci sono stati errori, otterremo all'interno della cartella di **OUTPUT** i file **EMI** da reinserire nella **ISO** con questa struttura:
