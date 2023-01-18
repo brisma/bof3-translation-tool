@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.3.2'
+version = '1.4.0'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -840,7 +840,7 @@ def dump_text(input, output=None, extra_table={}, verbose=False):
     print('Text dumped')
 
 # Raw dump from file
-def raw_dump(input, output=None, extra_table={}, offset=0, quantity=0, skip=0, repeat=1, trim=False, verbose=False):
+def raw_dump(input, output=None, extra_table={}, offset=0, quantity=0, skip=0, repeat=1, trim=False, raw=True, verbose=False):
     if not output:
         output = input.parent / f'{input.name}.json'
     else:
@@ -853,9 +853,9 @@ def raw_dump(input, output=None, extra_table={}, offset=0, quantity=0, skip=0, r
     if max_offset > bin.size:
         raise Exception(f'Raw Dump [offset + (quantity + skip) * repeat - skip] exceeds file size ({max_offset} > {bin.size}).')
 
-    json_data = {
+    json_data = None
+    data = {
         'data': {
-            'input': input.name,
             'offset': offset,
             'quantity': quantity,
             'skip': skip,
@@ -864,6 +864,13 @@ def raw_dump(input, output=None, extra_table={}, offset=0, quantity=0, skip=0, r
         'dump': []
     }
 
+    if output.is_file():
+        json_data = read_json(output)
+        print(f"File {output.name} with {len(json_data['raw_dumps'])} raw dumps already exists, appending new raw dump...")
+        json_data['raw_dumps'].append(data)
+    else:
+        json_data = { 'file': input.name, 'raw_dumps': [ data ] }
+
     if verbose:
         print(f'Raw dumping from {input.name} - offset: {offset}, quantity: {quantity}, skip: {skip}, repeat: {repeat}, trim: {trim}')
 
@@ -871,17 +878,18 @@ def raw_dump(input, output=None, extra_table={}, offset=0, quantity=0, skip=0, r
         start_offset = offset + i * (quantity + skip)
         end_offset = offset + i * (quantity + skip) + quantity
 
-        raw_bin = bin[start_offset:end_offset]
-        raw_dump = decode_text(np.trim_zeros(raw_bin, 'b') if trim else raw_bin, extra_table)
+        raw_bin = bin[start_offset:end_offset] if not trim else np.trim_zeros(bin[start_offset:end_offset], 'b')
+        raw_dump = decode_text(raw_bin, extra_table) if not raw else ''.join([f'<HEX {b:02x}>' for b in raw_bin])
+        
         if verbose:
             print(f'Raw dumping from 0x{start_offset:X} to 0x{end_offset:X}:')
             print(f' Original data: {" ".join(["{:02x}".format(x) for x in raw_bin])}')
-            print(f' Decoded text: {raw_dump}')
+            print(f' Decoded data: {raw_dump}')
 
-        json_data['dump'].append(raw_dump)
+        json_data['raw_dumps'][len(json_data['raw_dumps']) - 1]['dump'].append(raw_dump)
 
     write_json(output, json_data)
-    print(f'Raw dumped {quantity} byte from {input.name} into {output.name} {repeat} times')
+    print(f"Raw dumped {quantity} byte of raw {'text' if not raw else 'data'} from {input.name} into {output.name} {repeat} times")
 
 # Translate a JSON using Amazon Translate (ML)
 def translate_texts(input, output, source_lang, target_lang, verbose=False):
@@ -992,41 +1000,45 @@ def raw_reinsert(input, bin=None, extra_table={}, verbose=False):
     json_data = read_json(input)
     extra_table = dict((k, v.lower()) for k, v in extra_table.items()) # value in lower case when reinserting
 
-    bin_path = Path(bin) if bin else input.parent / Path(json_data['data']['input'])
-    offset = json_data['data']['offset']
-    quantity = json_data['data']['quantity']
-    skip = json_data['data']['skip']
-    repeat = json_data['data']['repeat']
+    bin_path = Path(bin) if bin else input.parent / Path(json_data['file'])
+    print(f"File {input.name} contains {len(json_data['raw_dumps'])} raw dumps, reinserting...")
 
-    bin = read_file(bin_path)
-    max_offset = offset + ((quantity + skip) * repeat) - skip
+    for i in range (len(json_data['raw_dumps'])):
+        offset = json_data['raw_dumps'][i]['data']['offset']
+        quantity = json_data['raw_dumps'][i]['data']['quantity']
+        skip = json_data['raw_dumps'][i]['data']['skip']
+        repeat = json_data['raw_dumps'][i]['data']['repeat']
 
-    if max_offset > bin.size:
-        raise Exception(f'Raw Reinsert [offset + (quantity + skip) * repeat - skip] exceeds file size ({max_offset} > {bin.size}).')
+        bin = read_file(bin_path)
+        max_offset = offset + ((quantity + skip) * repeat) - skip
 
-    if verbose:
-        print(f'Raw reinserting into {bin_path.name} - offset: {offset}, quantity: {quantity}, skip: {skip}, repeat: {repeat}')
-
-    for i in range(repeat):
-        start_offset = offset + i * (quantity + skip)
-        end_offset = offset + i * (quantity + skip) + quantity
-
-        text_encoded = encode_text(json_data['dump'][i], extra_table)
-        raw_encoded = np.pad(text_encoded, (0, quantity - text_encoded.size), 'constant', constant_values = 0x00)
-
-        if text_encoded.size > quantity:
-            raise Exception(f'Raw Reinsert of "{json_data["dump"][i]}" exceeds quantity limit of {quantity} bytes."')
+        if max_offset > bin.size:
+            raise Exception(f'Raw Reinsert [offset + (quantity + skip) * repeat - skip] exceeds file size ({max_offset} > {bin.size}).')
 
         if verbose:
-            print(f'Raw reinserting from 0x{start_offset:X} to 0x{end_offset:X}:')
-            print(f' Original data: {" ".join(["{:02x}".format(x) for x in bin[start_offset:end_offset]])}')
-            print(f' Text to encode: {json_data["dump"][i]}')
-            print(f' Raw encoded bytes: {" ".join(["{:02x}".format(x) for x in raw_encoded])}')
+            print(f"Raw reinserting into {bin_path.name} - offset: {offset}, quantity: {quantity}, skip: {skip}, repeat: {repeat} ({i} of {len(json_data['raw_dumps'])} raw dump)")
 
-        bin[start_offset:end_offset] = raw_encoded
+        for j in range(repeat):
+            start_offset = offset + j * (quantity + skip)
+            end_offset = offset + j * (quantity + skip) + quantity
+
+            text_encoded = encode_text(json_data['raw_dumps'][i]['dump'][j], extra_table)
+            raw_encoded = np.pad(text_encoded, (0, quantity - text_encoded.size), 'constant', constant_values = 0x00)
+
+            if text_encoded.size > quantity:
+                raise Exception(f"Raw Reinsert of {json_data['raw_dumps'][i]['dump'][j]} exceeds quantity limit of {quantity} bytes.")
+
+            if verbose:
+                print(f"Raw reinserting from 0x{start_offset:X} to 0x{end_offset:X}:")
+                print(f" Original data: {' '.join(['{:02x}'.format(x) for x in bin[start_offset:end_offset]])}")
+                print(f" Text to encode: {json_data['raw_dumps'][i]['dump'][j]}")
+                print(f" Raw encoded bytes: {' '.join(['{:02x}'.format(x) for x in raw_encoded])}")
+
+            bin[start_offset:end_offset] = raw_encoded
+        print(f"Raw reinserted {quantity} byte of new encoded text from {input.name} into {bin_path.name} {repeat} times ({i + 1} of {len(json_data['raw_dumps'])} raw dump)")
 
     write_file(bin_path, bin)
-    print(f'Raw reinserted {quantity} byte of new encoded text from {input.name} into {bin_path.name} {repeat} times')
+    print(f"Raw reinserted all raw dumps")
 
 # Index all texts into single file
 def index_texts(inputs, output_strings, output_pointers, verbose=False):
@@ -1443,6 +1455,7 @@ def main(command_line=None):
     rawdump.add_argument('--skip', help="how many bytes to skip (after dump)", type=int, required=False, default=0)
     rawdump.add_argument('--repeat', help="how many times repeat", type=int, required=False, default=1)
     rawdump.add_argument('--trim', help="trim all 0x00 from end", action='store_true', default=False)
+    rawdump.add_argument('--raw', help="don't decode text", action='store_true', default=False)
     rawdump.add_argument('--verbose', default=False, action='store_true', help='show verbose logs')
 
     translate = subparser.add_parser('translate', help='translate a JSON file using Amazon Translate (ML)')
@@ -1546,7 +1559,7 @@ def main(command_line=None):
         elif args.command == 'rawdump':
             for path in args.input:
                 raw_dump(input=path, output=args.output, extra_table=args.extra_table, offset=args.offset, quantity=args.quantity,
-                skip=args.skip, repeat=args.repeat, trim=args.trim, verbose=args.verbose)
+                skip=args.skip, repeat=args.repeat, trim=args.trim, raw=args.raw, verbose=args.verbose)
         elif args.command == 'translate':
             translate_texts(input=args.input, output=args.output, source_lang=args.source_lang, target_lang=args.target_lang, verbose=args.verbose)
         elif args.command == 'reinsert':

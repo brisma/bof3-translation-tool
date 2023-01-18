@@ -201,7 +201,7 @@ Inoltre se è stato aggiunto il parametro opzionale `--extra-table` saranno dump
 ### Estrazione del testo manualmente (Raw Dump)
 Molti file binari del gioco presentano del testo al loro interno, tuttavia essi non sono il solito schema puntatori+testo ma sono pezzi di eseguibili PSX/PSP che necessitano di essere modificati manualmente. Al loro interno si possono notare degli schemi ripetuti a distanze fisse. La funzionalità `rawdump` serve proprio a gestire queste situazioni.
 
-Un esempio di file 'grezzo' contenente dei testo è **GAME.1.bin** (di seguito quello estratto dalla versione **PSX NTSC/USA**):
+Un esempio di file 'grezzo' contenente del testo è **GAME.1.bin** (di seguito quello estratto dalla versione **PSX NTSC/USA**):
 
 ![GAME.1.bin Example](./img/GAME.1.bin.png)
 
@@ -210,36 +210,40 @@ Come si può notare il blocco di testo non è all'inizio del file ma parte da un
 Se volessimo estrarre questo blocco di testo possiamo utilizzare ad es. il seguente comando:
 
 ```
-python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.items.json --offset 0x33164 --quantity 12 --skip 6 --repeat 92 --trim
+python bof3tool.py rawdump -i GAME.1.bin --offset 0x33164 --quantity 12 --skip 6 --repeat 92 --trim
 ```
 
 Il risultato sarà:
 ```
 --- Breath of Fire III Tool (PSX/PSP) ---
 
-Raw dumped 12 byte from GAME.1.bin into GAME.1.bin.items.json 92 times.
+Raw dumped 12 byte of raw text from GAME.1.bin into GAME.1.bin.json 92 times
 ```
 
-Così facendo otterremo un **file JSON GAME.1.bin.items.json** contenente i 92 oggetti estratti dal file originale avente questa forma:
+Così facendo otterremo un **file JSON GAME.1.bin.json** contenente i 92 oggetti estratti dal file originale avente questa forma:
 
 ```json
 {
-    "data": {
-        "input": "GAME.1.bin",
-        "offset": 209252,
-        "quantity": 12,
-        "skip": 6,
-        "repeat": 92
-    },
-    "dump": [
-        "Nothing",
-        "Green Apple",
-        "Bread",
-        "Healing Herb",
-        "Vitamin",
-        "MultiVitamin",
-        "Vitamins",
-        ...
+    "file": "GAME.1.bin",
+    "raw_dumps": [
+        {
+            "data": {
+                "offset": 209252,
+                "quantity": 12,
+                "skip": 6,
+                "repeat": 92
+            },
+            "dump": [
+                "Nothing",
+                "Green Apple",
+                "Bread",
+                "Healing Herb",
+                "Vitamin",
+                "MultiVitamin",
+                "Vitamins",
+                ...
+            ]
+        }
     ]
 }
 ```
@@ -251,6 +255,52 @@ Così facendo otterremo un **file JSON GAME.1.bin.items.json** contenente i 92 o
 > **ATTENZIONE**: anche in questo caso è possibile sfruttare il parametro `--extra-table` per aggiungere ulteriori caratteri all'estrazione.
 
 All'interno del **file JSON** generato saranno presenti tutte le informazioni necessarie al reinserimento del testo in quello specifico file. Possiamo immaginarlo come una sorta di ***patch*** da applicare al file originale.
+
+Possiamo eventualmente aggiungere altri raw dump allo stesso **JSON** effettuando delle nuove estrazioni:
+
+```
+python bof3tool.py rawdump -i GAME.1.bin --offset 0x338DC --quantity 12 --skip 12 --repeat 83 --trim
+```
+
+Risultato:
+```
+--- Breath of Fire III Tool (PSX/PSP) ---
+
+File GAME.1.bin.json with 1 raw dumps already exists, appending new raw dump...
+Raw dumped 12 byte of raw text from GAME.1.bin into GAME.1.bin.json 83 times
+```
+
+Infine potremmo voler estrarre dei byte senza decodificarli (ovvero ottenere dei **\<HEX xx\>**): in questo caso possiamo usare il parametro `--raw`, ad esempio:
+```
+python bof3tool.py rawdump -i GAME.1.bin --offset 0x20000 --quantity 5 --raw
+```
+
+Risultato:
+```
+--- Breath of Fire III Tool (PSX/PSP) ---
+
+Raw dumped 5 byte of raw data from GAME.1.bin into GAME.1.bin.json 1 times
+```
+
+Che corrisponde ad un **JSON** con:
+```json
+{
+    "file": "GAME.1.bin",
+    "raw_dumps": [
+        {
+            "data": {
+                "offset": 131072,
+                "quantity": 5,
+                "skip": 0,
+                "repeat": 1
+            },
+            "dump": [
+                "<HEX 58><HEX 62><HEX 42><HEX 94><HEX 00>"
+            ]
+        }
+    ]
+}
+```
 
 ### Traduzione automatico con Amazon Translate (ML)
 Utilizzando la funzione `translate` è possibile automatizzare la traduzione del testo sfruttando il Machine Learning di Amazon Translate.
@@ -331,7 +381,7 @@ Il suo funzionamento richiedere il **file JSON** contenente le modifiche da appl
 Per procedere al reinserimento possiamo utilizzare il comando `rawreinsert`:
 
 ```
-python bof3tool.py rawreinsert -i GAME.1.bin.items.json
+python bof3tool.py rawreinsert -i GAME.1.bin.json
 ```
 
 > **ATTENZIONE**: possiamo aggiungere il parametro `-b nomefile` o `--bin nomefile` per indicare il file da modificare.
@@ -340,7 +390,10 @@ Il risultato che otterremo sarà:
 ```
 --- Breath of Fire III Tool (PSX/PSP) ---
 
-Raw reinserted 12 byte of new encoded text from GAME.1.bin.items.json into GAME.1.bin 92 times.
+File GAME.1.bin.json contains 2 raw dumps, reinserting...
+Raw reinserted 12 byte of new encoded text from GAME.1.bin.json into GAME.1.bin 92 times (1 of 2 raw dump)
+Raw reinserted 12 byte of new encoded text from GAME.1.bin.json into GAME.1.bin 83 times (2 of 2 raw dump)
+Raw reinserted all raw dumps
 ```
 
 > **ATTENZIONE**: anche in questo caso è possibile sfruttare il parametro `--extra-table` per aggiungere ulteriori caratteri nell'inserimento.
