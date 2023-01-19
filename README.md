@@ -502,7 +502,7 @@ Possiamo quindi provare a convertire il file in **TIM** (o **BMP**) usando:
 python bof3tool.py raw2tim -i FIRST/FIRST.4.bin --bpp 4 --width 128 --clut FIRST/FIRST.9.bin
 ````
 
-> Per ottenere una **BMP** è sufficiente utilizzare `raw2bmp` con gli stessi parametri ad eccezione di `--clut`
+> Per ottenere una **BMP** è sufficiente utilizzare `raw2bmp` con gli stessi parametri. Se si utilizza un file **CLUT** e si converte in **BMP** bisogna aggiungere il parametro `--palette n` specificando quale **palette** (dove **n** è il numero della **palette**, ad es. 3) utilizzare in quanto le **BMP** supportano **una sola palette alla volta**.
 
 Otterremo una **TIM**:
 ```
@@ -558,7 +558,7 @@ Decisamente meglio, no?
 > 
 > ![Font rearranged](./img/FIRST.4.bin.4b.128w.128x32.256r_negative.bmp)
 > 
-> Con le **TIM** ciò non è necessario in quanto le **TIM** generate possiedono già le due palette predefine o le **CLUT** importate all'interno.
+> Con le **TIM** ciò non è necessario in quanto le **TIM** generate senza indicare la palette possiedono già le due palette predefine o le **CLUT** importate all'interno.
 
 ### Conversione grafica TIM/BMP in RAW
 Tramite le funzioni `tim2raw` e `bmp2raw` possiamo effettuare il processo inverso al precedente.

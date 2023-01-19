@@ -1254,7 +1254,7 @@ def tim_to_raw(input, output, tile_w=None, tile_h = None, resize_width = None):
     print('Done')
 
 # Convert RAW graphic to BMP
-def raw_to_bmp(input, output, bpp, raw_width, tile_w=None, tile_h = None, resize_width = None, negative=False):
+def raw_to_bmp(input, output, bpp, raw_width, tile_w=None, tile_h = None, resize_width = None, negative=False, clut_file=None, palette=1):
     if not output:
         if tile_w and tile_h and resize_width:
             output = input.parent / f'{input.name}.{bpp}b.{raw_width}w.{tile_w}x{tile_h}.{resize_width}r.bmp'
@@ -1265,6 +1265,25 @@ def raw_to_bmp(input, output, bpp, raw_width, tile_w=None, tile_h = None, resize
 
     raw = read_file(input)
     raw_height = raw.size // raw_width * 2 if bpp == 4 else raw.size // raw_width
+
+    clut = None
+
+    if clut_file:
+        clut = read_file(Path(clut_file))
+
+        if bpp == 4:
+            if palette * 32 > clut.size:
+                raise Exception(f"CLUTs file only contains {clut.size // 32} palette")
+            clut = clut[32 * (palette - 1):32 * palette]
+        elif bpp == 8:
+            if palette * 512 > clut.size:
+                raise Exception(f"CLUTs file only contains {clut.size // 512} palette")
+            clut = clut[512 * (palette - 1):512 * palette]
+    else:
+        if bpp == 4:
+            clut = palette_4bpp if not negative else palette_4bpp_negative
+        elif bpp == 8:
+            clut = palette_8bpp if not negative else palette_8bpp_negative
 
     if resize_width and tile_w and resize_width % tile_w != 0:
         raise Exception(f'Image resize width {resize_width} not multiple of {tile_w}.')
@@ -1282,19 +1301,19 @@ def raw_to_bmp(input, output, bpp, raw_width, tile_w=None, tile_h = None, resize
     if bpp == 4:
         raw_8bit = np.dstack((np.bitwise_and(raw, 0x0f), np.bitwise_and(raw >> 4, 0x0f))).flatten()
         image = Image.frombytes("P", (raw_width, raw_8bit.size // raw_width), raw_8bit.tobytes(), 'raw', "P", 0, 1)
-        palette = ImagePalette.raw("BGR;15", np.array(bgr_to_rgb(palette_8bpp if not negative else palette_8bpp_negative)))
-        image.palette = palette
+        image_palette = ImagePalette.raw("BGR;15", np.array(bgr_to_rgb(clut)))
+        image.palette = image_palette
 
     if bpp == 8:
         image = Image.frombytes("P", (raw_width, raw.size // raw_width), raw.tobytes(), 'raw', "P", 0, 1)
-        palette = ImagePalette.raw("BGR;15", np.array(bgr_to_rgb(palette_8bpp if not negative else palette_8bpp_negative)))
-        image.palette = palette
+        image_palette = ImagePalette.raw("BGR;15", np.array(bgr_to_rgb(clut)))
+        image.palette = image_palette
 
     # Rearrange tile inside image
     if resize_width and tile_w and tile_h:
-        palette = image.getpalette()
+        image_palette = image.getpalette()
         image = Image.fromarray(rearrange_tile(np.asarray(image), resize_width, tile_w, tile_h))
-        image.putpalette(palette)
+        image.putpalette(image_palette)
 
     image.save(output, 'BMP')
     print('Done')
@@ -1509,12 +1528,14 @@ def main(command_line=None):
     raw2bmp = subparser.add_parser('raw2bmp', help='convert graphic RAW to BMP')
     raw2bmp.add_argument('-i', '--input', help='input .bin (RAW) files', type=Path, required=True, nargs='*')
     raw2bmp.add_argument('-o', '--output', help='output .BMP file', type=str, required=False, default=None)
-    raw2bmp.add_argument('--bpp', dest='bpp', help='bits per pixel', type=int, required=True, choices=[4, 8])
+    raw2bmp.add_argument('--bpp', help='bits per pixel', type=int, required=True, choices=[4, 8])
     raw2bmp.add_argument('--width', dest='width', help='image width', type=int, required=True, choices=[64, 128, 256, 512])
     raw2bmp.add_argument('--tile-width', dest='tile_w', help='tile width', type=int, required=False, default=None)
     raw2bmp.add_argument('--tile-height', dest='tile_h', help='tile height', type=int, required=False, default=None)
     raw2bmp.add_argument('--resize-width', dest='resize_width', help='resize width', type=int, required=False, default=None)
     raw2bmp.add_argument('--negative', dest='negative', help='negative colors', action='store_true', required=False, default=False)
+    raw2bmp.add_argument('--clut', help='import CLUTs file', type=Path, required=False, default=None)
+    raw2bmp.add_argument('--palette', help='CLUTs palette number (default 1)', type=int, required=False, default=1)
 
     bmp2raw = subparser.add_parser('bmp2raw', help='convert BMP to graphic RAW')
     bmp2raw.add_argument('-i', '--input', help='input .BMP file files', type=Path, required=True, nargs='*')
@@ -1581,8 +1602,8 @@ def main(command_line=None):
                 tim_to_raw(input=path, output=args.output, tile_w=args.tile_w, tile_h=args.tile_h, resize_width=args.resize_width)
         elif args.command == 'raw2bmp':
             for path in args.input:
-                raw_to_bmp(input=path, output=args.output, bpp=args.bpp, raw_width=args.width,
-                    tile_w=args.tile_w, tile_h=args.tile_h, resize_width=args.resize_width, negative=args.negative)
+                raw_to_bmp(input=path, output=args.output, bpp=args.bpp, raw_width=args.width, tile_w=args.tile_w,
+                tile_h=args.tile_h, resize_width=args.resize_width, negative=args.negative, clut_file=args.clut, palette=args.palette)
         elif args.command == 'bmp2raw':
             for path in args.input:
                 bmp_to_raw(input=path, output=args.output, bpp=args.bpp, tile_w=args.tile_w, tile_h=args.tile_h, resize_width=args.resize_width)
