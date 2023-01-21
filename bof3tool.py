@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.4.0'
+version = '1.4.1'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -651,10 +651,14 @@ def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, extra_table={},
         data_block_type = data_block_toc[12:14].tobytes().hex().upper() # uint16 little endian
         data_block_toc_padding = data_block_toc[14:16].tobytes().hex().upper() # uint16 little endian
 
-        is_sound = data_block_crc in ['70424156', '50504844']
+        is_sound = data_block_crc in ['70424156', '50504844'] # PSX pBAV / PSP PPHP
         is_graphic = data_block_type == '0300'
-        is_text = data_block_ram_location in ['80010000', '00010000', '8001A000', '0001A000']
-        is_clut = int(data_block_ram_location, 16) > 0x80033000 and int(data_block_ram_location, 16) < 0x80037000
+        is_text = data_block_ram_location in ['80010000', '00010000', '8001A000', '0001A000'] # PSX / PSP Texts
+        is_clut = False
+        if int(data_block_ram_location, 16) > 0x80033000 and int(data_block_ram_location, 16) < 0x80037000: # PSX CLUTs
+            is_clut = True
+        elif int(data_block_ram_location, 16) > 0x00033000 and int(data_block_ram_location, 16) < 0x00037000: # PSP CLUTs
+            is_clut = True
 
         data_block = {
             'data_block_file_name': str(Path(f'{input.stem}/{input.stem}.{data_block_number}.bin')),
@@ -1056,7 +1060,7 @@ def index_texts(inputs, output_strings, output_pointers, verbose=False):
             if input.name not in pointers_json:
                 pointers_json[input.name] = {}
 
-            if type(json_data[block]) is list:
+            if block != 'raw_dumps' and type(json_data[block]) is list:
                 pointers_json[input.name][block] = []
 
                 if block not in info:
@@ -1082,6 +1086,39 @@ def index_texts(inputs, output_strings, output_pointers, verbose=False):
                             print(f' String "{string}" is new, adding at position {len(strings_json["blocks"]) - 1}')
                         pointers_json[input.name][block].append(strings_json['blocks'].index(string))
                         info[block]['indexed_lines'] += 1
+            elif block == 'raw_dumps' and type(json_data[block]) is list:
+                pointers_json[input.name]['raw_dumps'] = []
+
+                if 'raw_dumps' not in info:
+                    info['raw_dumps'] = {
+                        'repeated_lines': 0,
+                        'indexed_lines': 0
+                    }
+
+                if verbose:
+                    print(f' Indexing {input.name} JSON raw_dumps...')
+
+                for i, raw_dump in enumerate(json_data['raw_dumps']):
+                    if i + 1 > len(pointers_json[input.name]['raw_dumps']):
+                        pointers_json[input.name]['raw_dumps'].append({
+                            'data': raw_dump['data'],
+                            'dump': []
+                        })
+
+                    for string in raw_dump['dump']:
+                        if string in strings_json['blocks']:
+                            pointer = strings_json['blocks'].index(string)
+                            if verbose and string != '':
+                                print(f' String "{string}" found at position {pointer}')
+                            pointers_json[input.name]['raw_dumps'][i]['dump'].append(pointer)
+                            if string != '':
+                                info['raw_dumps']['repeated_lines'] += 1
+                        else:
+                            strings_json['blocks'].append(string)
+                            if verbose and string != '':
+                                print(f' String "{string}" is new, adding at position {len(strings_json["blocks"]) - 1}')
+                            pointers_json[input.name]['raw_dumps'][i]['dump'].append(strings_json['blocks'].index(string))
+                            info['raw_dumps']['indexed_lines'] += 1
             else:
                 pointers_json[input.name][block] = json_data[block]
 
@@ -1110,7 +1147,7 @@ def expand_texts(input_strings, input_pointers, output_dir='', verbose=False):
             print(f' Recreating file {filename}...')
 
         for block in blocks:
-            if type(pointers_json[filename][block]) is list:
+            if block != 'raw_dumps' and type(pointers_json[filename][block]) is list:
                 if verbose:
                     print(f' Expanding block {block}...')
 
@@ -1122,6 +1159,26 @@ def expand_texts(input_strings, input_pointers, output_dir='', verbose=False):
                         if verbose:
                             print(f' Adding string "{strings_json["blocks"][pointer]}" at position {pointer} into {filename} file')
                     strings[block].append(strings_json['blocks'][pointer])
+            elif block == 'raw_dumps' and type(pointers_json[filename][block]) is list:
+                if verbose:
+                    print(f' Expanding block raw_dumps...')
+
+                strings['raw_dumps'] = []
+
+                for raw_dump in pointers_json[filename]['raw_dumps']:
+                    expanded_raw_dump = {
+                        'data': raw_dump['data'],
+                        'dump': []
+                    }
+
+                    for pointer in raw_dump['dump']:
+                        if strings_json['blocks'][pointer] != "":
+                            string_expanded += 1
+                            if verbose:
+                                print(f' Adding string "{strings_json["blocks"][pointer]}" at position {pointer} into {filename} file')
+                        expanded_raw_dump['dump'].append(strings_json['blocks'][pointer])
+
+                    strings['raw_dumps'].append(expanded_raw_dump)
             else:
                 strings[block] = pointers_json[filename][block]
 
