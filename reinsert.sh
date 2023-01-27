@@ -6,6 +6,8 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
+EXTRA_TABLE="$2"
+
 # Platform detection
 if [[ ! -f "$BIN/ETC/WARNING.EMI" && ! -f "$BIN/ETC/CAPLOGO.EMI" ]]; then
   PLATFORM="USA"
@@ -321,7 +323,7 @@ echo "Reinserting all WORLD dump files..."
 for file in TEMP/DUMP/$BIN/WORLD/*.json
 do
     filename=$(basename -- "$file")
-    python bof3tool.py reinsert -i "$file" -o "TEMP/BIN/$BIN/${filename%.*}"
+    python bof3tool.py reinsert -i "$file" -o "TEMP/BIN/$BIN/${filename%.*}" $EXTRA_TABLE
 done
 echo "Done"
 
@@ -330,7 +332,7 @@ echo "Reinserting all MENU dump files..."
 for file in TEMP/DUMP/$BIN/MENU/*.json
 do
     filename=$(basename -- "$file")
-    python bof3tool.py reinsert -i "$file" -o "TEMP/BIN/$BIN/${filename%.*}"
+    python bof3tool.py reinsert -i "$file" -o "TEMP/BIN/$BIN/${filename%.*}" $EXTRA_TABLE
 done
 echo "Done"
 
@@ -344,7 +346,7 @@ done <<< "$ENEMIES_TO_REINSERT"
 echo "Done"
 
 echo "Raw reinserts of all enemies names..."
-python bof3tool.py rawreinsert -i TEMP/DUMP/$BIN/ENEMIES/*.json
+python bof3tool.py rawreinsert -i TEMP/DUMP/$BIN/ENEMIES/*.json $EXTRA_TABLE
 mv -v TEMP/DUMP/$BIN/ENEMIES/*.bin TEMP/BIN/$BIN
 echo "Done"
 
@@ -365,7 +367,7 @@ while read -r filepath; do
   fi
 done <<< "$BIN_TO_RAW_REINSERT"
 if [ -n "$(find "TEMP/DUMP/$BIN/BINARY" -name '*.json' -print -quit)" ]; then
-  python bof3tool.py rawreinsert -i TEMP/DUMP/$BIN/BINARY/*.json
+  python bof3tool.py rawreinsert -i TEMP/DUMP/$BIN/BINARY/*.json $EXTRA_TABLE
 fi
 mv -v TEMP/DUMP/$BIN/BINARY/*.bin TEMP/BIN/$BIN
 echo "Done"

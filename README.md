@@ -837,7 +837,7 @@ Oltre a ciò, ovviamente, sarà necessario avere modificato i file descritti in 
 ### Reinserimento
 Per effettuare il reinserimento dei contenuti è sufficiente lanciare il tool sulla cartella originale:
 
-```./reinsert.sh PSX_PAL```
+```./reinsert.sh PSX_PAL "--extra-table Ì=9d à=9f è=a0 é=a1 É=a4 ì=a5 ò=a6 ù=a8 È=a9 À=97 Ò=98 Ù=99 …=9b9c"```
 
 Lo script inizierà a lavorare sul contenuto della cartella modificate effettuando questi passaggi:
 
