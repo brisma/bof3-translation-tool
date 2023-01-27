@@ -748,6 +748,11 @@ def pack(input, output_dir='', verbose=False):
         data_bin = read_file(input.parent / data_block_file_name)
         data_bin_size = data_bin.size
         data_bin_padding_size = 2048 - (data_bin_size % 2048) if 2048 - (data_bin_size % 2048) != 2048 else 0
+        delta_bin = (data_bin_size + data_bin_padding_size) - (data_block_size + data_block_padding_size)
+        
+        # Expand buffer
+        if delta_bin > 0:
+            data_blocks = np.concatenate([data_blocks, np.full(delta_bin, 0x5F, dtype=np.ubyte)])
         
         if verbose:
             print(f'--- Data block {data_block_number} ---')
