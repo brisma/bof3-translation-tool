@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.4.1'
+version = '1.4.2'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -1031,10 +1031,11 @@ def raw_reinsert(input, bin=None, extra_table={}, verbose=False):
             end_offset = offset + j * (quantity + skip) + quantity
 
             text_encoded = encode_text(json_data['raw_dumps'][i]['dump'][j], extra_table)
-            raw_encoded = np.pad(text_encoded, (0, quantity - text_encoded.size), 'constant', constant_values = 0x00)
 
             if text_encoded.size > quantity:
                 raise Exception(f"Raw Reinsert of {json_data['raw_dumps'][i]['dump'][j]} exceeds quantity limit of {quantity} bytes.")
+
+            raw_encoded = np.pad(text_encoded, (0, quantity - text_encoded.size), 'constant', constant_values = 0x00)
 
             if verbose:
                 print(f"Raw reinserting from 0x{start_offset:X} to 0x{end_offset:X}:")
