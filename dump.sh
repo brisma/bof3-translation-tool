@@ -205,7 +205,6 @@ GFX_DUMP_COMMANDS_USA=(
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/DEMO.6.bin --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/DEMO/DEMO.8.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/FIRST.4.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/FIRST/FIRST.9.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/FIRST.5.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/FIRST/FIRST.11.bin"
-  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/FIRST.6.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/FIRST/FIRST.9.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/MAGIC008.2.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/BMAGIC/MAGIC008/MAGIC008.3.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/MAGIC067.7.bin --bpp 4 --width 128 --tile-width 64 --tile-height 16 --resize-width 64 --clut UNPACKED/$BIN/BMAGIC/MAGIC067/MAGIC067.8.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/SCENA17.2.bin --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/SCENARIO/SCENA17/SCENA17.4.bin"
@@ -218,7 +217,34 @@ GFX_DUMP_COMMANDS_PAL+=(
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/LOAD.1.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/LOAD/LOAD.2.bin"
 )
 
-GFX_DUMP_COMMANDS_PSP=("${GFX_DUMP_COMMANDS_USA[@]}")
+GFX_DUMP_COMMANDS_PSP=(
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA016.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD00/AREA016/AREA016.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA016.8.bin.4.2 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 128 --clut UNPACKED/$BIN/WORLD00/AREA016/AREA016.9.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA030.14.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD00/AREA030/AREA030.15.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA030.14.bin.3 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD00/AREA030/AREA030.15.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA030.14.bin.4.2 --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD00/AREA030/AREA030.15.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA033.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD00/AREA033/AREA033.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA045.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD01/AREA045/AREA045.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA065.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD01/AREA065/AREA065.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA087.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD02/AREA087/AREA087.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA088.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD02/AREA088/AREA088.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA115.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD03/AREA115/AREA115.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA121.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD03/AREA121/AREA121.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA128.8.bin.4.1 --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD03/AREA128/AREA128.9.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA151.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD03/AREA151/AREA151.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/BATE.2.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/BATE/BATE.5.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/BATL_DRA.1.bin --bpp 8 --width 64 --tile-width 64 --tile-height 64 --resize-width 128 --clut UNPACKED/$BIN/BATTLE/BATL_DRA/BATL_DRA.2.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/BATL_OVR.2.bin --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/BATTLE/BATL_OVR/BATL_OVR.3.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/DEMO.5.bin --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/DEMO/DEMO.8.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/DEMO.6.bin --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/DEMO/DEMO.8.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/FIRST.5.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/FIRST/FIRST.10.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/FIRST.6.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/FIRST/FIRST.12.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/MAGIC008.2.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/BMAGIC/MAGIC008/MAGIC008.3.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/MAGIC067.7.bin --bpp 4 --width 128 --tile-width 64 --tile-height 16 --resize-width 64 --clut UNPACKED/$BIN/BMAGIC/MAGIC067/MAGIC067.8.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/SCENA17.2.bin --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/SCENARIO/SCENA17/SCENA17.4.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/SCENA17.3.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/SCENARIO/SCENA17/SCENA17.5.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/START.6.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/START/START.7.bin"
+)
 
 # Removes folders that do not contain text/graphics to be translated
 dirs_to_delete="BENEMY BGM BMAG_XA BPLCHAR PLCHAR SCE_XA MODULE PSMF"
