@@ -590,6 +590,130 @@ python bof3tool.py rawdump -i SCENA10.1.bin -o SCENA10.1.bin.choose_parts.json -
 SYSYOU.1.bin
 python bof3tool.py rawdump -i SISYOU.1.bin -o SISYOU.1.bin.pwr_def_int.json --offset 0x3438 --quantity 4 --repeat 7 --trim
 
+AREA030.5.bin
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x111CC --quantity 12 --repeat 1 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x111D8 --quantity 20 --repeat 1 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x111EC --quantity 16 --repeat 1 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x111FC --quantity 12 --repeat 1 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x11208 --quantity 32 --repeat 1 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x11228 --quantity 16 --repeat 1 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x11240 --quantity 28 --repeat 1 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x1125C --quantity 24 --repeat 1 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x11274 --quantity 32 --repeat 1 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x115E0 --quantity 4 --repeat 5 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x115F4 --quantity 5 --repeat 2 --trim
+
+BATTLE.16.bin
+python bof3tool.py rawdump -i BATTLE.16.bin -o BATTLE.16.bin.json --offset 0x20530 --quantity 4 --skip 2 --repeat 3 --trim
+python bof3tool.py rawdump -i BATTLE.16.bin -o BATTLE.16.bin.json --offset 0x2055C --quantity 4 --skip 1 --repeat 2 --trim
+python bof3tool.py rawdump -i BATTLE.16.bin -o BATTLE.16.bin.json --offset 0x20660 --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i BATTLE.16.bin -o BATTLE.16.bin.json --offset 0x2069C --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i BATTLE.16.bin -o BATTLE.16.bin.json --offset 0x206D8 --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i BATTLE.16.bin -o BATTLE.16.bin.json --offset 0x20700 --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i BATTLE.16.bin -o BATTLE.16.bin.json --offset 0x2073C --quantity 4 --repeat 2 --trim
+
+COMMU02.9.bin
+python bof3tool.py rawdump -i COMMU02.9.bin -o COMMU02.9.bin.json --offset 0x3C --quantity 4 --skip 1 --repeat 4 --trim
+python bof3tool.py rawdump -i COMMU02.9.bin -o COMMU02.9.bin.json --offset 0xA0A8 --quantity 4 --skip 4 --repeat 2 --trim
+python bof3tool.py rawdump -i COMMU02.9.bin -o COMMU02.9.bin.json --offset 0xA410 --quantity 4 --repeat 2 --trim
+python bof3tool.py rawdump -i COMMU02.9.bin -o COMMU02.9.bin.json --offset 0xA418 --quantity 8 --repeat 3 --trim
+
+COMMU03.7.bin
+python bof3tool.py rawdump -i COMMU03.7.bin -o COMMU03.7.bin.json --offset 0x4 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i COMMU03.7.bin -o COMMU03.7.bin.json --offset 0xC --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i COMMU03.7.bin -o COMMU03.7.bin.json --offset 0x11 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i COMMU03.7.bin -o COMMU03.7.bin.json --offset 0x17 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i COMMU03.7.bin -o COMMU03.7.bin.json --offset 0x1C --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i COMMU03.7.bin -o COMMU03.7.bin.json --offset 0x26 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i COMMU03.7.bin -o COMMU03.7.bin.json --offset 0x2C --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i COMMU03.7.bin -o COMMU03.7.bin.json --offset 0x34 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i COMMU03.7.bin -o COMMU03.7.bin.json --offset 0x3C --quantity 5 --repeat 1 --trim
+
+MAGIC003.4.bin
+python bof3tool.py rawdump -i MAGIC003.4.bin -o MAGIC003.4.bin.json --offset 0x1EA1 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i MAGIC003.4.bin -o MAGIC003.4.bin.json --offset 0x1EA5 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i MAGIC003.4.bin -o MAGIC003.4.bin.json --offset 0x1EAD --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i MAGIC003.4.bin -o MAGIC003.4.bin.json --offset 0x1EBA --quantity 2 --repeat 1 --trim
+python bof3tool.py rawdump -i MAGIC003.4.bin -o MAGIC003.4.bin.json --offset 0x1EC7 --quantity 4 --repeat 1 --trim
+
+BATE.1.bin
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x50 --quantity 7 --skip 13 --repeat 10 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x57 --quantity 1 --skip 19 --repeat 10 --trim --raw
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x7AF0 --quantity 8 --repeat 2 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x7F18 --quantity 4 --repeat 8 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x7F40 --quantity 8 --repeat 2 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x7F84 --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x7FBC --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x7FC0 --quantity 4 --skip 4 --repeat 6 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x7FEC --quantity 4 --skip 4 --repeat 16 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x80F4 --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x8114 --quantity 3 --skip 3 --repeat 3 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x8224 --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x8260 --quantity 8 --repeat 4 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x8290 --quantity 8 --repeat 5 --trim
+
+SHISU.1.bin
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x34 --quantity 7 --skip 13 --repeat 10 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x3B --quantity 1 --skip 19 --repeat 10 --trim --raw
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x8F3C --quantity 4 --repeat 8 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x8F64 --quantity 8 --repeat 2 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x8FA8 --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x8FE0 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x8FE4 --quantity 4 --skip 4 --repeat 6 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x9010 --quantity 4 --skip 4 --repeat 16 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x9118 --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x9138 --quantity 3 --skip 3 --repeat 3 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x9248 --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x9284 --quantity 8 --repeat 4 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x92B4 --quantity 8 --repeat 5 --trim
+
+SHOP.1.bin
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x114 --quantity 7 --skip 13 --repeat 10 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x11B --quantity 1 --skip 19 --repeat 10 --trim --raw
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14C14 --quantity 4 --repeat 8 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14C3C --quantity 8 --repeat 2 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14C80 --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14CB8 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14CBC --quantity 4 --skip 4 --repeat 6 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14CE8 --quantity 4 --skip 4 --repeat 16 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14DF0 --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14E10 --quantity 3 --skip 3 --repeat 3 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14F20 --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14F5C --quantity 8 --repeat 4 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14F8C --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x1511C --quantity 8 --repeat 2 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x152DC --quantity 8 --repeat 4 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x15360 --quantity 4 --repeat 1 --trim
+
+START.9.bin
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x7C --quantity 7 --skip 13 --repeat 10 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x83 --quantity 1 --skip 19 --repeat 10 --trim --raw
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1E0 --quantity 12 --repeat 3 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x204 --quantity 8 --repeat 2 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x214 --quantity 12 --repeat 1 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x229 --quantity 6 --skip 15 --repeat 6 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x300 --quantity 5 --repeat 4 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1A914 --quantity 5 --skip 159 --repeat 8 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1BD30 --quantity 4 --repeat 8 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1BD58 --quantity 8 --repeat 2 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1BD9C --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1BDD4 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1BDD8 --quantity 4 --skip 4 --repeat 6 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1BE04 --quantity 4 --skip 4 --repeat 16 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1BF0C --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1BF2C --quantity 3 --skip 3 --repeat 3 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C03C --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C078 --quantity 8 --repeat 4 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C0A8 --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C126 --quantity 4 --skip 4 --repeat 3 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C17E --quantity 6 --skip 2 --repeat 6 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C590 --quantity 4 --repeat 5 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C8C8 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C8D0 --quantity 12 --repeat 3 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C8F4 --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C91C --quantity 12 --repeat 2 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1CA08 --quantity 4 --repeat 1 --trim
+
 ---
 
 [BOF3 PSX USA]
@@ -637,3 +761,127 @@ python bof3tool.py rawdump -i GAME.1.bin -o GAME.1.bin.item_weapon_armor.json --
 
 MAGIC060.1.bin
 python bof3tool.py rawdump -i MAGIC060.1.bin -o MAGIC060.1.bin.weak_exp_item.json --offset 0x1F00 --quantity 8 --repeat 5 --trim
+
+AREA030.5.bin
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x111AC --quantity 12 --repeat 1 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x111B8 --quantity 20 --repeat 1 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x111CC --quantity 16 --repeat 1 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x111DC --quantity 12 --repeat 1 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x111E8 --quantity 32 --repeat 1 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x11208 --quantity 16 --repeat 1 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x11220 --quantity 28 --repeat 1 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x1123C --quantity 24 --repeat 1 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x11254 --quantity 32 --repeat 1 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x115C0 --quantity 4 --repeat 5 --trim
+python bof3tool.py rawdump -i AREA030.5.bin -o AREA030.5.bin.json --offset 0x115D4 --quantity 5 --repeat 2 --trim
+
+BATTLE.16.bin
+python bof3tool.py rawdump -i BATTLE.16.bin -o BATTLE.16.bin.json --offset 0x20530 --quantity 4 --skip 2 --repeat 3 --trim
+python bof3tool.py rawdump -i BATTLE.16.bin -o BATTLE.16.bin.json --offset 0x2055C --quantity 4 --skip 1 --repeat 2 --trim
+python bof3tool.py rawdump -i BATTLE.16.bin -o BATTLE.16.bin.json --offset 0x20660 --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i BATTLE.16.bin -o BATTLE.16.bin.json --offset 0x2069C --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i BATTLE.16.bin -o BATTLE.16.bin.json --offset 0x206D8 --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i BATTLE.16.bin -o BATTLE.16.bin.json --offset 0x20700 --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i BATTLE.16.bin -o BATTLE.16.bin.json --offset 0x2073C --quantity 4 --repeat 2 --trim
+
+COMMU02.9.bin
+python bof3tool.py rawdump -i COMMU02.9.bin -o COMMU02.9.bin.json --offset 0x3C --quantity 4 --skip 1 --repeat 4 --trim
+python bof3tool.py rawdump -i COMMU02.9.bin -o COMMU02.9.bin.json --offset 0xA0A8 --quantity 4 --skip 4 --repeat 2 --trim
+python bof3tool.py rawdump -i COMMU02.9.bin -o COMMU02.9.bin.json --offset 0xA410 --quantity 4 --repeat 2 --trim
+python bof3tool.py rawdump -i COMMU02.9.bin -o COMMU02.9.bin.json --offset 0xA418 --quantity 8 --repeat 3 --trim
+
+COMMU03.7.bin
+python bof3tool.py rawdump -i COMMU03.7.bin -o COMMU03.7.bin.json --offset 0x4 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i COMMU03.7.bin -o COMMU03.7.bin.json --offset 0xC --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i COMMU03.7.bin -o COMMU03.7.bin.json --offset 0x11 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i COMMU03.7.bin -o COMMU03.7.bin.json --offset 0x17 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i COMMU03.7.bin -o COMMU03.7.bin.json --offset 0x1C --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i COMMU03.7.bin -o COMMU03.7.bin.json --offset 0x26 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i COMMU03.7.bin -o COMMU03.7.bin.json --offset 0x2C --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i COMMU03.7.bin -o COMMU03.7.bin.json --offset 0x34 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i COMMU03.7.bin -o COMMU03.7.bin.json --offset 0x3C --quantity 5 --repeat 1 --trim
+
+MAGIC003.4.bin
+python bof3tool.py rawdump -i MAGIC003.4.bin -o MAGIC003.4.bin.json --offset 0x1EA1 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i MAGIC003.4.bin -o MAGIC003.4.bin.json --offset 0x1EA5 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i MAGIC003.4.bin -o MAGIC003.4.bin.json --offset 0x1EAD --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i MAGIC003.4.bin -o MAGIC003.4.bin.json --offset 0x1EBA --quantity 2 --repeat 1 --trim
+python bof3tool.py rawdump -i MAGIC003.4.bin -o MAGIC003.4.bin.json --offset 0x1EC7 --quantity 4 --repeat 1 --trim
+
+BATE.1.bin
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x50 --quantity 7 --skip 13 --repeat 10 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x57 --quantity 1 --skip 19 --repeat 10 --trim --raw
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x7AF0 --quantity 8 --repeat 2 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x7F18 --quantity 4 --repeat 8 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x7F40 --quantity 8 --repeat 2 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x7F84 --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x7FBC --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x7FC0 --quantity 4 --skip 4 --repeat 6 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x7FEC --quantity 4 --skip 4 --repeat 16 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x80F4 --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x8114 --quantity 3 --skip 3 --repeat 3 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x8224 --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x8260 --quantity 8 --repeat 4 --trim
+python bof3tool.py rawdump -i BATE.1.bin -o BATE.1.bin.json --offset 0x8290 --quantity 8 --repeat 5 --trim
+
+SHISU.1.bin
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x34 --quantity 7 --skip 13 --repeat 10 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x3B --quantity 1 --skip 19 --repeat 10 --trim --raw
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x8F3C --quantity 4 --repeat 8 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x8F64 --quantity 8 --repeat 2 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x8FA8 --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x8FE0 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x8FE4 --quantity 4 --skip 4 --repeat 6 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x9010 --quantity 4 --skip 4 --repeat 16 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x9118 --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x9138 --quantity 3 --skip 3 --repeat 3 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x9248 --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x9284 --quantity 8 --repeat 4 --trim
+python bof3tool.py rawdump -i SHISU.1.bin -o SHISU.1.bin.json --offset 0x92B4 --quantity 8 --repeat 5 --trim
+
+SHOP.1.bin
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x114 --quantity 7 --skip 13 --repeat 10 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x11B --quantity 1 --skip 19 --repeat 10 --trim --raw
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14C14 --quantity 4 --repeat 8 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14C3C --quantity 8 --repeat 2 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14C80 --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14CB8 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14CBC --quantity 4 --skip 4 --repeat 6 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14CE8 --quantity 4 --skip 4 --repeat 16 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14DF0 --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14E10 --quantity 3 --skip 3 --repeat 3 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14F20 --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14F5C --quantity 8 --repeat 4 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x14F8C --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x1511C --quantity 8 --repeat 2 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x152DC --quantity 8 --repeat 4 --trim
+python bof3tool.py rawdump -i SHOP.1.bin -o SHOP.1.bin.json --offset 0x15360 --quantity 4 --repeat 1 --trim
+
+START.9.bin
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x7C --quantity 7 --skip 13 --repeat 10 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x83 --quantity 1 --skip 19 --repeat 10 --trim --raw
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1E0 --quantity 12 --repeat 3 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x204 --quantity 8 --repeat 2 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x214 --quantity 12 --repeat 1 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x229 --quantity 6 --skip 15 --repeat 6 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x300 --quantity 5 --repeat 4 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1A914 --quantity 5 --skip 159 --repeat 8 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1BD30 --quantity 4 --repeat 8 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1BD58 --quantity 8 --repeat 2 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1BD9C --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1BDD4 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1BDD8 --quantity 4 --skip 4 --repeat 6 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1BE04 --quantity 4 --skip 4 --repeat 16 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1BF0C --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1BF2C --quantity 3 --skip 3 --repeat 3 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C03C --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C078 --quantity 8 --repeat 4 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C0A8 --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C126 --quantity 4 --skip 4 --repeat 3 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C17E --quantity 6 --skip 2 --repeat 6 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C590 --quantity 4 --repeat 5 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C8C8 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C8D0 --quantity 12 --repeat 3 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C8F4 --quantity 8 --repeat 5 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C91C --quantity 12 --repeat 2 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1CA08 --quantity 4 --repeat 1 --trim

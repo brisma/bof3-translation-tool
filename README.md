@@ -768,7 +768,7 @@ Per effettuare l'esportazione dei contenuti è sufficiente lanciare il tool sull
 
 Lo script inizierà a lavorare sul contenuto della cartella del gioco effettuando questi passaggi:
 
-1. Cancellazione dei file/cartelle non necessari/e
+1. Cancella tutti i file/cartelle non necessari/e
 2. Spacchetta tutti i file **.EMI** e dumpa testo
 3. Sposta i dump del gioco e dei menu nelle cartelle finali
 4. Estrae i nomi di tutti i nemici
@@ -776,7 +776,7 @@ Lo script inizierà a lavorare sul contenuto della cartella del gioco effettuand
 6. Copia e splitta tutte le grafiche **RAW**
 7. Converte le grafiche **RAW** in **TIM**
 8. Sposta le grafiche **TIM** nelle cartelle finali
-9.  Copia i file binari da modificare manualmente
+9. Copia i file binari da modificare manualmente
 10. Crea le cartelle per l'injecting dei file (prima e/o dopo il reinsert)
 11. Indicizza i dump di gioco, menu e nemici
 
@@ -785,14 +785,12 @@ Al termine della procedura otterremo le seguenti cartelle/file:
 
 - BINARY
   - PSX_PAL
-    - BATTLE.16.bin (**da modificare**)
-    - MAGIC003.4.bin (**da modificare**)
-    - ...
+    - SCENA17.1.bin (**da modificare tramite hex editor, contiene i titoli di coda**)
 - DUMP
   - PSX_PAL
     - BINARY
-      - GAME.1.bin.abilities.json (**da modificare**)
-      - GAME.1.bin.accessories.json (**da modificare**)
+      - AREA030.5.bin.json (**da modificare**)
+      - BATE.1.bin.json (**da modificare**)
       - ...
     - dump_enemies.json (**da modificare**)
     - dump_menu.json (**da modificare**)
@@ -882,9 +880,7 @@ Al termine di tutta la procedura, se non ci sono stati errori, otterremo all'int
 
 ## Cosa manca
 
-Oltre alla traduzione vera a propria dei testi e delle grafiche manca ancora l'analisi completa di tutti i file binari alla ricerca di testi da iniettare per tutte e tre le versioni (PAL/USA/PSP).
-
-Ad es. è risaputo che i menu della versione **PSP** sono all'interno del file `BOOT.BIN`.
+Oltre alla traduzione vera a propria dei testi e delle grafiche manca ancora l'analisi completa del file **BOOT.BIN** della versione **PSP**, mentre è stata completata l'analisi di tutti i file binari delle versioni PSX USA e PAL.
 
 Bisogna quindi modificare gli script `dump.sh` e `reinsert.sh` per gestire l'estrazione manuale (Raw Dump) ed il reinserimento manuale (Raw Reinsert) di questo file.
 
