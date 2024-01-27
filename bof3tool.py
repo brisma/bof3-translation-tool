@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.4.2'
+version = '1.4.3'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -861,7 +861,6 @@ def raw_dump(input, output=None, extra_table={}, offset=0, quantity=0, skip=0, r
     if max_offset > bin.size:
         raise Exception(f'Raw Dump [offset + (quantity + skip) * repeat - skip] exceeds file size ({max_offset} > {bin.size}).')
 
-    json_data = None
     data = {
         'data': {
             'offset': offset,
@@ -871,13 +870,6 @@ def raw_dump(input, output=None, extra_table={}, offset=0, quantity=0, skip=0, r
         },
         'dump': []
     }
-
-    if output.is_file():
-        json_data = read_json(output)
-        print(f"File {output.name} with {len(json_data['raw_dumps'])} raw dumps already exists, appending new raw dump...")
-        json_data['raw_dumps'].append(data)
-    else:
-        json_data = { 'file': input.name, 'raw_dumps': [ data ] }
 
     if verbose:
         print(f'Raw dumping from {input.name} - offset: {offset}, quantity: {quantity}, skip: {skip}, repeat: {repeat}, trim: {trim}')
@@ -894,7 +886,20 @@ def raw_dump(input, output=None, extra_table={}, offset=0, quantity=0, skip=0, r
             print(f' Original data: {" ".join(["{:02x}".format(x) for x in raw_bin])}')
             print(f' Decoded data: {raw_dump}')
 
-        json_data['raw_dumps'][len(json_data['raw_dumps']) - 1]['dump'].append(raw_dump)
+        data['dump'].append(raw_dump)
+
+    json_data = None
+
+    if output.is_file():
+        json_data = read_json(output)
+
+        if data in json_data['raw_dumps']:
+            print(f"File {output.name} already contains this raw dump, skipped...")
+        else:
+            print(f"File {output.name} with {len(json_data['raw_dumps'])} raw dumps already exists, appending new raw dump...")
+            json_data['raw_dumps'].append(data)
+    else:
+        json_data = { 'file': input.name, 'raw_dumps': [ data ] }
 
     write_json(output, json_data)
     print(f"Raw dumped {quantity} byte of raw {'text' if not raw else 'data'} from {input.name} into {output.name} {repeat} times")
