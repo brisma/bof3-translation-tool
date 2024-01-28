@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.4.3'
+version = '1.4.4'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -1014,6 +1014,7 @@ def raw_reinsert(input, bin=None, extra_table={}, verbose=False):
     extra_table = dict((k, v.lower()) for k, v in extra_table.items()) # value in lower case when reinserting
 
     bin_path = Path(bin) if bin else input.parent / Path(json_data['file'])
+    bin = read_file(bin_path)
     print(f"File {input.name} contains {len(json_data['raw_dumps'])} raw dumps, reinserting...")
 
     for i in range (len(json_data['raw_dumps'])):
@@ -1022,7 +1023,6 @@ def raw_reinsert(input, bin=None, extra_table={}, verbose=False):
         skip = json_data['raw_dumps'][i]['data']['skip']
         repeat = json_data['raw_dumps'][i]['data']['repeat']
 
-        bin = read_file(bin_path)
         max_offset = offset + ((quantity + skip) * repeat) - skip
 
         if max_offset > bin.size:
@@ -1149,10 +1149,11 @@ def expand_texts(input_strings, input_pointers, output_dir='', verbose=False):
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     print(f'Expanding {len(pointers_json)} files...')
 
-    strings = {}
     string_expanded = 0
 
     for filename, blocks in pointers_json.items():
+        strings = {}
+
         if verbose:
             print(f' Recreating file {filename}...')
 
