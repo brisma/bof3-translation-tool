@@ -885,3 +885,429 @@ python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C8D0 -
 python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C8F4 --quantity 8 --repeat 5 --trim
 python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1C91C --quantity 12 --repeat 2 --trim
 python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1CA08 --quantity 4 --repeat 1 --trim
+
+---
+
+[BOF3 PSP]
+
+# PLAY MONO STEREO etc
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2D6CD8 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2D6CE0 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2D6CE8 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2D6CF0 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2D6CFA --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2D6D00 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2D6D05 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2D6D0B --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2D6D10 --quantity 4 --repeat 1 --trim
+
+# Nomi personaggi
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DDCC8 --quantity 5 --skip 159 --repeat 8 --trim
+
+# ITEM WEAPON ARMOR OPTION VITAL
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DF208 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DF20D --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DF214 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DF21A --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DF221 --quantity 5 --repeat 1 --trim
+
+# Pesca
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DF6E8 --quantity 10 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DF6F3 --quantity 17 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DF705 --quantity 15 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DF715 --quantity 12 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DF722 --quantity 30 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DF741 --quantity 13 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DF755 --quantity 25 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DF76F --quantity 22 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DF786 --quantity 30 --repeat 1 --trim
+
+# GearDataRule
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DFB1A --quantity 4 --repeat 3 --trim
+
+# ROD LURE
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DFBE6 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DFBE9 --quantity 4 --repeat 1 --trim
+
+# EQUIP GUIDE
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DFBED --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2DFBF2 --quantity 5 --repeat 1 --trim
+
+# Choose parts
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2E0664 --quantity 12 --repeat 1 --trim
+
+# Nothing Green Apple Bread
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2E59C0 --quantity 12 --skip 6 --repeat 92 --trim
+
+# Nothing Flier Wallet
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2E6038 --quantity 12 --skip 4 --repeat 16 --trim
+
+# Nothing Dagger BallockKnife
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2E6138 --quantity 12 --skip 12 --repeat 83 --trim
+
+# Nothing Clothing LeatherArmor
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2E6900 --quantity 12 --skip 10 --repeat 68 --trim
+
+# Nothing Titan Belt High Boots
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2E6ED8 --quantity 12 --skip 8 --repeat 52 --trim
+
+# Pwr Def Int Agl
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC37E --quantity 3 --skip 1 --repeat 4 --trim
+
+# EQUIP EXP NEXT
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC394 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC39A --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC39E --quantity 4 --repeat 1 --trim
+
+# Use Sort Drop Opti
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC3D7 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC3DB --quantity 4 --skip 1 --repeat 5 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC3F4 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC3F8 --quantity 4 --skip 1 --repeat 16 --trim
+
+# Pois Conf
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC4D1 --quantity 4 --skip 1 --repeat 2 --trim
+
+# Pwr Def Int Agl
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC4DB --quantity 3 --skip 3 --repeat 4 --trim
+
+# Normal Normal Attack
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC50C --quantity 7 --skip 13 --repeat 10 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC513 --quantity 1 --skip 19 --repeat 10 --trim --raw
+
+# Pwr Def Int Agl
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC5D4 --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC5F2 --quantity 3 --skip 3 --repeat 3 --trim
+
+# ITEM WEAPON ARMOR
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC604 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC609 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC610 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC616 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC61D --quantity 5 --repeat 1 --trim
+
+# HEAL ASSIST ATTACK
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC638 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC63D --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC644 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC64B --quantity 5 --repeat 1 --trim
+
+# ITEM WEAPON ARMOR
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC664 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC669 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC670 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC676 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC67D --quantity 5 --repeat 1 --trim
+
+# Window Clr Backgroud Button Config.
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC6D0 --quantity 10 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC6DB --quantity 10 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC6E6 --quantity 14 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC6F5 --quantity 11 --repeat 1 --trim
+
+# Fast Med. Slow
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC703 --quantity 4 --skip 4 --repeat 3 --trim
+
+# Off On Manual Auto
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC75B --quantity 6 --skip 2 --repeat 4 --trim
+
+# Speak Move Action
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC786 --quantity 6 --skip 15 --repeat 6 --trim
+
+# Next Back Quit
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2ECB98 --quantity 4 --skip 1 --repeat 3 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2ECBA7 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2ECBAC --quantity 2 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2ECBAF --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2ECBB3 --quantity 4 --skip 1 --repeat 2 --trim
+
+# SORT ManualSort NormalItem 
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2ECEF6 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2ECEFB --quantity 10 --skip 1 --repeat 3 --trim
+
+# Power Defence Kind
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2ECF1C --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2ECF22 --quantity 7 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2ECF2A --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2ECF2F --quantity 7 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2ECF37 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2ECF3E --quantity 10 --skip 1 --repeat 2 --trim
+
+# Pois Conf GENE
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2ECFAA --quantity 4 --skip 1 --repeat 3 --trim
+
+# Scholar Merchant Inn
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EF15A --quantity 8 --repeat 20 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EF232 --quantity 8 --repeat 1 --trim
+
+# Ryu Nina Garr
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EF4D4 --quantity 5 --repeat 7 --trim
+
+# HIGH LOW SET
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EF580 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EF584 --quantity 3 --skip 1 --repeat 2 --trim
+
+# Cash
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EF5D4 --quantity 4 --repeat 1 --trim
+
+# Ok Del Next
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EF760 --quantity 2 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EF763 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EF767 --quantity 4 --skip 1 --repeat 2 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EF771 --quantity 3 --repeat 1 --trim
+
+# Pot
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EF79C --quantity 3 --repeat 1 --trim
+
+# Next Back Quit
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EF80F --quantity 4 --skip 1 --repeat 3 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EF81E --quantity 3 --repeat 1 --trim
+
+# faeries faery
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EF8D4 --quantity 7 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EF8DB --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EF8E2 --quantity 7 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EF8E9 --quantity 5 --repeat 1 --trim
+
+# Palce Serow Candy
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EF968 --quantity 5 --skip 4 --repeat 60 --trim
+
+# Pwr Def Int Agl
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EFDBC --quantity 3 --skip 1 --repeat 4 --trim
+
+# Pois Conf
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EFE9D --quantity 4 --skip 1 --repeat 2 --trim
+
+# Atk Abl Use Exa
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F0199 --quantity 3 --skip 5 --repeat 7 --trim
+
+# Attack Examine Defend
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F0418 --quantity 12 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F0432 --quantity 12 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F044C --quantity 12 --skip 1 --repeat 8 --trim
+
+# Nue Stomp Gambit Super Combo
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F3444 --quantity 12 --skip 8 --repeat 227 --trim
+
+# Data Pick Best
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F47D7 --quantity 4 --skip 2 --repeat 3 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F4801 --quantity 4 --skip 1 --repeat 2 --trim
+
+# Use Eqip
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F48E8 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F48EC --quantity 4 --repeat 1 --trim
+
+# ITEM WEAPON ARMOR
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F48F1 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F48F6 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F48FD --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F4903 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F490A --quantity 5 --repeat 1 --trim
+
+# HEAL ASSIST ATTACK
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F4924 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F4929 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F4930 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F4937 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F493D --quantity 6 --repeat 1 --trim
+
+# Pwr Def Int Agl
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F4958 --quantity 3 --skip 3 --repeat 4 --trim
+
+# ITEM WEAPON ARMOR
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F497C --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F4981 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F4988 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F498E --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F4995 --quantity 5 --repeat 1 --trim
+
+# HIT COMBO READY GO
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F4A0E --quantity 9 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F4A1A --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F4A27 --quantity 2 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F4A34 --quantity 4 --repeat 1 --trim
+
+# WEAK EXP ITEM POINT
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F5000 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F5005 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F500B --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F5010 --quantity 5 --repeat 1 --trim
+
+# turns left
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F75F0 --quantity 10 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F75FB --quantity 10 --repeat 1 --trim
+
+# Pwr Def Int Agl
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F86FE --quantity 3 --skip 1 --repeat 4 --trim
+
+# EQUIP EXP NEXT
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8714 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F871A --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F871E --quantity 4 --repeat 1 --trim
+
+# Use Sort Drop
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8757 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F875B --quantity 4 --skip 1 --repeat 5 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8774 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8778 --quantity 4 --skip 1 --repeat 16 --trim
+
+# Pois Conf
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8851 --quantity 4 --skip 1 --repeat 2 --trim
+
+# Pwr Def Int Agl
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F885B --quantity 3 --skip 3 --repeat 4 --trim
+
+# Normal Normal Attack
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F888C --quantity 7 --skip 13 --repeat 10 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8893 --quantity 1 --skip 19 --repeat 10 --trim --raw
+
+# Pwr Def Int Agl
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8954 --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8972 --quantity 3 --skip 3 --repeat 3 --trim
+
+# ITEM WEAPON ARMOR
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8984 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8989 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8990 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8996 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F899D --quantity 5 --repeat 1 --trim
+
+# HEAL ASSIST ATTACK
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F89B8 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F89BD --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F89C4 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F89CB --quantity 5 --repeat 1 --trim
+
+# ITEM WEAPON ARMOR
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F89E4 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F89E9 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F89F0 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F89F6 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F89FD --quantity 5 --repeat 1 --trim
+
+# Pois Conf
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8AB8 --quantity 4 --skip 1 --repeat 2 --trim
+
+# Ink NOTE
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8B68 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8B6C --quantity 4 --repeat 1 --trim
+
+# SORT LOOK
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8E0C --quantity 4 --skip 1 --repeat 2 --trim
+
+# High AP Low AP
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8E16 --quantity 7 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8E1E --quantity 6 --repeat 1 --trim
+
+# MSTR
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8E3E --quantity 4 --repeat 1 --trim
+
+# Whelp Beyd
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F8E58 --quantity 5 --repeat 2 --trim
+
+# Pwr Def Int Agl
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F939E --quantity 3 --skip 1 --repeat 4 --trim
+
+# EQUIP EXP NEXT
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F93B4 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F93BA --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F93BE --quantity 4 --repeat 1 --trim
+
+# Use Sort Drop
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F93F7 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F93FB --quantity 4 --skip 1 --repeat 5 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9414 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9418 --quantity 4 --skip 1 --repeat 16 --trim
+
+# Pois Conf
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F94F1 --quantity 4 --skip 1 --repeat 2 --trim
+
+# Pwr Def Int Agl
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F94FB --quantity 3 --skip 3 --repeat 4 --trim
+
+# Normal Normal Attack
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F952C --quantity 7 --skip 13 --repeat 10 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9533 --quantity 1 --skip 19 --repeat 10 --trim --raw
+
+# Pwr Def Int Agl
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F95F4 --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9612 --quantity 3 --skip 3 --repeat 3 --trim
+
+# ITEM WEAPON ARMOR
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9624 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9629 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9630 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9636 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F963D --quantity 5 --repeat 1 --trim
+
+# HEAL ASSIST ATTACK
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9658 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F965D --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9664 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F966B --quantity 5 --repeat 1 --trim
+
+# ITEM WEAPON ARMOR
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9684 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9689 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9690 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9696 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F969D --quantity 5 --repeat 1 --trim
+
+# Pwr Def Int Agl
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9CBE --quantity 3 --skip 1 --repeat 4 --trim
+
+# EQUIP EXP NEXT
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9CD4 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9CDA --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9CDE --quantity 4 --repeat 1 --trim
+
+# Use Sort Drop
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9D17 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9D1B --quantity 4 --skip 1 --repeat 5 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9D34 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9D38 --quantity 4 --skip 1 --repeat 16 --trim
+
+# Pois Conf
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9E11 --quantity 4 --skip 1 --repeat 2 --trim
+
+# Pwr Def Int Agl
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9E1B --quantity 3 --skip 3 --repeat 4 --trim
+
+# Normal Normal Attack
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9E4C --quantity 7 --skip 13 --repeat 10 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9E53 --quantity 1 --skip 19 --repeat 10 --trim --raw
+
+# Pwr Def Int Agl
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9F14 --quantity 3 --skip 3 --repeat 4 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9F32 --quantity 3 --skip 3 --repeat 3 --trim
+
+# ITEM WEAPON ARMOR
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9F44 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9F49 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9F50 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9F56 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9F5D --quantity 5 --repeat 1 --trim
+
+# HEAL ASSIST ATTACK
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9F78 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9F7D --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9F84 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9F8B --quantity 5 --repeat 1 --trim
+
+# ITEM WEAPON ARMOR
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9FA4 --quantity 4 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9FA9 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9FB0 --quantity 5 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9FB6 --quantity 6 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2F9FBD --quantity 5 --repeat 1 --trim
+
+# ROD LURE
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2FAB80 --quantity 3 --repeat 1 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2FAB84 --quantity 4 --repeat 1 --trim
+
+# EQUIP GUIDE
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2FAC68 --quantity 5 --repeat 2 --trim
+
+# Level
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2FACEB --quantity 5 --repeat 1 --trim
+

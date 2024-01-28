@@ -15,6 +15,10 @@ elif [[ -f "$BIN/ETC/WARNING.EMI" ]]; then
   PLATFORM="PAL"
 elif [[ -f "$BIN/ETC/CAPLOGO.EMI" ]]; then
   PLATFORM="PSP"
+  if [ ! -f "$BIN/BOOT.BIN" ]; then
+    echo "Error: no BOOT.BIN for PSP platform found"
+    exit 1
+  fi
 fi
 
 echo "Platform detected: $PLATFORM"
@@ -385,10 +389,20 @@ while read -r filepath; do
     cp -v UNPACKED/$BIN/$filepath TEMP/DUMP/$BIN/BINARY
   fi
 done <<< "$BIN_TO_RAW_REINSERT"
+
+if [ $PLATFORM == "PSP" ]; then
+  if [[ -f "$BIN/BOOT.BIN" && ! -f "TEMP/DUMP/$BIN/BINARY/BOOT.BIN" ]]; then
+    cp -v $BIN/BOOT.BIN TEMP/DUMP/$BIN/BINARY
+  fi
+fi
+
 if [ -n "$(find "TEMP/DUMP/$BIN/BINARY" -name '*.json' -print -quit)" ]; then
   python bof3tool.py rawreinsert -i TEMP/DUMP/$BIN/BINARY/*.json $EXTRA_TABLE
 fi
 mv -v TEMP/DUMP/$BIN/BINARY/*.bin TEMP/BIN/$BIN
+if [ $PLATFORM == "PSP" ]; then
+  mv -v TEMP/DUMP/$BIN/BINARY/BOOT.BIN TEMP/BIN/$BIN
+fi
 echo "Done"
 
 # Copy graphics to TEMP/GFX/platform
@@ -621,9 +635,12 @@ fi
 mkdir -p OUTPUT/$BIN
 echo "Done"
 
-# Copy all EMI files to OUTPUT/platform folder (preserving file tree)
+# Copy all EMI files to OUTPUT/platform folder (preserving file tree) and copy BOOT.BIN for PSP platform only
 echo "Copying all EMI files to OUTPUT/$BIN..."
 rsync -am --include="*/" --include="*.EMI" --exclude="*" --delete-excluded TEMP/UNPACKED/$BIN/ OUTPUT/$BIN
+if [ $PLATFORM == "PSP" ]; then
+  cp -v TEMP/BIN/$BIN/BOOT.BIN OUTPUT/$BIN
+fi
 echo "Done"
 
 # Remove TEMP folder

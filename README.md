@@ -737,6 +737,8 @@ Lo script `dump.sh` è pensato per essere eseguito su una cartella contenente la
 
 Immaginando di avere la **ISO** del gioco (**PSX PAL**, **PSX USA** o **PSP**) a disposizione sarà necessario esportare la cartella `BIN` (per le versioni **PSX**) o la cartella `USA` (per la versione **PSP**) e rinominarle rispettivamente **PSX_PAL**, **PSX_USA** o **PSP**.
 
+Infine, per la sola versione **PSP**, è necessario aggiungere anche il file **BOOT.BIN** (situato nell'**ISO** del gioco al path `PSP_GAME/SYSDIR/BOOT.BIN`) all'interno della cartella **PSP**.
+
 > Potete copiare la cartella **PSX_PAL**/**PSX_USA**/**PSP** direttamente in questo repository.
 
 Ad es. ci ritroveremo con una cartella avente questa struttura:
@@ -758,6 +760,17 @@ Ad es. ci ritroveremo con una cartella avente questa struttura:
   - WORLD02
   - WORLD03
   - WORLD04
+
+La versione **PSP** sarà leggermente differente:
+
+- PSP
+  - **BOOT.BIN** (file in aggiunta)
+  - BATTLE
+  - BENEMY
+  - BGM
+  - BMAG_XA
+  - BMAGIC
+  - ...
 
 A questo punto siamo pronti per l'estrazione.
 
@@ -880,8 +893,8 @@ Al termine di tutta la procedura, se non ci sono stati errori, otterremo all'int
 
 ## Cosa manca
 
-Oltre alla traduzione vera a propria dei testi e delle grafiche manca ancora l'analisi completa del file **BOOT.BIN** della versione **PSP**, mentre è stata completata l'analisi di tutti i file binari delle versioni PSX USA e PAL.
+Dalla **versione 1.4.4** è stato completata l'analisi, il dump.sh ed il reinsert.sh del file **BOOT.BIN** della versione **PSP**, allo stato attuale l'intero testo di gioco è dumpabile e reinseribile per tutte e tre le versioni (**PSX USA**, **PSX PAL** e **PSP**).
 
-Bisogna quindi modificare gli script `dump.sh` e `reinsert.sh` per gestire l'estrazione manuale (Raw Dump) ed il reinserimento manuale (Raw Reinsert) di questo file.
+Ciò significa che manca solo la traduzione e l'editing grafico :)
 
 Per comodità ho creato un file di nome `Analisi dei file.txt` in cui sono presenti degli appunti sulle varie scoperte per le tre versioni.
