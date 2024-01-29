@@ -848,7 +848,7 @@ Oltre a ciò, ovviamente, sarà necessario avere modificato i file descritti in 
 ### Reinserimento
 Per effettuare il reinserimento dei contenuti è sufficiente lanciare il tool sulla cartella originale:
 
-```./reinsert.sh PSX_PAL "--extra-table Ì=9d à=9f è=a0 é=a1 É=a4 ì=a5 ò=a6 ù=a8 È=a9 À=97 Ò=98 Ù=99 …=9b9c"```
+```./reinsert.sh PSX_PAL "--extra-table Ì=9d à=9f è=a0 é=a1 É=a4 ì=a5 ò=a6 ù=a8 È=a9 À=97 Ò=98 Ù=99 …=9b9c °=aa"```
 
 Lo script inizierà a lavorare sul contenuto della cartella modificate effettuando questi passaggi:
 
@@ -871,11 +871,11 @@ Lo script inizierà a lavorare sul contenuto della cartella modificate effettuan
 17. Sostituisce i file binari da reimpacchettare nelle destinazioni finali di **TEMP**
 18. Reimpacchetta tutti i file **EMI** in **TEMP**
 19. Crea la cartella di **OUTPUT** finale
-20. Copia tutti i file **EMI** generati nella cartella **OUTPUT**
-21. Elimina tutti i file **EMI** che risultano essere ancora identici agli originali
+20. Copia tutti i file **EMI** generati nella cartella **OUTPUT** e, solo nel caso della versione **PSP** anche il file **BOOT.BIN**
+21. Elimina tutti i file **EMI** (o il file **BOOT.BIN** della versione **PSP**) che risultano essere ancora identici agli originali
 
 ### Risultato finale
-Al termine di tutta la procedura, se non ci sono stati errori, otterremo all'interno della cartella di **OUTPUT** i file **EMI** da reinserire nella **ISO** con questa struttura:
+Al termine di tutta la procedura, se non ci sono stati errori, otterremo all'interno della cartella di **OUTPUT** i file **EMI** (o il file **BOOT.BIN** della versione **PSP**) da reinserire nella **ISO** con questa struttura:
 
 - OUTPUT
   - PSX_PAL
@@ -893,7 +893,7 @@ Al termine di tutta la procedura, se non ci sono stati errori, otterremo all'int
 
 ## Cosa manca
 
-Dalla **versione 1.4.4** è stato completata l'analisi, il dump.sh ed il reinsert.sh del file **BOOT.BIN** della versione **PSP**, allo stato attuale l'intero testo di gioco è dumpabile e reinseribile per tutte e tre le versioni (**PSX USA**, **PSX PAL** e **PSP**).
+Dalla **versione 1.4.4** è stata completata l'analisi dei file binari, gli script **dump.sh** e **reinsert.sh** sono stati aggiornati per supportare il **BOOT.BIN** della versione **PSP**, allo stato attuale l'intero testo di gioco è dumpabile e reinseribile per tutte e tre le versioni (**PSX USA**, **PSX PAL** e **PSP**).
 
 Ciò significa che manca solo la traduzione e l'editing grafico :)
 
