@@ -692,6 +692,7 @@ python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1E0 --q
 python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x204 --quantity 8 --repeat 2 --trim
 python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x214 --quantity 12 --repeat 1 --trim
 python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x229 --quantity 6 --skip 15 --repeat 6 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x228 --quantity 1 --skip 20 --repeat 6 --trim --raw
 python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x300 --quantity 5 --repeat 4 --trim
 python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1A914 --quantity 5 --skip 159 --repeat 8 --trim
 python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1BD30 --quantity 4 --repeat 8 --trim
@@ -864,6 +865,7 @@ python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1E0 --q
 python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x204 --quantity 8 --repeat 2 --trim
 python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x214 --quantity 12 --repeat 1 --trim
 python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x229 --quantity 6 --skip 15 --repeat 6 --trim
+python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x228 --quantity 1 --skip 20 --repeat 6 --trim --raw
 python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x300 --quantity 5 --repeat 4 --trim
 python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1A914 --quantity 5 --skip 159 --repeat 8 --trim
 python bof3tool.py rawdump -i START.9.bin -o START.9.bin.json --offset 0x1BD30 --quantity 4 --repeat 8 --trim
@@ -1013,6 +1015,7 @@ python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC75B --quan
 
 # Speak Move Action
 python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC786 --quantity 6 --skip 15 --repeat 6 --trim
+python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2EC785 --quantity 1 --skip 20 --repeat 6 --trim --raw
 
 # Next Back Quit
 python bof3tool.py rawdump -i BOOT.BIN -o BOOT.BIN.json --offset 0x2ECB98 --quantity 4 --skip 1 --repeat 3 --trim
