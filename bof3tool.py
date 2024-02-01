@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.4.4'
+version = '1.4.5'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -768,17 +768,19 @@ def pack(input, output_dir='', verbose=False):
             print(f' Contains CLUTs: {is_clut}')
 
         if not data_bin_size <= data_block_size + data_block_padding_size:
-            if is_text:
-                if data_bin_size + data_block_padding_size > 22528: # Over 0x5800 bytes limit
-                    raise Exception(f'Text data block {data_block_number} is too big even after expansion to 22528 bytes, cannot be injected.')
-                else:
-                    # Expand buffer
-                    delta_bin = (data_bin_size + data_bin_padding_size) - (data_block_size + data_block_padding_size)
-                    if delta_bin > 0:
-                        data_blocks = np.concatenate([data_blocks, np.full(delta_bin, 0x5F, dtype=np.ubyte)])
-                    print(f'New text data block expanded to {data_block_size + data_block_padding_size} bytes (<= 22528 bytes limit)')
-            else:
-                raise Exception(f'Data block {data_block_number} is too big, cannot be injected.')
+            # if is_text:
+            #     if data_bin_size + data_block_padding_size > 22528: # Over 0x5800 bytes limit
+            #         raise Exception(f'Text data block {data_block_number} is too big even after expansion to 22528 bytes, cannot be injected.')
+            #     else:
+            #         # Expand buffer
+            #         delta_bin = (data_bin_size + data_bin_padding_size) - (data_block_size + data_block_padding_size)
+            #         if delta_bin > 0:
+            #             data_blocks = np.concatenate([data_blocks, np.full(delta_bin, 0x5F, dtype=np.ubyte)])
+            #         print(f'New text data block expanded to {data_block_size + data_block_padding_size} bytes (<= 22528 bytes limit)')
+            # else:
+            #     raise Exception(f'Data block {data_block_number} is too big, cannot be injected.')
+            exceed_size = (data_bin_size + data_bin_padding_size) - (data_block_size + data_block_padding_size)
+            raise Exception(f'Data block {data_block_number} is too big (exceeds of {exceed_size} bytes), cannot be injected.')
 
         data_block_toc = np.full(16, 0x2E, dtype=np.ubyte)
         data_block_toc[0:4] = np.frombuffer(struct.pack('<I', data_bin_size), dtype=np.ubyte)
