@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.4.5'
+version = '1.4.6'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -779,7 +779,7 @@ def pack(input, output_dir='', verbose=False):
             #         print(f'New text data block expanded to {data_block_size + data_block_padding_size} bytes (<= 22528 bytes limit)')
             # else:
             #     raise Exception(f'Data block {data_block_number} is too big, cannot be injected.')
-            exceed_size = (data_bin_size + data_bin_padding_size) - (data_block_size + data_block_padding_size)
+            exceed_size = data_bin_size - (data_block_size + data_block_padding_size)
             raise Exception(f'Data block {data_block_number} is too big (exceeds of {exceed_size} bytes), cannot be injected.')
 
         data_block_toc = np.full(16, 0x2E, dtype=np.ubyte)
