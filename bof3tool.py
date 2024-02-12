@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.4.7'
+version = '1.4.8'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -1006,6 +1006,11 @@ def reinsert_text(input, output=None, extra_table={}, verbose=False):
                 bin_text = np.hstack((bin_text, text_encoded))
 
         output_data = np.concatenate([output_data, np.concatenate([bin_pointers, bin_text], dtype=np.ubyte)], dtype=np.ubyte)
+
+        # Blocks need to be multiples of 4
+        if index + 1 < len(blocks):
+            padding_length = (4 - len(output_data) % 4) % 4
+            output_data = np.concatenate([output_data, np.zeros(padding_length, dtype=np.ubyte)], dtype=np.ubyte)
 
     write_file(output, np.array(output_data, dtype=np.ubyte))
     print('Text reinserted')
