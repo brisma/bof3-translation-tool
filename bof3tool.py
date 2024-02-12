@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.4.6'
+version = '1.4.7'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -653,7 +653,7 @@ def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, extra_table={},
 
         is_sound = data_block_crc in ['70424156', '50504844'] # PSX pBAV / PSP PPHP
         is_graphic = data_block_type == '0300'
-        is_text = data_block_ram_location in ['80010000', '00010000', '8001A000', '0001A000'] # PSX / PSP Texts
+        is_text = data_block_ram_location in ['80010000', '00010000', '8001A000', '0001A000', '00596000'] # PSX / PSP Texts
         is_clut = False
         if int(data_block_ram_location, 16) > 0x80033000 and int(data_block_ram_location, 16) < 0x80037000: # PSX CLUTs
             is_clut = True
