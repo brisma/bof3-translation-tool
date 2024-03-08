@@ -95,6 +95,7 @@ BIN_DUMP_COMMANDS_COMMON=(
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/SHOP/SHOP.1.bin -o DUMP/$BIN/BINARY/SHOP.1.bin.json --offset 0x14F5C --quantity 8 --repeat 4 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/SHOP/SHOP.1.bin -o DUMP/$BIN/BINARY/SHOP.1.bin.json --offset 0x14F8C --quantity 8 --repeat 5 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/SHOP/SHOP.1.bin -o DUMP/$BIN/BINARY/SHOP.1.bin.json --offset 0x1511C --quantity 8 --repeat 2 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/SHOP/SHOP.1.bin -o DUMP/$BIN/BINARY/SHOP.1.bin.json --offset 0x15138 --quantity 3 --repeat 1 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/SHOP/SHOP.1.bin -o DUMP/$BIN/BINARY/SHOP.1.bin.json --offset 0x152DC --quantity 8 --repeat 4 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/SHOP/SHOP.1.bin -o DUMP/$BIN/BINARY/SHOP.1.bin.json --offset 0x15360 --quantity 4 --repeat 1 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/SISYOU/SISYOU.1.bin -o DUMP/$BIN/BINARY/SISYOU.1.bin.json --offset 0x3438 --quantity 4 --repeat 7 --trim"
