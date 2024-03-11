@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.4.8'
+version = '1.5.0'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -1030,11 +1030,6 @@ def raw_reinsert(input, bin=None, extra_table={}, verbose=False):
         skip = json_data['raw_dumps'][i]['data']['skip']
         repeat = json_data['raw_dumps'][i]['data']['repeat']
 
-        max_offset = offset + ((quantity + skip) * repeat) - skip
-
-        if max_offset > bin.size:
-            raise Exception(f'Raw Reinsert [offset + (quantity + skip) * repeat - skip] exceeds file size ({max_offset} > {bin.size}).')
-
         if verbose:
             print(f"Raw reinserting into {bin_path.name} - offset: {offset}, quantity: {quantity}, skip: {skip}, repeat: {repeat} ({i} of {len(json_data['raw_dumps'])} raw dump)")
 
@@ -1054,6 +1049,9 @@ def raw_reinsert(input, bin=None, extra_table={}, verbose=False):
                 print(f" Original data: {' '.join(['{:02x}'.format(x) for x in bin[start_offset:end_offset]])}")
                 print(f" Text to encode: {json_data['raw_dumps'][i]['dump'][j]}")
                 print(f" Raw encoded bytes: {' '.join(['{:02x}'.format(x) for x in raw_encoded])}")
+
+            if end_offset > bin.size:
+                bin = np.concatenate([bin, np.zeros(end_offset - bin.size, dtype=np.ubyte)], dtype=np.ubyte)
 
             bin[start_offset:end_offset] = raw_encoded
         print(f"Raw reinserted {quantity} byte of new encoded text from {input.name} into {bin_path.name} {repeat} times ({i + 1} of {len(json_data['raw_dumps'])} raw dump)")
