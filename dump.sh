@@ -130,7 +130,7 @@ BIN_DUMP_COMMANDS_COMMON=(
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/START/START.9.bin -o DUMP/$BIN/BINARY/START.9.bin.json --offset 0x1C126 --quantity 4 --skip 4 --repeat 3 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/START/START.9.bin -o DUMP/$BIN/BINARY/START.9.bin.json --offset 0x1C17E --quantity 6 --skip 2 --repeat 6 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/START/START.9.bin -o DUMP/$BIN/BINARY/START.9.bin.json --offset 0x1C590 --quantity 4 --repeat 5 --trim"
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/START/START.9.bin -o DUMP/$BIN/BINARY/START.9.bin.json --offset 0x1C8C8 --quantity 4 --repeat 1 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/START/START.9.bin -o DUMP/$BIN/BINARY/START.9.bin.json --offset 0x1C8C8 --quantity 8 --repeat 1 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/START/START.9.bin -o DUMP/$BIN/BINARY/START.9.bin.json --offset 0x1C8D0 --quantity 12 --repeat 3 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/START/START.9.bin -o DUMP/$BIN/BINARY/START.9.bin.json --offset 0x1C8F4 --quantity 8 --repeat 5 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/START/START.9.bin -o DUMP/$BIN/BINARY/START.9.bin.json --offset 0x1C91C --quantity 12 --repeat 2 --trim"
