@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.5.0'
+version = '1.5.1'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -500,7 +500,9 @@ def encode_text(data, extra_table):
                     elif tag[0] == 'TIME':
                         text_bytes = np.hstack((text_bytes, np.array([0x16, int(tag[1], 16)], dtype=np.ubyte))) 
                     elif tag[0] == 'HEX':
-                        text_bytes = np.hstack((text_bytes, np.array([int(tag[1], 16)], dtype=np.ubyte))) 
+                        text_bytes = np.hstack((text_bytes, np.array([int(tag[1], 16)], dtype=np.ubyte)))
+                    elif tag[0] == 'ALIGN':
+                        text_bytes = np.hstack((text_bytes, np.array([0xAB, *struct.pack('b', int(tag[1]))], dtype=np.ubyte))) 
                     else:
                         raise Exception(f'Tag <{" ".join(tag)}> in string "{data}" not valid.')
                 else:
