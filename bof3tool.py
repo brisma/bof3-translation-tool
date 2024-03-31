@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.5.1'
+version = '1.6.0'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -170,6 +170,38 @@ def rearrange_tile(image, width, tile_w, tile_h):
     image_rearranged = image_rearranged.reshape(tile_h * h_grid, tile_w * w_grid)
 
     return image_rearranged
+
+# Convert a number into align opcode [ASM mod - 0xC0 | (n // 2 & 0x3F)]
+def convert_num_to_align_opcode(n):
+    if n == 1: return 0xAA
+    elif n == -1: return 0xAB
+    else: return 0xC0 | (n // 2 & 0x3F)
+
+# Function to scompose a big number into align opcodes [ASM mod]
+def generate_align_opcodes(n):
+    align_opcodes = []
+    while n > 0:
+        if n == 1 or n % 2 == 0:
+            next_number = min(n if n == 1 else 62, 62 if n % 2 != 0 else n)
+            align_opcodes.append(convert_num_to_align_opcode(next_number))
+            n -= next_number
+        else:
+            align_opcodes.append(convert_num_to_align_opcode(1))
+            n -= 1
+    else:
+        while n < 0:
+            if n != -1:
+                next_number = max(n, -62)
+                if next_number % 2 != 0:
+                    next_number += 1
+                if next_number == -2:
+                    next_number = -1
+                align_opcodes.append(convert_num_to_align_opcode(next_number))
+                n -= next_number
+            else:
+                align_opcodes.append(convert_num_to_align_opcode(-1))
+                n += 1
+    return align_opcodes
 
 # Check if valid EMI
 def check_valid_emi(emi_data):
@@ -502,7 +534,7 @@ def encode_text(data, extra_table):
                     elif tag[0] == 'HEX':
                         text_bytes = np.hstack((text_bytes, np.array([int(tag[1], 16)], dtype=np.ubyte)))
                     elif tag[0] == 'ALIGN':
-                        text_bytes = np.hstack((text_bytes, np.array([0xAB, *struct.pack('b', int(tag[1]))], dtype=np.ubyte))) 
+                        text_bytes = np.hstack((text_bytes, np.array(generate_align_opcodes(int(tag[1])), dtype=np.ubyte))) 
                     else:
                         raise Exception(f'Tag <{" ".join(tag)}> in string "{data}" not valid.')
                 else:
