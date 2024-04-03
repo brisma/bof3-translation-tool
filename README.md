@@ -29,7 +29,6 @@ Breath of Fire 3 Translation Tool
 
 ## Introduzione
 Questo tool è stato sviluppato per spacchettare e reimpacchettare i file in formato **EMI** di Breath of Fire 3 PSX/PSP. 
-Con ogni probabilità funziona anche con Breath of Fire 4 (almeno per la gestione degli **EMI**, non ho verificato testi/grafica).
 
 Oltre alla gestione degli **EMI** supporta anche l'estrazione ed il reinserimento dei testi di gioco presenti nei file **EMI** e permette l'indicizzazione dei testi duplicati nei vari file in un unico file e, viceversa, ne permette l'espansione in multipli file.
 
@@ -781,8 +780,8 @@ Per effettuare l'esportazione dei contenuti è sufficiente lanciare il tool sull
 
 Lo script inizierà a lavorare sul contenuto della cartella del gioco effettuando questi passaggi:
 
-1. Cancella tutti i file/cartelle non necessari/e
-2. Spacchetta tutti i file **.EMI** e dumpa testo
+1. Spacchetta tutti i file **.EMI** e dumpa il testo
+2. Cancella tutti i dump non necessari (scene di debug)
 3. Sposta i dump del gioco e dei menu nelle cartelle finali
 4. Estrae i nomi di tutti i nemici
 5. Estrae manualmente alcuni pezzi di menu dai file binari
