@@ -262,6 +262,7 @@ AREA087.8.bin
 AREA088.6.bin
 AREA088.8.bin
 AREA089.14.bin
+AREA104.8.bin
 AREA115.6.bin
 AREA115.8.bin
 AREA121.6.bin
@@ -284,6 +285,7 @@ GFX_REINSERT_COMMANDS_COMMON=(
   "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/AREA065.6.bin.1.8b.64w.64x32.256r.tim -o TEMP/GFX/$BIN/AREA065.6.bin.1 --tile-width 64 --tile-height 32 --resize-width 64"
   "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/AREA087.6.bin.1.8b.64w.64x32.256r.tim -o TEMP/GFX/$BIN/AREA087.6.bin.1 --tile-width 64 --tile-height 32 --resize-width 64"
   "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/AREA088.6.bin.1.8b.64w.64x32.256r.tim -o TEMP/GFX/$BIN/AREA088.6.bin.1 --tile-width 64 --tile-height 32 --resize-width 64"
+  "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/AREA104.8.bin.4.2.8b.64w.64x32.128r.tim -o TEMP/GFX/$BIN/AREA104.8.bin.4.2 --tile-width 64 --tile-height 32 --resize-width 64"
   "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/AREA115.6.bin.1.8b.64w.64x32.256r.tim -o TEMP/GFX/$BIN/AREA115.6.bin.1 --tile-width 64 --tile-height 32 --resize-width 64"
   "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/AREA121.6.bin.1.8b.64w.64x32.256r.tim -o TEMP/GFX/$BIN/AREA121.6.bin.1 --tile-width 64 --tile-height 32 --resize-width 64"
   "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/AREA128.8.bin.4.1.4b.128w.128x32.256r.tim -o TEMP/GFX/$BIN/AREA128.8.bin.4.1 --tile-width 128 --tile-height 32 --resize-width 128"
@@ -460,6 +462,7 @@ python bof3tool.py split -i TEMP/GFX/$BIN/RAW/AREA065.8.bin.4 -o TEMP/GFX/$BIN/R
 python bof3tool.py split -i TEMP/GFX/$BIN/RAW/AREA087.8.bin.4 -o TEMP/GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256 --quantity 2
 python bof3tool.py split -i TEMP/GFX/$BIN/RAW/AREA088.8.bin.4 -o TEMP/GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256 --quantity 2
 python bof3tool.py split -i TEMP/GFX/$BIN/RAW/AREA089.14.bin.4 -o TEMP/GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256 --quantity 2
+python bof3tool.py split -i TEMP/GFX/$BIN/RAW/AREA104.8.bin.4 -o TEMP/GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256 --quantity 2
 python bof3tool.py split -i TEMP/GFX/$BIN/RAW/AREA115.8.bin.4 -o TEMP/GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256 --quantity 2
 python bof3tool.py split -i TEMP/GFX/$BIN/RAW/AREA121.8.bin.4 -o TEMP/GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256 --quantity 2
 python bof3tool.py split -i TEMP/GFX/$BIN/RAW/AREA128.8.bin.4 -o TEMP/GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256 --quantity 2
@@ -508,6 +511,7 @@ cp -v TEMP/GFX/$BIN/AREA016.8.bin.4.2 TEMP/GFX/$BIN/RAW/AREA088.8.bin.4.2
 cp -v TEMP/GFX/$BIN/AREA030.14.bin.1 TEMP/GFX/$BIN/RAW/AREA089.14.bin.1
 cp -v TEMP/GFX/$BIN/AREA030.14.bin.3 TEMP/GFX/$BIN/RAW/AREA089.14.bin.3
 cp -v TEMP/GFX/$BIN/AREA030.14.bin.4.2 TEMP/GFX/$BIN/RAW/AREA089.14.bin.4.2
+cp -v TEMP/GFX/$BIN/AREA104.8.bin.4.2 TEMP/GFX/$BIN/RAW/AREA104.8.bin.4.2
 cp -v TEMP/GFX/$BIN/AREA115.6.bin.1 TEMP/GFX/$BIN/RAW/AREA115.6.bin.1
 cp -v TEMP/GFX/$BIN/AREA016.8.bin.4.2 TEMP/GFX/$BIN/RAW/AREA115.8.bin.4.2
 cp -v TEMP/GFX/$BIN/AREA121.6.bin.1 TEMP/GFX/$BIN/RAW/AREA121.6.bin.1
@@ -565,6 +569,9 @@ python bof3tool.py merge -i TEMP/GFX/$BIN/RAW/AREA088.8.bin.* -o TEMP/BIN/$BIN/A
 python bof3tool.py merge -i TEMP/GFX/$BIN/RAW/AREA089.14.bin.4.* -o TEMP/GFX/$BIN/RAW/AREA089.14.bin.4 --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256
 rm -f TEMP/GFX/$BIN/RAW/AREA089.14.bin.4.*
 python bof3tool.py merge -i TEMP/GFX/$BIN/RAW/AREA089.14.bin.* -o TEMP/BIN/$BIN/AREA089.14.bin --bpp 8 --tile-width 64 --tile-height 32 --resize-width 1024
+python bof3tool.py merge -i TEMP/GFX/$BIN/RAW/AREA104.8.bin.4.* -o TEMP/GFX/$BIN/RAW/AREA104.8.bin.4 --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256
+rm -f TEMP/GFX/$BIN/RAW/AREA104.8.bin.4.*
+python bof3tool.py merge -i TEMP/GFX/$BIN/RAW/AREA104.8.bin.* -o TEMP/BIN/$BIN/AREA104.8.bin --bpp 8 --tile-width 64 --tile-height 32 --resize-width 1024
 python bof3tool.py merge -i TEMP/GFX/$BIN/RAW/AREA115.6.bin.* -o TEMP/BIN/$BIN/AREA115.6.bin --bpp 8 --tile-width 64 --tile-height 32 --resize-width 1024
 python bof3tool.py merge -i TEMP/GFX/$BIN/RAW/AREA115.8.bin.4.* -o TEMP/GFX/$BIN/RAW/AREA115.8.bin.4 --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256
 rm -f TEMP/GFX/$BIN/RAW/AREA115.8.bin.4.*

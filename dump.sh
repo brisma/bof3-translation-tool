@@ -544,6 +544,7 @@ AREA045.6.bin
 AREA065.6.bin
 AREA087.6.bin
 AREA088.6.bin
+AREA104.8.bin
 AREA115.6.bin
 AREA121.6.bin
 AREA128.8.bin
@@ -574,6 +575,7 @@ GFX_DUMP_COMMANDS_COMMON=(
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA065.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD01/AREA065/AREA065.7.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA087.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD02/AREA087/AREA087.7.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA088.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD02/AREA088/AREA088.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA104.8.bin.4.2 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 128 --clut UNPACKED/$BIN/WORLD02/AREA104/AREA104.9.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA115.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD03/AREA115/AREA115.7.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA121.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD03/AREA121/AREA121.7.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA128.8.bin.4.1 --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD03/AREA128/AREA128.9.bin"
@@ -730,6 +732,7 @@ echo "Done"
 echo "Splitting 4BPP RAW images parts..."
 python bof3tool.py split -i GFX/$BIN/RAW/AREA016.8.bin.4 -o GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256 --quantity 2
 python bof3tool.py split -i GFX/$BIN/RAW/AREA030.14.bin.4 -o GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256 --quantity 2
+python bof3tool.py split -i GFX/$BIN/RAW/AREA104.8.bin.4 -o GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256 --quantity 2
 python bof3tool.py split -i GFX/$BIN/RAW/AREA128.8.bin.4 -o GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256 --quantity 2
 echo "Done"
 
