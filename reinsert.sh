@@ -250,6 +250,7 @@ START.9.bin STATUS.1.bin"
 
 GFX_RAW_FILES="AREA016.6.bin
 AREA016.8.bin
+AREA030.12.bin
 AREA030.14.bin
 AREA033.6.bin
 AREA033.8.bin
@@ -277,6 +278,7 @@ TURIMODE.4.bin"
 GFX_REINSERT_COMMANDS_COMMON=(
   "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/AREA016.6.bin.1.8b.64w.64x32.256r.tim -o TEMP/GFX/$BIN/AREA016.6.bin.1 --tile-width 64 --tile-height 32 --resize-width 64"
   "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/AREA016.8.bin.4.2.8b.64w.64x32.128r.tim -o TEMP/GFX/$BIN/AREA016.8.bin.4.2 --tile-width 64 --tile-height 32 --resize-width 64"
+  "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/AREA030.12.bin.4.8b.64w.64x32.256r.tim -o TEMP/GFX/$BIN/AREA030.12.bin.4 --tile-width 64 --tile-height 32 --resize-width 64"
   "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/AREA030.14.bin.1.8b.64w.64x32.256r.tim -o TEMP/GFX/$BIN/AREA030.14.bin.1 --tile-width 64 --tile-height 32 --resize-width 64"
   "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/AREA030.14.bin.3.8b.64w.64x32.256r.tim -o TEMP/GFX/$BIN/AREA030.14.bin.3 --tile-width 64 --tile-height 32 --resize-width 64"
   "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/AREA030.14.bin.4.2.4b.128w.128x32.256r.tim -o TEMP/GFX/$BIN/AREA030.14.bin.4.2 --tile-width 128 --tile-height 32 --resize-width 128"
@@ -495,6 +497,7 @@ echo "Done"
 echo "Copying duplicated splitted RAW parts and Font..."
 cp -v TEMP/GFX/$BIN/AREA016.6.bin.1 TEMP/GFX/$BIN/RAW/AREA016.6.bin.1
 cp -v TEMP/GFX/$BIN/AREA016.8.bin.4.2 TEMP/GFX/$BIN/RAW/AREA016.8.bin.4.2
+cp -v TEMP/GFX/$BIN/AREA030.12.bin.4 TEMP/GFX/$BIN/RAW/AREA030.12.bin.4
 cp -v TEMP/GFX/$BIN/AREA030.14.bin.1 TEMP/GFX/$BIN/RAW/AREA030.14.bin.1
 cp -v TEMP/GFX/$BIN/AREA030.14.bin.3 TEMP/GFX/$BIN/RAW/AREA030.14.bin.3
 cp -v TEMP/GFX/$BIN/AREA030.14.bin.4.2 TEMP/GFX/$BIN/RAW/AREA030.14.bin.4.2

@@ -538,6 +538,7 @@ WORLD04/AREA198/AREA198.11.bin"
 
 GFX_RAW_FILES="AREA016.6.bin
 AREA016.8.bin
+AREA030.12.bin
 AREA030.14.bin
 AREA033.6.bin
 AREA045.6.bin
@@ -567,6 +568,7 @@ START.6.bin"
 GFX_DUMP_COMMANDS_COMMON=(
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA016.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD00/AREA016/AREA016.7.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA016.8.bin.4.2 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 128 --clut UNPACKED/$BIN/WORLD00/AREA016/AREA016.9.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA030.12.bin.4 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD00/AREA030/AREA030.13.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA030.14.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD00/AREA030/AREA030.15.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA030.14.bin.3 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD00/AREA030/AREA030.15.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA030.14.bin.4.2 --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD00/AREA030/AREA030.15.bin"
