@@ -22,7 +22,7 @@ fi
 echo "Platform detected: $PLATFORM"
 
 BIN_DUMP_COMMANDS_COMMON=(
-  "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.json --offset 0x1A2B0 --quantity 4 --skip 4 --repeat 7 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.json --offset 0x1A2B0 --quantity 8 --repeat 7 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.json --offset 0x1A400 --quantity 12 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.json --offset 0x1A41A --quantity 12 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/BATTLE/BATTLE/BATTLE.4.bin -o DUMP/$BIN/BINARY/BATTLE.4.bin.json --offset 0x1A434 --quantity 12 --skip 1 --repeat 8 --trim"
@@ -378,7 +378,7 @@ BIN_DUMP_COMMANDS_PSP=(
   "python bof3tool.py rawdump -i $BIN/BOOT.BIN -o DUMP/$BIN/BINARY/BOOT.BIN_commands.json --offset 0x2EF771 --quantity 3 --repeat 1 --trim"
   "python bof3tool.py rawdump -i $BIN/BOOT.BIN -o DUMP/$BIN/BINARY/BOOT.BIN_commands.json --offset 0x2EF80F --quantity 4 --skip 1 --repeat 3 --trim"
   "python bof3tool.py rawdump -i $BIN/BOOT.BIN -o DUMP/$BIN/BINARY/BOOT.BIN_commands.json --offset 0x2EF81E --quantity 3 --repeat 1 --trim"
-  "python bof3tool.py rawdump -i $BIN/BOOT.BIN -o DUMP/$BIN/BINARY/BOOT.BIN_commands.json --offset 0x2F0199 --quantity 3 --skip 5 --repeat 7 --trim"
+  "python bof3tool.py rawdump -i $BIN/BOOT.BIN -o DUMP/$BIN/BINARY/BOOT.BIN_commands.json --offset 0x2F0199 --quantity 8 --repeat 7 --trim"
   "python bof3tool.py rawdump -i $BIN/BOOT.BIN -o DUMP/$BIN/BINARY/BOOT.BIN_commands.json --offset 0x2F0418 --quantity 12 --repeat 1 --trim"
   "python bof3tool.py rawdump -i $BIN/BOOT.BIN -o DUMP/$BIN/BINARY/BOOT.BIN_commands.json --offset 0x2F0432 --quantity 12 --repeat 1 --trim"
   "python bof3tool.py rawdump -i $BIN/BOOT.BIN -o DUMP/$BIN/BINARY/BOOT.BIN_commands.json --offset 0x2F044C --quantity 12 --skip 1 --repeat 8 --trim"
