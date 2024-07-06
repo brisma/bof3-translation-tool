@@ -550,6 +550,7 @@ AREA115.6.bin
 AREA121.6.bin
 AREA128.8.bin
 AREA151.6.bin
+AREA172.8.bin
 BATE.2.bin
 BATL_DRA.1.bin
 BATL_OVR.2.bin
@@ -582,6 +583,7 @@ GFX_DUMP_COMMANDS_COMMON=(
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA121.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD03/AREA121/AREA121.7.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA128.8.bin.4.1 --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD03/AREA128/AREA128.9.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA151.6.bin.1 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/WORLD03/AREA151/AREA151.7.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/AREA172.8.bin.4.2 --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 128 --clut UNPACKED/$BIN/WORLD04/AREA172/AREA172.9.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/BATE.2.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/BATE/BATE.5.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/BATL_DRA.1.bin --bpp 8 --width 64 --tile-width 64 --tile-height 64 --resize-width 128 --clut UNPACKED/$BIN/BATTLE/BATL_DRA/BATL_DRA.2.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/BATL_OVR.2.bin --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/BATTLE/BATL_OVR/BATL_OVR.3.bin"
@@ -736,6 +738,7 @@ python bof3tool.py split -i GFX/$BIN/RAW/AREA016.8.bin.4 -o GFX/$BIN/RAW --bpp 8
 python bof3tool.py split -i GFX/$BIN/RAW/AREA030.14.bin.4 -o GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256 --quantity 2
 python bof3tool.py split -i GFX/$BIN/RAW/AREA104.8.bin.4 -o GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256 --quantity 2
 python bof3tool.py split -i GFX/$BIN/RAW/AREA128.8.bin.4 -o GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256 --quantity 2
+python bof3tool.py split -i GFX/$BIN/RAW/AREA172.8.bin.4 -o GFX/$BIN/RAW --bpp 8 --tile-width 64 --tile-height 32 --resize-width 256 --quantity 2
 echo "Done"
 
 # Convert all RAW splitted files to TIM files
