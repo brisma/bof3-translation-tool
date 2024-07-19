@@ -141,6 +141,7 @@ BIN_DUMP_COMMANDS_COMMON=(
 BIN_DUMP_COMMANDS_USA=("${BIN_DUMP_COMMANDS_COMMON[@]}")
 BIN_DUMP_COMMANDS_USA+=(
   "python bof3tool.py rawdump -i UNPACKED/$BIN/BOSS/BOSS025/BOSS025.14.bin -o DUMP/$BIN/BINARY/BOSS025.14.bin.json --offset 0x1AA8 --quantity 12 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/COMMU01/COMMU01.8.bin -o DUMP/$BIN/BINARY/COMMU01.8.bin.json --offset 0x4030 --quantity 8 --repeat 1 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/COMMU01/COMMU01.8.bin -o DUMP/$BIN/BINARY/COMMU01.8.bin.json --offset 0x4134 --quantity 8 --repeat 20 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.json --offset 0x32434 --quantity 8 --repeat 5 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.json --offset 0x33164 --quantity 12 --skip 6 --repeat 92 --trim"
@@ -175,6 +176,7 @@ BIN_DUMP_COMMANDS_USA+=(
 BIN_DUMP_COMMANDS_PAL=("${BIN_DUMP_COMMANDS_COMMON[@]}")
 BIN_DUMP_COMMANDS_PAL+=(
   "python bof3tool.py rawdump -i UNPACKED/$BIN/BOSS/BOSS025/BOSS025.14.bin -o DUMP/$BIN/BINARY/BOSS025.14.bin.json --offset 0x1AD4 --quantity 12 --repeat 2 --trim"
+  "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/COMMU01/COMMU01.8.bin -o DUMP/$BIN/BINARY/COMMU01.8.bin.json --offset 0x3FA4 --quantity 8 --repeat 1 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/COMMU01/COMMU01.8.bin -o DUMP/$BIN/BINARY/COMMU01.8.bin.json --offset 0x40A8 --quantity 8 --repeat 20 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.json --offset 0x324B8 --quantity 8 --repeat 5 --trim"
   "python bof3tool.py rawdump -i UNPACKED/$BIN/ETC/GAME/GAME.1.bin -o DUMP/$BIN/BINARY/GAME.1.bin.json --offset 0x331E8 --quantity 12 --skip 6 --repeat 92 --trim"
