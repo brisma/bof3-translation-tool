@@ -299,6 +299,7 @@ GFX_REINSERT_COMMANDS_COMMON=(
   "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/BATE.2.bin.4b.128w.128x32.256r.tim -o TEMP/BIN/$BIN/BATE.2.bin --tile-width 128 --tile-height 32 --resize-width 128"
   "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/BATL_DRA.1.bin.8b.64w.64x64.128r.tim -o TEMP/BIN/$BIN/BATL_DRA.1.bin --tile-width 64 --tile-height 64 --resize-width 64"
   "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/BATL_OVR.2.bin.8b.64w.64x32.256r.tim -o TEMP/BIN/$BIN/BATL_OVR.2.bin --tile-width 64 --tile-height 32 --resize-width 64"
+  "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/COMMU02.3.bin.4b.128w.128x32.256r.tim -o TEMP/BIN/$BIN/COMMU02.3.bin --tile-width 128 --tile-height 32 --resize-width 128"
   "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/DEMO.5.bin.8b.64w.64x32.256r.tim -o TEMP/BIN/$BIN/DEMO.5.bin --tile-width 64 --tile-height 32 --resize-width 64"
   "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/DEMO.6.bin.8b.64w.64x32.256r.tim -o TEMP/BIN/$BIN/DEMO.6.bin --tile-width 64 --tile-height 32 --resize-width 64"
   "python bof3tool.py tim2raw -i TEMP/GFX/$BIN/MAGIC008.2.bin.4b.128w.128x32.256r.tim -o TEMP/BIN/$BIN/MAGIC008.2.bin --tile-width 128 --tile-height 32 --resize-width 128"
@@ -351,6 +352,7 @@ BATE.2.bin STATUS.2.bin
 BATE.2.bin AREA030.21.bin
 BATE.2.bin AREA089.21.bin
 BATE.2.bin AREA129.21.bin
+COMMU02.3.bin COMMU02B.2.bin
 AREA030.14.bin TURIMODE.4.bin
 AREA151.6.bin AREA152.6.bin"
 

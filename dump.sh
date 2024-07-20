@@ -588,6 +588,7 @@ BATL_DRA.1.bin
 BATL_OVR.2.bin
 DEMO.5.bin
 DEMO.6.bin
+COMMU02.3.bin
 FIRST.4.bin
 FIRST.5.bin
 FIRST.6.bin
@@ -619,6 +620,7 @@ GFX_DUMP_COMMANDS_COMMON=(
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/BATE.2.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/BATE/BATE.5.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/BATL_DRA.1.bin --bpp 8 --width 64 --tile-width 64 --tile-height 64 --resize-width 128 --clut UNPACKED/$BIN/BATTLE/BATL_DRA/BATL_DRA.2.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/BATL_OVR.2.bin --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/BATTLE/BATL_OVR/BATL_OVR.3.bin"
+  "python bof3tool.py raw2tim -i GFX/$BIN/RAW/COMMU02.3.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/COMMU02/COMMU02.4.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/DEMO.5.bin --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/DEMO/DEMO.8.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/DEMO.6.bin --bpp 8 --width 64 --tile-width 64 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/ETC/DEMO/DEMO.8.bin"
   "python bof3tool.py raw2tim -i GFX/$BIN/RAW/MAGIC008.2.bin --bpp 4 --width 128 --tile-width 128 --tile-height 32 --resize-width 256 --clut UNPACKED/$BIN/BMAGIC/MAGIC008/MAGIC008.3.bin"
