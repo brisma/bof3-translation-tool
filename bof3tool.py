@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.6.0'
+version = '1.6.1'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -243,7 +243,7 @@ def read_json(json_path):
         with json_path.open(encoding="UTF-8") as source:
             return json.load(source)
     except ValueError:
-        raise Exception(f'File {input} is not valid JSON file.')
+        raise Exception(f'File {json_path} is not valid JSON file.')
 
 # Write JSON file
 def write_json(json_path, json_data):
