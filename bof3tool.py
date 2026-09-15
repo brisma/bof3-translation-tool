@@ -742,6 +742,28 @@ def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, extra_table={},
     print(f'EMI {input} unpacked into {emi_data_blocks} files')
 
 # Pack bin files into EMI file
+# What a text block may grow to, by where the game loads it.  Measured on the
+# PSX executable: the area text sits at 0x80010000 and the battle text at
+# 0x8001A000, and both are live at once -- in battle the area text stays
+# loaded -- while 0x80020000 is the engine's GPU primitive buffer, alive for
+# the whole game.  So each block may grow until it reaches its neighbour.
+#
+# The old 0x5800 limit was the worst case of the two (0x6000 less one sector)
+# applied to every block, including the 200 area ones that have nearly twice
+# the room.
+TEXT_BLOCK_NEIGHBOUR = {
+    0x80010000: 0x8001A000,     # area text  -> 40960 bytes
+    0x8001A000: 0x80020000,     # battle text -> 24576 bytes
+}
+
+
+def text_block_ceiling(ram_location):
+    """How big a text block loaded there may become, 0 if we do not know."""
+    address = int(ram_location, 16)
+    neighbour = TEXT_BLOCK_NEIGHBOUR.get(address)
+    return neighbour - address if neighbour else 0
+
+
 def pack(input, output_dir='', verbose=False):
     emi_path = Path(output_dir) / f'{input.stem}.EMI'
 
@@ -802,19 +824,24 @@ def pack(input, output_dir='', verbose=False):
             print(f' Contains CLUTs: {is_clut}')
 
         if not data_bin_size <= data_block_size + data_block_padding_size:
-            # if is_text:
-            #     if data_bin_size + data_block_padding_size > 22528: # Over 0x5800 bytes limit
-            #         raise Exception(f'Text data block {data_block_number} is too big even after expansion to 22528 bytes, cannot be injected.')
-            #     else:
-            #         # Expand buffer
-            #         delta_bin = (data_bin_size + data_bin_padding_size) - (data_block_size + data_block_padding_size)
-            #         if delta_bin > 0:
-            #             data_blocks = np.concatenate([data_blocks, np.full(delta_bin, 0x5F, dtype=np.ubyte)])
-            #         print(f'New text data block expanded to {data_block_size + data_block_padding_size} bytes (<= 22528 bytes limit)')
-            # else:
-            #     raise Exception(f'Data block {data_block_number} is too big, cannot be injected.')
             exceed_size = data_bin_size - (data_block_size + data_block_padding_size)
-            raise Exception(f'Data block {data_block_number} is too big (exceeds of {exceed_size} bytes), cannot be injected.')
+            ceiling = text_block_ceiling(data_block_ram_location) if is_text else 0
+
+            if not ceiling:
+                raise Exception(f'Data block {data_block_number} is too big (exceeds of {exceed_size} bytes), cannot be injected.')
+            if data_bin_size > ceiling:
+                raise Exception(f'Text data block {data_block_number} is too big ({data_bin_size} bytes): '
+                                f'loaded at 0x{data_block_ram_location}, it may not pass {ceiling} bytes.')
+
+            # Grow the buffer: the block keeps its place, everything after it
+            # moves down, and so does every file after this one on the disc --
+            # which is why the build has to rewrite the executable's LBA table
+            # afterwards (ISO/tools/psx_lba.py).
+            delta_bin = (data_bin_size + data_bin_padding_size) - (data_block_size + data_block_padding_size)
+            if delta_bin > 0:
+                data_blocks = np.concatenate([data_blocks, np.full(delta_bin, 0x5F, dtype=np.ubyte)])
+            print(f'Text data block {data_block_number} grown to {data_bin_size} bytes '
+                  f'(+{exceed_size}, ceiling {ceiling})')
 
         data_block_toc = np.full(16, 0x2E, dtype=np.ubyte)
         data_block_toc[0:4] = np.frombuffer(struct.pack('<I', data_bin_size), dtype=np.ubyte)
