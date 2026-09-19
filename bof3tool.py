@@ -751,9 +751,16 @@ def unpack(input, output_dir='', dump_txt=False, dump_gfx=False, extra_table={},
 # The old 0x5800 limit was the worst case of the two (0x6000 less one sector)
 # applied to every block, including the 200 area ones that have nearly twice
 # the room.
+#
+# The PSP port copies the blocks into a buffer laid out like the PSX memory,
+# and its TOCs carry the same addresses without the KSEG0 bit.  Across its 445
+# archives nothing loads between 0x00010000 and 0x0001A000 either, so the area
+# text has the same room.  What follows the battle text there has not been
+# measured, so that one stays as it was: it may not grow.
 TEXT_BLOCK_NEIGHBOUR = {
     0x80010000: 0x8001A000,     # area text  -> 40960 bytes
     0x8001A000: 0x80020000,     # battle text -> 24576 bytes
+    0x00010000: 0x0001A000,     # area text on PSP -> 40960 bytes
 }
 
 
