@@ -2,12 +2,13 @@ import argparse
 import json
 import struct
 import re
+import sys
 import numpy as np
 from pathlib import Path
 from PIL import Image
 from PIL import ImagePalette
 
-version = '1.6.1'
+version = '1.7.0'
 
 # Map of files containing graphics to dump
 gfx_map = {
@@ -842,8 +843,8 @@ def pack(input, output_dir='', verbose=False):
 
             # Grow the buffer: the block keeps its place, everything after it
             # moves down, and so does every file after this one on the disc --
-            # which is why the build has to rewrite the executable's LBA table
-            # afterwards (ISO/tools/psx_lba.py).
+            # which is why a PSX build has to rewrite the executable's LBA table
+            # afterwards (the lba command).  The PSP opens its files by name.
             delta_bin = (data_bin_size + data_bin_padding_size) - (data_block_size + data_block_padding_size)
             if delta_bin > 0:
                 data_blocks = np.concatenate([data_blocks, np.full(delta_bin, 0x5F, dtype=np.ubyte)])
@@ -1575,6 +1576,191 @@ def merge_images(inputs, output, bpp, tile_w, tile_h, resize_width):
 
     print('Done')
 
+# Keep the PSX executable's hardwired file table in step with the disc.
+#
+# Breath of Fire III never looks a file up by name: it takes a file number,
+# reads a sector out of a table hardwired in its executable -- one entry per
+# file in the disc's own LBA order, plus a last one for the start of the audio
+# track -- and asks the CD library for that sector.  Verified entry by entry
+# against both retail discs (887 of 887 on USA, 889 of 889 on PAL), which is
+# why the table can be rebuilt by simply reading the filesystem.
+#
+# So if any file grows, every file after it slides down the disc, the table
+# stays behind and the game reads somebody else's sectors: the black screen
+# that made block expansion get switched off in 2024.  Rewriting the table
+# after the image is built is what lets a text block grow.
+#
+# The table is not at the same address in both versions (0x80182444 on USA,
+# 0x80182910 on PAL), so it is found by content rather than by a constant: it
+# is the one long run of ascending sector numbers, and the run must have
+# exactly one more entry than the disc has files.
+#
+# These functions stop with SystemExit rather than an Exception: main() turns
+# an Exception into a message and exits 0, and a build has to be able to stop
+# on a table that does not match.
+SECTOR_2352 = 2352      # a raw MODE2/2352 track, as mkpsxiso writes it
+SECTOR_2048 = 2048      # a plain .iso
+MODE2_DATA_OFFSET = 24  # sync + header + subheader, before the user data
+PREGAP = 150            # what sits between the data track and the audio track
+EXE_HEADER = 0x800
+
+
+class DiscImage:
+    """The data track, whatever sector size it was written with."""
+
+    def __init__(self, path):
+        self.path = Path(path)
+        self.size = self.path.stat().st_size
+        if self.size % SECTOR_2352 == 0:
+            self.sector_size, self.offset = SECTOR_2352, MODE2_DATA_OFFSET
+        elif self.size % SECTOR_2048 == 0:
+            self.sector_size, self.offset = SECTOR_2048, 0
+        else:
+            raise SystemExit(f'{path}: {self.size} bytes is neither 2352 nor 2048 per sector')
+        self.sectors = self.size // self.sector_size
+        self.handle = open(self.path, 'rb')
+
+    def sector(self, lba, count=1):
+        out = b''
+        for i in range(count):
+            self.handle.seek((lba + i) * self.sector_size + self.offset)
+            out += self.handle.read(SECTOR_2048)
+        return out
+
+    def files(self):
+        """Every file on the disc as (lba, length, path), in disc order."""
+        pvd = self.sector(16)
+        if pvd[1:6] != b'CD001':
+            raise SystemExit(f'{self.path}: no ISO9660 volume descriptor at sector 16')
+        root = pvd[156:156 + 34]
+        found = []
+        self._walk(struct.unpack_from('<I', root, 2)[0],
+                   struct.unpack_from('<I', root, 10)[0], '', found)
+        found.sort()
+        return found
+
+    def _walk(self, lba, length, path, found):
+        data = self.sector(lba, (length + SECTOR_2048 - 1) // SECTOR_2048)
+        pos = 0
+        while pos < len(data):
+            record_length = data[pos]
+            if record_length == 0:                      # rest of the sector is padding
+                pos = (pos // SECTOR_2048 + 1) * SECTOR_2048
+                continue
+            record = data[pos:pos + record_length]
+            child_lba = struct.unpack_from('<I', record, 2)[0]
+            child_length = struct.unpack_from('<I', record, 10)[0]
+            flags = record[25]
+            name = record[33:33 + record[32]]
+            pos += record_length
+            if record[32] == 1 and name in (b'\x00', b'\x01'):   # . and ..
+                continue
+            full = path + '/' + name.decode('ascii', 'replace')
+            if flags & 2:
+                self._walk(child_lba, child_length, full, found)
+            else:
+                found.append((child_lba, child_length, full))
+
+
+def lba_expected_table(image):
+    """What the table should say: every file's sector, then the audio track."""
+    return [lba for lba, _, _ in image.files()] + [image.sectors + PREGAP]
+
+
+def lba_find_table(executable, count):
+    """Where the table sits in a PS-EXE, found by its own shape.
+
+    Returns the offset in the file of a run of `count` ascending sector
+    numbers.  Anything else -- no such run, or more than one -- is an error
+    worth stopping for rather than guessing at.
+    """
+    if executable[:8] != b'PS-X EXE':
+        raise SystemExit('not a PS-EXE')
+    words = len(executable) // 4
+    values = struct.unpack_from(f'<{words}I', executable, 0)
+    hits = []
+    start = 0
+    while start + count <= words:
+        if values[start] == 0 or values[start] > 400000:
+            start += 1
+            continue
+        run = start
+        while run + 1 < words and values[run] < values[run + 1] <= 400000:
+            run += 1
+        if run - start + 1 == count:
+            hits.append(start * 4)
+        start = max(run, start) + 1
+    if not hits:
+        raise SystemExit(f'no run of {count} ascending sector numbers in the executable')
+    if len(hits) > 1:
+        raise SystemExit(f'{len(hits)} candidate tables at {", ".join(hex(h) for h in hits)} -- refusing to guess')
+    return hits[0]
+
+
+def lba_read_table(executable, count, offset):
+    return list(struct.unpack_from(f'<{count}I', executable, offset))
+
+
+def lba_executable_name(image):
+    """The disc's own executable, from SYSTEM.CNF."""
+    for lba, length, path in image.files():
+        if path.upper().endswith('/SYSTEM.CNF;1'):
+            text = image.sector(lba, 1)[:length].decode('ascii', 'replace')
+            for piece in text.replace('\\', '/').split():
+                if piece.upper().startswith('CDROM'):
+                    return piece.split('/')[-1].split(';')[0]
+    raise SystemExit(f'{image.path}: no BOOT line in SYSTEM.CNF')
+
+
+def lba_read_executable(image):
+    """The executable as it currently sits inside the image."""
+    name = lba_executable_name(image)
+    for lba, length, path in image.files():
+        if path.split('/')[-1].split(';')[0].upper() == name.upper():
+            return image.sector(lba, (length + SECTOR_2048 - 1) // SECTOR_2048)[:length]
+    raise SystemExit(f'{image.path}: {name} is not on the disc')
+
+
+# Compare the table inside the image's own executable with its filesystem
+def lba_check(input):
+    image = DiscImage(input)
+    files = image.files()
+    want = lba_expected_table(image)
+    executable = lba_read_executable(image)
+    offset = lba_find_table(executable, len(want))
+    got = lba_read_table(executable, len(want), offset)
+    load = struct.unpack_from('<I', executable, 0x18)[0]
+    address = load + offset - EXE_HEADER
+
+    wrong = [(i, got[i], want[i]) for i in range(len(want)) if got[i] != want[i]]
+    print(f'{image.path.name}: {len(files)} files, table of {len(want)} entries at 0x{address:08X} (offset 0x{offset:X})')
+    if not wrong:
+        print('  every entry matches the filesystem, audio track included')
+        return 0
+    print(f'  {len(wrong)} entries disagree with the filesystem:')
+    for index, got_value, want_value in wrong[:10]:
+        name = files[index][2] if index < len(files) else '(audio track)'
+        print(f'    entry {index:3d}: table says {got_value}, disc says {want_value}   {name}')
+    if len(wrong) > 10:
+        print(f'    ... and {len(wrong) - 10} more')
+    return 1
+
+
+# Write the sectors of the image's filesystem into an executable on disk
+def lba_write(input, executable):
+    image = DiscImage(input)
+    want = lba_expected_table(image)
+    executable = Path(executable)
+    data = bytearray(executable.read_bytes())
+    offset = lba_find_table(data, len(want))
+    before = lba_read_table(data, len(want), offset)
+    struct.pack_into(f'<{len(want)}I', data, offset, *want)
+    executable.write_bytes(data)
+    changed = sum(1 for a, b in zip(before, want) if a != b)
+    load = struct.unpack_from('<I', data, 0x18)[0]
+    print(f'{executable.name}: wrote {len(want)} entries at 0x{load + offset - EXE_HEADER:08X}, {changed} of them changed')
+    return 0
+
 def main(command_line=None):
     # Parser for extra table characters
     class ParseExtraTable(argparse.Action):
@@ -1703,6 +1889,14 @@ def main(command_line=None):
     merge.add_argument('--tile-height', dest='tile_h', help='tile height', type=int, required=True)
     merge.add_argument('--resize-width', dest='resize_width', help='resize width', type=int, required=True)
 
+    lba = subparser.add_parser('lba', help='check or rewrite the file table (LBA) of the PSX executable')
+    lba_action = lba.add_subparsers(help='Action', required=True, dest='action')
+    lba_check_parser = lba_action.add_parser('check', help="compare the table inside the image's own executable with its filesystem")
+    lba_check_parser.add_argument('-i', '--input', help='input disc image (2352 or 2048 bytes per sector)', type=Path, required=True)
+    lba_write_parser = lba_action.add_parser('write', help="write the sectors of the image's filesystem into an executable on disk")
+    lba_write_parser.add_argument('-i', '--input', help='input disc image (2352 or 2048 bytes per sector)', type=Path, required=True)
+    lba_write_parser.add_argument('-e', '--executable', help='PS-EXE to write the table into (ex. SLUS_004.22)', type=Path, required=True)
+
     parser.add_argument('-v', '--version', action='version', version=f'{parser.prog} {version}')
     args = parser.parse_args(command_line)
 
@@ -1753,6 +1947,12 @@ def main(command_line=None):
                 split_image(input=path, output=args.output, bpp=args.bpp, tile_w=args.tile_w, tile_h=args.tile_h, resize_width=args.resize_width, quantity=args.quantity)
         elif args.command == 'merge':
             merge_images(inputs=args.input, output=args.output, bpp=args.bpp, tile_w=args.tile_w, tile_h=args.tile_h, resize_width=args.resize_width)
+        elif args.command == 'lba':
+            # The exit code is the answer: a build stops on a table that is wrong
+            if args.action == 'check':
+                sys.exit(lba_check(input=args.input))
+            elif args.action == 'write':
+                sys.exit(lba_write(input=args.input, executable=args.executable))
     except Exception as err:
         print(f'Error: {err}')
 

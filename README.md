@@ -17,6 +17,7 @@ Breath of Fire 3 Translation Tool
     - [Conversione grafica TIM/BMP in RAW](#conversione-grafica-timbmp-in-raw)
     - [Dividere la grafica RAW (split)](#dividere-la-grafica-raw-split)
     - [Riunire le grafiche RAW divise (merge)](#riunire-le-grafiche-raw-divise-merge)
+    - [Tabella dei file dell'eseguibile PSX (LBA)](#tabella-dei-file-delleseguibile-psx-lba)
   - [Dump di tutti i testi/grafiche/file binari da modificare](#dump-di-tutti-i-testigrafichefile-binari-da-modificare)
     - [Prerequisiti](#prerequisiti)
     - [Estrazione](#estrazione)
@@ -44,12 +45,12 @@ python bof3tool.py -h
 Ad esempio mostrerà cosa è in grado di fare;
 
 ```
-usage: bof3tool.py [-h] [-v] {unpack,pack,dump,rawdump,translate,reinsert,rawreinsert,index,expand,raw2tim,tim2raw,raw2bmp,bmp2raw,split,merge} ...
+usage: bof3tool.py [-h] [-v] {unpack,pack,dump,rawdump,translate,reinsert,rawreinsert,index,expand,raw2tim,tim2raw,raw2bmp,bmp2raw,split,merge,lba} ...
 
 Breath of Fire III Tool (PSX/PSP)
 
 positional arguments:
-  {unpack,pack,dump,rawdump,translate,reinsert,rawreinsert,index,expand,raw2tim,tim2raw,raw2bmp,bmp2raw}
+  {unpack,pack,dump,rawdump,translate,reinsert,rawreinsert,index,expand,raw2tim,tim2raw,raw2bmp,bmp2raw,split,merge,lba}
                         Description
     unpack              unpack EMI files into bin files
     pack                pack bin files into EMI file
@@ -66,6 +67,7 @@ positional arguments:
     bmp2raw             convert BMP to graphic RAW
     split               split raw image
     merge               merge splitted raw image
+    lba                 check or rewrite the file table (LBA) of the PSX executable
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -88,6 +90,7 @@ I comandi a disposizione sono:
 * **bmp2raw**: converte un file in formato **BMP** in grafica **RAW** riarraggiando i tile
 * **split**: divide un file grafico **RAW** in più file
 * **merge**: unisce più file grafici **RAW** in un unico file
+* **lba**: verifica o riscrive la tabella dei file (**LBA**) cablata nell'eseguibile **PSX**
 
 ### Spacchettare file EMI
 Per estrarre uno o più file **EMI** è sufficiente dare ad esempio un:
@@ -161,8 +164,14 @@ output/AREA000.EMI created.
 >
 > In questo caso il tool applicherà la seguente logica:
 > - se il file è di poco più grande e può rientrare nel padding originale del blocco (i blocchi sono da 2048 byte) verrà reinserito senza problemi poiché consuma il padding già presente
-> - se il file supera la dimensione originale e consuma tutto il padding disponibile allora il file all'interno dell'**EMI** verrà espanso in automatico purché sia minore del **limite massimo di 0x5800 (22528) byte**.
-> - se il file **supera** il **limite di 0x5800 (22528)** byte il reimpacchettamente andrà in **errore**
+> - se il file supera la dimensione originale e consuma tutto il padding disponibile, e si tratta di un **blocco di testo**, il blocco all'interno dell'**EMI** verrà espanso in automatico fino a quanto c'è posto in RAM nel punto in cui il gioco lo carica:
+>   - **40960 byte** per il testo delle aree, caricato a `0x80010000` (su **PSP** `0x00010000`): dopo di lui c'è il testo di battaglia
+>   - **24576 byte** per il testo di battaglia, caricato a `0x8001A000`: dopo di lui c'è il buffer delle primitive della GPU (solo **PSX**: su **PSP** non è stato misurato cosa lo segue, quindi lì non cresce)
+> - se il blocco **supera** quel tetto, oppure non è un blocco di testo, il reimpacchettamento andrà in **errore**
+>
+> Il vecchio **limite di 0x5800 (22528) byte** era il caso del testo di battaglia (0x6000 meno un settore) applicato a tutti i blocchi.
+>
+> Un **EMI** che cresce di un settore sposta più in là sul disco tutti i file che lo seguono. Su **PSX** il gioco non cerca i file per nome ma legge il settore da una tabella cablata nell'eseguibile, quindi dopo aver ricostruito l'immagine la tabella **va riscritta** con il comando `lba` (vedi [Tabella dei file dell'eseguibile PSX](#tabella-dei-file-delleseguibile-psx-lba)). Su **PSP** i file vengono aperti per nome e non serve altro.
 
 ### Estrazione del testo
 Per estrarre il testo di gioco nel formato **puntatori+testo** possiamo utilizzare il comando `dump` sul file **bin** contenente il testo:
@@ -725,6 +734,45 @@ Ed ecco che verrà ricostruito il file originale `AREA030.14.bin` a partire dall
 > **ATTENZIONE**: ricordate di utilizzare il giusto `--resize-width` che sarà la somma di tutte le larghezze di tutte le immagini.
 >
 > Inoltre, utilizzando il parametro `--output` possiamo specificare un nome per il file di output, in alternativa verrà usato il nome del primo file da mergiare privato dell'estensione.
+
+### Tabella dei file dell'eseguibile PSX (LBA)
+Su **PSX** *Breath of Fire III* non cerca mai un file per nome: prende il **numero** del file, legge un settore da una tabella cablata nell'eseguibile e chiede quel settore al lettore. La tabella ha una voce per ogni file, nell'ordine in cui i file stanno sul disco, più un'ultima voce con l'inizio della traccia audio (la lunghezza della traccia dati più i 150 settori di pregap). Verificato voce per voce sui due dischi originali: 887 su 887 per **USA**, 889 su 889 per **PAL**.
+
+Finché nessun file cambia dimensione la tabella resta giusta. Appena un **EMI** cresce di un settore, tutti i file dopo di lui scivolano più in là, la tabella resta indietro e il gioco legge i settori di qualcun altro: schermo nero. Per questo la tabella va riscritta dopo aver costruito l'immagine.
+
+La tabella non sta allo stesso indirizzo nelle due versioni (`0x80182444` su **USA**, `0x80182910` su **PAL**), quindi il tool la trova dal contenuto: è l'unica lunga fila di numeri di settore crescenti, e deve avere esattamente una voce in più dei file del disco. Se non la trova, o ne trova più d'una, si ferma invece di tirare a indovinare.
+
+Per confrontare la tabella dell'eseguibile **dentro l'immagine** con il filesystem dell'immagine stessa:
+```
+python bof3tool.py lba check -i "Breath of Fire III (USA) [Italian] (Track 1).bin"
+```
+
+Il risultato che otterremo sarà:
+```
+--- Breath of Fire III Tool (PSX/PSP) ---
+
+Breath of Fire III (USA) [Italian] (Track 1).bin: 887 files, table of 888 entries at 0x80182444 (offset 0xEC444)
+  every entry matches the filesystem, audio track included
+```
+
+Se qualche voce non combacia vengono elencate le prime dieci, con il file a cui appartengono.
+
+Per scrivere in un eseguibile **su disco** i settori letti dal filesystem di un'immagine:
+```
+python bof3tool.py lba write -i "Breath of Fire III (USA) [Italian] (Track 1).bin" -e SLUS_004.22
+```
+
+```
+--- Breath of Fire III Tool (PSX/PSP) ---
+
+SLUS_004.22: wrote 888 entries at 0x80182444, 3 of them changed
+```
+
+L'immagine può essere a settori grezzi da **2352** byte (come la scrive `mkpsxiso`) oppure una `.iso` da **2048**.
+
+Dato che la tabella sta dentro un file del disco, l'immagine va costruita **due volte**: la prima per sapere dove sono finiti i file, poi `lba write` sull'eseguibile, poi la seconda con l'eseguibile aggiornato (che non cambia dimensione, quindi non sposta più niente), e infine `lba check` sull'immagine che si distribuisce.
+
+> **ATTENZIONE**: a differenza degli altri comandi, `lba` esce con un codice **diverso da 0** quando la tabella non combacia o non si trova, così uno script di build può fermarsi (`... || exit 1`).
 
 ## Dump di tutti i testi/grafiche/file binari da modificare
 All'interno del repository viene fornito uno script `dump.sh` bash che automatizza l'esportazione di tutti i contenuti che andranno tradotti/modificati.
